@@ -42,3 +42,248 @@
             clearTimeout(fallbackTimeout);
         }
     }
+
+    /**
+     * SessionUtils Object
+     * Manages session-related functionalities including retrieval, storage, clearing,
+     * appending to URLs, handling session expiry, and initializing session checks.
+     */
+    const SessionUtils = {
+        // Core session data management
+        getSessionId() {
+            try {
+                // Primary session ID retrieval from URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionId = urlParams.get('sessionId');
+                if (sessionId) {
+                    try {
+                        localStorage.setItem('sessionId', sessionId);
+                    } catch (e) {
+                        console.warn('Could not store session ID in localStorage:', e);
+                    }
+                    return sessionId;
+                }
+                
+                // Fallback to localStorage
+                return localStorage.getItem('sessionId');
+            } catch (e) {
+                console.warn('Error getting session ID:', e);
+                return null;
+            }
+        },
+
+        setSessionId(sessionId) {
+            if (sessionId) {
+                try {
+                    localStorage.setItem('sessionId', sessionId);
+                    // Record device information for session tracking
+                    this.recordDeviceInfo(sessionId);
+                } catch (e) {
+                    console.warn('Could not store session ID:', e);
+                }
+            }
+        },
+
+        clearSession() {
+            try {
+                localStorage.removeItem('sessionId');
+                // Clear any cached session data
+                this.clearSessionCache();
+                console.log('Session data cleared successfully');
+            } catch (e) {
+                console.warn('Could not clear session:', e);
+            }
+        },
+
+        // URL and navigation management
+        appendSessionToUrl(url) {
+            const sessionId = this.getSessionId();
+            if (!sessionId) return url;
+            
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}sessionId=${encodeURIComponent(sessionId)}`;
+        },
+
+        handleSessionExpiry() {
+            console.log('Handling session expiry');
+            this.clearSession();
+            
+            // Notify server of session expiry
+            this.notifySessionExpiry();
+            
+            // Add error handling and logging
+            google.script.run
+                .withSuccessHandler((url) => {
+                    console.log('Received login URL:', url);
+                    if (!url) {
+                        console.error('Failed to get login URL');
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                    
+                    const redirectUrl = url + '?page=login';
+                    console.log('Redirecting to:', redirectUrl);
+                    closeOrRedirect(redirectUrl);
+                })
+                .withFailureHandler((error) => {
+                    console.error('Failed to handle session expiry:', error);
+                    window.location.href = '/login.html';
+                })
+                .getWebAppUrl();
+        },
+
+        // Session initialization and validation
+        initializeSession() {
+            const currentUrl = window.location.href;
+            console.log('Initializing session management on:', currentUrl);
+            
+            // Add timestamp to logging
+            console.log('Session initialization started at:', new Date().toISOString());
+            
+            if (this.isLoginPage(currentUrl)) {
+                console.log('On login page, clearing any existing sessions');
+                this.clearSession();
+                return;
+            }
+            
+            const sessionId = this.getSessionId();
+            console.log('Retrieved sessionId:', sessionId ? 'exists' : 'not found');
+            
+            if (!sessionId) {
+                console.log('No session ID found, redirecting to login');
+                this.handleSessionExpiry();
+                return;
+            }
+            
+            console.log('Setting up session monitoring');
+            this.setupSessionCheck(sessionId);
+            this.initializeActivityTracking();
+        },
+
+        isLoginPage(url) {
+            const currentUrl = url || window.location.href;
+            return currentUrl.includes('page=login') || 
+                   (document.getElementById('loginForm') !== null);
+        },
+
+        // Session monitoring and maintenance
+        setupSessionCheck(sessionId) {
+            console.log('Setting up session check');
+            
+            const checkInterval = setInterval(() => {
+                if (document.hidden) return;
+
+                google.script.run
+                    .withSuccessHandler((isValid) => {
+                        if (!isValid) {
+                            console.log('Session check failed, clearing interval and handling expiry');
+                            clearInterval(checkInterval);
+                            this.handleSessionExpiry();
+                        } else {
+                            console.log('Session check passed');
+                            this.updateLastActivity();
+                        }
+                    })
+                    .withFailureHandler((error) => {
+                        console.error('Session check failed:', error);
+                        clearInterval(checkInterval);
+                        this.handleSessionExpiry();
+                    })
+                    .validateSession(sessionId);
+            }, 5 * 60 * 1000); // 5 minute interval
+
+            // Cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                clearInterval(checkInterval);
+            });
+        },
+
+        // Device and activity tracking
+        recordDeviceInfo(sessionId) {
+            try {
+                const deviceInfo = {
+                    userAgent: navigator.userAgent,
+                    timestamp: new Date().toISOString(),
+                    screenSize: `${window.screen.width}x${window.screen.height}`,
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                };
+                
+                google.script.run
+                    .withFailureHandler((error) => {
+                        console.error('Failed to record device info:', error);
+                    })
+                    .recordSessionDevice(sessionId, deviceInfo);
+            } catch (e) {
+                console.warn('Error recording device info:', e);
+            }
+        },
+
+        initializeActivityTracking() {
+            let activityTimeout;
+            
+            const resetTimeout = () => {
+                if (activityTimeout) {
+                    clearTimeout(activityTimeout);
+                }
+                
+                activityTimeout = setTimeout(() => {
+                    console.log('Activity timeout reached');
+                    this.handleSessionExpiry();
+                }, 30 * 60 * 1000); // 30 minute timeout
+            };
+
+            // Track user activity
+            ['mousedown', 'keypress', 'scroll', 'touchstart'].forEach(event => {
+                document.addEventListener(event, () => {
+                    resetTimeout();
+                    this.updateLastActivity();
+                });
+            });
+
+            resetTimeout();
+        },
+
+        // Cache management
+        clearSessionCache() {
+            try {
+                const cacheKeys = ['userPermissions', 'sessionData', 'activityLog'];
+                cacheKeys.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+            } catch (e) {
+                console.warn('Error clearing session cache:', e);
+            }
+        },
+
+        updateLastActivity() {
+            const sessionId = this.getSessionId();
+            if (!sessionId) return;
+
+            google.script.run
+                .withFailureHandler((error) => {
+                    console.error('Failed to update activity:', error);
+                })
+                .updateSessionActivity(sessionId);
+        },
+
+        notifySessionExpiry() {
+            const sessionId = this.getSessionId();
+            if (!sessionId) return;
+
+            google.script.run
+                .withFailureHandler((error) => {
+                    console.error('Failed to notify session expiry:', error);
+                })
+                .logSessionExpiry(sessionId);
+        }
+    };
+
+    // Initialize session management when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded at:', new Date().toISOString());
+        console.log('Initializing session management');
+        SessionUtils.initializeSession();
+    });
+  </script>
+</body>
+</html>
