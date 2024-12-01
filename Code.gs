@@ -1,6 +1,6 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.4
+ * Version: 1.5
  * Last Updated: 2024-12-01 23:40 GMT+2
  *
  * Description:
@@ -3091,6 +3091,32 @@ function processAjaxRequest(action, user, params) {
     default:
       throw new Error('Unknown action: ' + action);
   }
+}
+
+/**
+ * Records device information for session tracking
+ * @param {string} sessionId - Session ID
+ * @param {Object} deviceInfo - Device information
+ */
+function recordSessionDevice(sessionId, deviceInfo) {
+    try {
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+        const sheet = ss.getSheetByName(SESSION_CONFIG.SHEET_NAME);
+        
+        if (!sheet) return;
+
+        const data = sheet.getDataRange().getValues();
+        const sessionRow = data.findIndex(row => 
+            row[SESSION_CONFIG.COLUMNS.SESSION_ID] === sessionId
+        );
+
+        if (sessionRow > -1) {
+            // Update device info in the last column
+            sheet.getRange(sessionRow + 1, 8).setValue(JSON.stringify(deviceInfo));
+        }
+    } catch (error) {
+        console.error('Error recording device info:', error);
+    }
 }
 
 

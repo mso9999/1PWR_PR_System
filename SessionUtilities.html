@@ -1,6 +1,6 @@
 <!-- SessionUtilities.html -->
 <!-- Last Updated: December 1, 2024 23:40 GMT+2 -->
-<!-- Version: 1.2 -->
+<!-- Version: 1.3 -->
 <!-- Description: Client-side session management utilities for the 1PWR PR System -->
 <!-- Author: [Your Name] -->
 
@@ -137,45 +137,40 @@
         initializeSession() {
             const currentUrl = window.location.href;
             console.log('Initializing session management on:', currentUrl);
-            console.log('Session initialization started at:', new Date().toISOString());
             
-            // Add debug logging for URL parameters
-            const urlParams = new URLSearchParams(window.location.search);
-            console.log('URL Parameters:', Object.fromEntries(urlParams));
-            
+            // Don't redirect to login if we're already there
             if (this.isLoginPage(currentUrl)) {
                 console.log('On login page, clearing any existing sessions');
                 this.clearSession();
                 return;
             }
-            
+
             const sessionId = this.getSessionId();
             console.log('Retrieved sessionId:', sessionId);
             
-            // Add validation check
-            if (sessionId) {
-                console.log('Validating session:', sessionId);
-                google.script.run
-                    .withSuccessHandler((isValid) => {
-                        console.log('Session validation result:', isValid);
-                        if (!isValid) {
-                            console.log('Session invalid, redirecting to login');
-                            this.handleSessionExpiry();
-                        }
-                    })
-                    .withFailureHandler((error) => {
-                        console.error('Session validation failed:', error);
-                        this.handleSessionExpiry();
-                    })
-                    .validateSession(sessionId);
-            }
-            
             if (!sessionId) {
                 console.log('No session ID found, redirecting to login');
-                this.handleSessionExpiry();
+                window.location.href = currentUrl + 
+                    (currentUrl.includes('?') ? '&' : '?') + 
+                    'page=login';
                 return;
             }
-            
+
+            // Validate session without redirecting immediately
+            google.script.run
+                .withSuccessHandler((isValid) => {
+                    console.log('Session validation result:', isValid);
+                    if (!isValid && !this.isLoginPage(currentUrl)) {
+                        window.location.href = currentUrl + 
+                            (currentUrl.includes('?') ? '&' : '?') + 
+                            'page=login';
+                    }
+                })
+                .withFailureHandler((error) => {
+                    console.error('Session validation failed:', error);
+                })
+                .validateSession(sessionId);
+
             console.log('Setting up session monitoring');
             this.setupSessionCheck(sessionId);
             this.initializeActivityTracking();
