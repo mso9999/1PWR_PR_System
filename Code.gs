@@ -1,5 +1,8 @@
 /*******************************************************************************************
  * File: Code.gs
+ * Version: 1.3
+ * Last Updated: 2024-12-01 23:40 GMT+2
+ *
  * Description:
  *   This server-side script file contains all the Google Apps Script functions that handle
  *   data processing, retrieval, and storage for the custom purchase request web app. It
@@ -21,7 +24,7 @@
  *   - Data is fetched, processed, and returned to the client-side scripts for dynamic content
  *     rendering.
  *
- * Last Updated: December 1, 2024 22:00 GMT+2
+ *
  *******************************************************************************************/
 
 // Replace with your actual Spreadsheet ID
