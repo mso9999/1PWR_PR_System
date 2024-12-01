@@ -137,9 +137,11 @@
         initializeSession() {
             const currentUrl = window.location.href;
             console.log('Initializing session management on:', currentUrl);
-            
-            // Add timestamp to logging
             console.log('Session initialization started at:', new Date().toISOString());
+            
+            // Add debug logging for URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            console.log('URL Parameters:', Object.fromEntries(urlParams));
             
             if (this.isLoginPage(currentUrl)) {
                 console.log('On login page, clearing any existing sessions');
@@ -148,7 +150,25 @@
             }
             
             const sessionId = this.getSessionId();
-            console.log('Retrieved sessionId:', sessionId ? 'exists' : 'not found');
+            console.log('Retrieved sessionId:', sessionId);
+            
+            // Add validation check
+            if (sessionId) {
+                console.log('Validating session:', sessionId);
+                google.script.run
+                    .withSuccessHandler((isValid) => {
+                        console.log('Session validation result:', isValid);
+                        if (!isValid) {
+                            console.log('Session invalid, redirecting to login');
+                            this.handleSessionExpiry();
+                        }
+                    })
+                    .withFailureHandler((error) => {
+                        console.error('Session validation failed:', error);
+                        this.handleSessionExpiry();
+                    })
+                    .validateSession(sessionId);
+            }
             
             if (!sessionId) {
                 console.log('No session ID found, redirecting to login');

@@ -260,7 +260,10 @@ function handleLogin(event) {
             
             // Store session
             if (typeof SessionUtils !== 'undefined') {
+                console.log('Storing session ID:', response.sessionId);
                 SessionUtils.setSessionId(response.sessionId);
+            } else {
+                console.warn('SessionUtils not available');
             }
 
             // Construct redirect URL with session
@@ -269,7 +272,11 @@ function handleLogin(event) {
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
             console.log('Final redirect URL:', redirectUrl);
-            window.location.href = redirectUrl;
+            
+            // Add delay to ensure session is stored
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, 100);
         })
         .withFailureHandler(function(error) {
             console.error('Login error:', error);
