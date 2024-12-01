@@ -1,4 +1,8 @@
 <!-- SessionUtilities.html -->
+<!-- Last Updated: December 1, 2024 22:00 GMT+2 -->
+<!-- Description: Client-side session management utilities for the 1PWR PR System -->
+<!-- Author: [Your Name] -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -101,25 +105,19 @@
                 .withSuccessHandler((url) => {
                     if (!url) {
                         console.error('Failed to get login URL');
-                        window.location.href = '?page=login';
+                        // Fall back to default login path
+                        window.location.href = '/login.html';
                         return;
                     }
                     
-                    // Add login parameter to ensure proper page load
-                    const loginUrl = url + (url.includes('?') ? '&' : '?') + 'page=login';
-                    closeOrRedirect(loginUrl);
+                    // Use utility function for consistent navigation
+                    closeOrRedirect(url + '?page=login');
                 })
                 .withFailureHandler((error) => {
                     console.error('Failed to handle session expiry:', error);
-                    window.location.href = '?page=login';
+                    window.location.href = '/login.html';
                 })
                 .getWebAppUrl();
-        },
-
-        isLoginPage(url) {
-            const currentUrl = url || window.location.href;
-            return currentUrl.includes('page=login') || 
-                   (document.getElementById('loginForm') !== null);
         },
 
         // Session initialization and validation
@@ -143,6 +141,12 @@
             console.log('Setting up session monitoring');
             this.setupSessionCheck(sessionId);
             this.initializeActivityTracking();
+        },
+
+        isLoginPage(url) {
+            const currentUrl = url || window.location.href;
+            return currentUrl.includes('page=login') || 
+                   (document.getElementById('loginForm') !== null);
         },
 
         // Session monitoring and maintenance

@@ -21,8 +21,7 @@
  *   - Data is fetched, processed, and returned to the client-side scripts for dynamic content
  *     rendering.
  *
- * Author: [Your Name]
- * Date: [Date]
+ * Last Updated: December 1, 2024 22:00 GMT+2
  *******************************************************************************************/
 
 // Replace with your actual Spreadsheet ID
@@ -376,15 +375,13 @@ function doGet(e) {
     console.log('Event object:', JSON.stringify(e));
 
     try {
-        // Handle logout action first
+        // Handle logout first
         if (e.parameter.action === 'logout') {
             const sessionId = e.parameter.sessionId;
             console.log('Handling logout for session:', sessionId);
             if (sessionId) {
                 removeSession(sessionId);
             }
-            const userCache = CacheService.getUserCache();
-            userCache.remove('userSession');
             return HtmlService.createTemplateFromFile('Login')
                 .evaluate()
                 .setTitle('Login - 1PWR Procurement')
@@ -392,27 +389,20 @@ function doGet(e) {
                 .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
         }
 
-        // Get and validate session
+        // If it's an explicit login page request, show login
+        if (e.parameter.page === 'login') {
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        }
+
+        // For all other pages, require valid session
         const sessionId = e.parameter.sessionId;
-        console.log('Checking session ID:', sessionId);
-        
-        // If no session ID and no explicit login page request, show login
-        if (!sessionId && (!e.parameter.page || e.parameter.page !== 'login')) {
-            console.log('No session ID provided - showing login page');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // Get user for session
         const user = sessionId ? getCurrentUser(sessionId) : null;
-        console.log('User from session:', user ? 'Found' : 'Not found');
-
-        // If no valid user and not login page, show login
-        if (!user && (!e.parameter.page || e.parameter.page !== 'login')) {
-            console.log('No valid user found - redirecting to login');
+        
+        if (!user) {
             return HtmlService.createTemplateFromFile('Login')
                 .evaluate()
                 .setTitle('Login - 1PWR Procurement')
@@ -421,7 +411,6 @@ function doGet(e) {
         }
 
         // Handle different page requests
-        let template;
         if (e.parameter.page === 'submitted') {
             console.log('Handling submitted view request');
             return serveSubmittedView(e);
@@ -438,7 +427,7 @@ function doGet(e) {
         if (e.parameter.page === 'form') {
             console.log('Handling form page request');
             try {
-                template = HtmlService.createTemplateFromFile('index');
+                const template = HtmlService.createTemplateFromFile('index');
                 // Add user context to template
                 template.user = user;
                 console.log('Form template created successfully');
@@ -460,7 +449,7 @@ function doGet(e) {
         console.log('Loading dashboard for user');
         try {
             console.log('Creating dashboard template');
-            template = HtmlService.createTemplateFromFile('DashboardWeb');
+            const template = HtmlService.createTemplateFromFile('DashboardWeb');
             // Add user context to template
             template.user = user;
             template.sessionId = sessionId;

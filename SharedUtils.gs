@@ -1,7 +1,7 @@
 /**
  * SharedUtils.gs (Refactored)
  * Part 1 of 3: Core Configuration and Session Management
- * Last Updated: 2024-11-21
+ * Last Updated: December 1, 2024 22:00 GMT+2
  * 
  * This file contains consolidated utility functions for the PR system.
  * Major changes:
@@ -1173,43 +1173,16 @@ function getCurrentUser(sessionId) {
     console.log('Getting current user for session:', sessionId);
     
     try {
-        // First try session ID if provided
-        if (sessionId) {
-            console.log('Validating provided session ID');
-            const sheetSession = validateSession(sessionId);
-            if (sheetSession) {
-                console.log('Found valid sheet session for:', sheetSession.username);
-                return sheetSession;
-            }
-            console.log('Sheet session validation failed');
+        if (!sessionId) {
+            console.log('No session ID provided');
+            return null;
         }
 
-        // Fall back to cache-based session
-        const userCache = CacheService.getUserCache();
-        const sessionData = userCache.get('userSession');
-        console.log('Checking cache-based session');
-
-        if (sessionData) {
-            const session = JSON.parse(sessionData);
-            console.log('Found cached session for:', session.username);
-            
-            const sessionTime = new Date(session.timestamp).getTime();
-            const currentTime = new Date().getTime();
-            const hoursSinceSession = (currentTime - sessionTime) / (1000 * 60 * 60);
-
-            if (hoursSinceSession <= SESSION_CONFIG.SESSION_DURATION / 60) {
-                console.log('Using valid cached session');
-                return {
-                    username: session.username,
-                    role: session.role,
-                    email: Session.getActiveUser().getEmail()
-                };
-            } else {
-                console.log('Cached session expired');
-                userCache.remove('userSession');
-            }
-        } else {
-            console.log('No cached session found');
+        // Only check sheet session
+        const sheetSession = validateSession(sessionId);
+        if (sheetSession) {
+            console.log('Found valid sheet session for:', sheetSession.username);
+            return sheetSession;
         }
 
         console.log('No valid session found');
@@ -1220,66 +1193,71 @@ function getCurrentUser(sessionId) {
     }
 }
 
-// Helper function to validate sheet-based session
 function validateSession(sessionId) {
-    console.log('Validating session:', sessionId);
     if (!sessionId) return null;
-
+    
     try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         const sheet = ss.getSheetByName(SESSION_CONFIG.SHEET_NAME);
-
         if (!sheet) {
-            console.error('Session sheet not found');
+            console.warn('Session sheet not found');
             return null;
         }
 
         const data = sheet.getDataRange().getValues();
-        const sessions = data.slice(1); // Skip header row
-
-        console.log('Looking for session in sheet');
-        const sessionIndex = sessions.findIndex(row =>
+        const sessionRow = data.find(row => 
             row[SESSION_CONFIG.COLUMNS.SESSION_ID] === sessionId &&
             row[SESSION_CONFIG.COLUMNS.STATUS] === SESSION_CONFIG.STATUS.ACTIVE
         );
 
-        if (sessionIndex === -1) {
-            console.log('Session not found or not active');
+        if (!sessionRow) {
+            console.log('No active session found for ID:', sessionId);
             return null;
         }
 
-        const session = sessions[sessionIndex];
-        const lastActivity = new Date(session[SESSION_CONFIG.COLUMNS.LAST_ACTIVITY]);
+        // Check session expiry
+        const lastActivity = new Date(sessionRow[SESSION_CONFIG.COLUMNS.LAST_ACTIVITY]);
         const now = new Date();
         const inactiveMinutes = (now - lastActivity) / (1000 * 60);
 
         if (inactiveMinutes > SESSION_CONFIG.INACTIVITY_TIMEOUT) {
             console.log('Session expired due to inactivity');
-            const sessionRow = sessionIndex + 2;
-            sheet.getRange(sessionRow, SESSION_CONFIG.COLUMNS.STATUS + 1)
-                .setValue(SESSION_CONFIG.STATUS.EXPIRED);
+            // Update session status to expired
+            markSessionExpired(sessionId);
             return null;
         }
 
-        // Update last activity
-        const sessionRow = sessionIndex + 2;
-        sheet.getRange(sessionRow, SESSION_CONFIG.COLUMNS.LAST_ACTIVITY + 1)
-            .setValue(now);
-
-        console.log('Session validated successfully');
         return {
-            username: session[SESSION_CONFIG.COLUMNS.USERNAME],
-            email: session[SESSION_CONFIG.COLUMNS.EMAIL],
-            role: session[SESSION_CONFIG.COLUMNS.ROLE],
-            lastActivity: now
+            username: sessionRow[SESSION_CONFIG.COLUMNS.USERNAME],
+            email: sessionRow[SESSION_CONFIG.COLUMNS.EMAIL],
+            role: sessionRow[SESSION_CONFIG.COLUMNS.ROLE],
+            sessionId: sessionId
         };
 
     } catch (error) {
-        console.error('Session validation error:', error);
+        console.error('Error validating session:', error);
         return null;
     }
 }
 
+function markSessionExpired(sessionId) {
+    try {
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+        const sheet = ss.getSheetByName(SESSION_CONFIG.SHEET_NAME);
+        if (!sheet) return;
+
+        const data = sheet.getDataRange().getValues();
+        const rowIndex = data.findIndex(row => row[SESSION_CONFIG.COLUMNS.SESSION_ID] === sessionId);
+        
+        if (rowIndex > -1) {
+            sheet.getRange(rowIndex + 1, SESSION_CONFIG.COLUMNS.STATUS + 1)
+                .setValue(SESSION_CONFIG.STATUS.EXPIRED);
+            console.log('Session marked as expired:', sessionId);
+        }
+    } catch (error) {
+        console.error('Error marking session expired:', error);
+    }
+}
 
 /**
  * Gets redirect URL for secure navigation
