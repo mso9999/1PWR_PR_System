@@ -378,119 +378,25 @@ function doGet(e) {
     console.log('Event object:', JSON.stringify(e));
 
     try {
-        // If no parameters at all, default to login page
-        if (!e.parameter || Object.keys(e.parameter).length === 0) {
-            console.log('No parameters - serving login page');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // Handle logout
-        if (e.parameter.action === 'logout') {
-            const sessionId = e.parameter.sessionId;
-            console.log('Handling logout for session:', sessionId);
-            if (sessionId) {
-                removeSession(sessionId);
-            }
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // If it's an explicit login page request, show login
-        if (e.parameter.page === 'login') {
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // For all other pages, require valid session
-        const sessionId = e.parameter.sessionId;
-        const user = sessionId ? getCurrentUser(sessionId) : null;
+        // Create template
+        const template = HtmlService.createTemplateFromFile('Login');
         
-        if (!user) {
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // Handle different page requests
-        if (e.parameter.page === 'submitted') {
-            console.log('Handling submitted view request');
-            return serveSubmittedView(e);
-        }
-
-        if (e.parameter.page === 'prview') {
-            console.log('Handling PR view request');
-            console.log('PR Number:', e.parameter.pr);
-            const result = handlePRView(e.parameter.pr);
-            console.log('PR view handler completed');
-            return result;
-        }
-
-        if (e.parameter.page === 'form') {
-            console.log('Handling form page request');
-            try {
-                const template = HtmlService.createTemplateFromFile('index');
-                // Add user context to template
-                template.user = user;
-                console.log('Form template created successfully');
-                const evaluated = template
-                    .evaluate()
-                    .setTitle('Submit Purchase Request')
-                    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-                    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-                console.log('Form template evaluated successfully');
-                return evaluated;
-            } catch (formError) {
-                console.log('ERROR: Error creating form:', formError.toString());
-                throw formError;
-            }
-        }
-
-        // Default to dashboard
-        console.log('Loading dashboard for user');
-        try {
-            console.log('Creating dashboard template');
-            const template = HtmlService.createTemplateFromFile('DashboardWeb');
-            // Add user context to template
-            template.user = user;
-            template.sessionId = sessionId;
-
-            const deploymentUrl = ScriptApp.getService().getUrl();
-            console.log('Deployment URL:', deploymentUrl);
-            template.deploymentUrl = deploymentUrl;
-
-            console.log('Evaluating dashboard template');
-            const evaluated = template
-                .evaluate()
-                .setTitle('Dashboard')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-            console.log('Dashboard template evaluated successfully');
-            return evaluated;
-        } catch (dashError) {
-            console.log('ERROR: Error creating dashboard:', dashError.toString());
-            console.log('Error stack:', dashError.stack);
-            throw dashError;
-        }
+        // Evaluate template
+        const output = template.evaluate()
+            .setTitle('Login - 1PWR Procurement')
+            .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+            .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+            
+        // Set Content Security Policy header
+        output.addHeader('Content-Security-Policy', 
+            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval';");
+            
+        return output;
 
     } catch (error) {
         console.error('Error in doGet:', error);
         return createErrorPage(error.message);
-    } finally {
-        console.log('==================== END doGet ====================');
     }
 }
 
