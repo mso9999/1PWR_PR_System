@@ -2,8 +2,8 @@
 /*******************************************************************************
 * File: Login.html
 * Purpose: Authentication interface for 1PWR Procurement System
-* Version: 1.1
-* Last Updated: 2024-11-20
+* Version: 1.2
+* Last Updated: 2024-12-01 23:40 GMT+2
 *
 * Integration Points:
 * ------------------
@@ -234,89 +234,50 @@ function handleLogin(event) {
     const errorDiv = document.getElementById('error');
     const loadingDiv = document.getElementById('loading');
     const loginButton = document.getElementById('loginButton');
-    const resetDialog = document.getElementById('resetDialog');
 
-    // Preserve form state for potential password reset
-    const currentFormState = {
-        username: username,
-        hasActivePasswordReset: resetDialog && !resetDialog.classList.contains('hidden')
-    };
-
-    // Clear previous errors and show loading state
+    // Clear previous errors and show loading
     errorDiv.classList.add('hidden');
     loadingDiv.classList.remove('hidden');
     loginButton.disabled = true;
 
-    // First step: Verify user credentials
+    console.log('Sending verification request');
+    
     google.script.run
-        .withFailureHandler(function(error) {
-            console.error('Login failed:', error);
-            showError(error.message || 'Login failed. Please try again.');
-            loadingDiv.classList.add('hidden');
-            loginButton.disabled = false;
-            isLoginInProgress = false;
-
-            // Preserve password reset state if active
-            if (currentFormState.hasActivePasswordReset) {
-                showResetPassword();
-            }
-        })
-        .withSuccessHandler(function(result) {
-            console.log('Received authentication response');
-
-            if (!result.success) {
-                handleLoginError(result);
+        .withSuccessHandler(function(response) {
+            console.log('Received server response:', response);
+            
+            if (!response.success) {
+                console.log('Login failed:', response.message);
+                errorDiv.textContent = response.message || 'Login failed';
+                errorDiv.classList.remove('hidden');
+                loadingDiv.classList.add('hidden');
+                loginButton.disabled = false;
+                isLoginInProgress = false;
                 return;
             }
 
-            try {
-                // Store session ID using SessionUtils
-                if (result.sessionId) {
-                    if (!window.SessionUtils) {
-                        throw new Error('Session management system not initialized');
-                    }
-                    SessionUtils.setSessionId(result.sessionId);
-
-                    // Handle navigation with session management
-                    google.script.run
-                        .withSuccessHandler(function(redirectInfo) {
-                            if (!redirectInfo || !redirectInfo.url) {
-                                handleLoginError({ message: 'Failed to get redirect URL' });
-                                return;
-                            }
-
-                            try {
-                                // Update loading state
-                                loadingDiv.textContent = 'Preparing dashboard...';
-
-                                // Clear any existing password reset state
-                                if (window.resetInProgress) {
-                                    hideResetPassword();
-                                }
-
-                                // Perform navigation with session
-                                const redirectUrl = SessionUtils.appendSessionToUrl(redirectInfo.url);
-                                closeOrRedirect(redirectUrl);
-
-                            } catch (e) {
-                                console.error('Error during navigation:', e);
-                                handleLoginError({ message: 'Navigation error occurred' });
-                            }
-                        })
-                        .withFailureHandler(function(error) {
-                            console.error('Redirect URL request failed:', error);
-                            handleLoginError({ message: 'Failed to complete login process' });
-                        })
-                        .getRedirectUrl();
-
-                } else {
-                    handleLoginError({ message: 'Invalid session data received' });
-                }
-
-            } catch (e) {
-                console.error('Error during login success handling:', e);
-                handleLoginError({ message: 'Error during login process' });
+            console.log('Login successful, redirecting to:', response.redirectUrl);
+            
+            // Store session
+            if (typeof SessionUtils !== 'undefined') {
+                SessionUtils.setSessionId(response.sessionId);
             }
+
+            // Construct redirect URL with session
+            const redirectUrl = response.redirectUrl + 
+                (response.redirectUrl.includes('?') ? '&' : '?') + 
+                'sessionId=' + encodeURIComponent(response.sessionId);
+
+            console.log('Final redirect URL:', redirectUrl);
+            window.location.href = redirectUrl;
+        })
+        .withFailureHandler(function(error) {
+            console.error('Login error:', error);
+            errorDiv.textContent = 'An error occurred during login';
+            errorDiv.classList.remove('hidden');
+            loadingDiv.classList.add('hidden');
+            loginButton.disabled = false;
+            isLoginInProgress = false;
         })
         .verifyUser(username, password);
 }

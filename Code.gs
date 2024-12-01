@@ -375,7 +375,17 @@ function doGet(e) {
     console.log('Event object:', JSON.stringify(e));
 
     try {
-        // Handle logout first
+        // If no parameters at all, default to login page
+        if (!e.parameter || Object.keys(e.parameter).length === 0) {
+            console.log('No parameters - serving login page');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        }
+
+        // Handle logout
         if (e.parameter.action === 'logout') {
             const sessionId = e.parameter.sessionId;
             console.log('Handling logout for session:', sessionId);
