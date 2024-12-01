@@ -1,6 +1,6 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.5
+ * Version: 1.6
  * Last Updated: 2024-12-01 23:40 GMT+2
  *
  * Description:
@@ -3116,6 +3116,24 @@ function recordSessionDevice(sessionId, deviceInfo) {
         }
     } catch (error) {
         console.error('Error recording device info:', error);
+    }
+}
+
+/**
+ * Handles secure navigation between pages
+ * @param {string} url - URL to navigate to
+ * @returns {boolean} Success status
+ */
+function navigateToUrl(url) {
+    try {
+        // Log navigation attempt
+        console.log('Navigation requested to:', url);
+        
+        // Return true to trigger client-side navigation
+        return true;
+    } catch (error) {
+        console.error('Navigation error:', error);
+        return false;
     }
 }
 
