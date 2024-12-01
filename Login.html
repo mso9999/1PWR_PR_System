@@ -2,7 +2,7 @@
 /*******************************************************************************
 * File: Login.html
 * Purpose: Authentication interface for 1PWR Procurement System
-* Version: 1.3
+* Version: 1.4
 * Last Updated: 2024-12-01 23:40 GMT+2
 *
 * Integration Points:
@@ -273,10 +273,8 @@ function handleLogin(event) {
 
             console.log('Final redirect URL:', redirectUrl);
             
-            // Add delay to ensure session is stored
-            setTimeout(() => {
-                window.location.href = redirectUrl;
-            }, 100);
+            // Force top-level navigation
+            window.top.location.href = redirectUrl;
         })
         .withFailureHandler(function(error) {
             console.error('Login error:', error);
