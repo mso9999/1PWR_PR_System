@@ -1,6 +1,6 @@
 <!-- SessionUtilities.html -->
 <!-- Last Updated: December 1, 2024 23:40 GMT+2 -->
-<!-- Version: 1.5 -->
+<!-- Version: 1.6 -->
 <!-- Description: Client-side session management utilities for the 1PWR PR System -->
 <!-- Author: [Your Name] -->
 
@@ -176,7 +176,12 @@
                 google.script.run
                     .withSuccessHandler((url) => {
                         console.log('Got login URL:', url);
-                        google.script.host.setLocation(url + '?page=login');
+                        try {
+                            window.top.location.href = url + '?page=login';
+                        } catch (e) {
+                            console.warn('Navigation fallback:', e);
+                            window.location.href = url + '?page=login';
+                        }
                     })
                     .getWebAppUrl();
                 return;
@@ -189,7 +194,12 @@
                     if (!isValid && !this.isLoginPage(currentUrl)) {
                         google.script.run
                             .withSuccessHandler((url) => {
-                                google.script.host.setLocation(url + '?page=login');
+                                try {
+                                    window.top.location.href = url + '?page=login';
+                                } catch (e) {
+                                    console.warn('Navigation fallback:', e);
+                                    window.location.href = url + '?page=login';
+                                }
                             })
                             .getWebAppUrl();
                     }
