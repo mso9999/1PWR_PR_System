@@ -423,11 +423,13 @@ function doGet(e) {
     }
 }
 
+// Version: 4.0
 function serveLoginPage() {
     return HtmlService.createTemplateFromFile('Login')
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.NATIVE)
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
@@ -444,7 +446,8 @@ function serveDashboard(e, user) {
         return template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.NATIVE)  // Changed to NATIVE
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
     } catch (error) {
         console.error('Error serving dashboard:', error);
@@ -458,8 +461,8 @@ function serveFormPage(e, user) {
     return template
         .evaluate()
         .setTitle('Submit Purchase Request')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
@@ -2180,7 +2183,7 @@ function verifyPRTracker() {
     // Fix the syntax error in the comparison
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    ); 
+    )); 
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');
