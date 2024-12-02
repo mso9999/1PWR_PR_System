@@ -440,7 +440,7 @@ function serveLoginPage() {
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
-// Version: 2.5
+// Version: 2.6
 function serveDashboard(e, user) {
     console.log('Loading dashboard for user:', user.username);
     try {

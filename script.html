@@ -1127,19 +1127,14 @@ function copyToPreview() {
 
 function updatePreview() {
   const previewElement = document.getElementById('preview');
-  if (!previewElement) {
-    console.log('Preview element not found, skipping update');
+  const previewContent = document.getElementById('previewContent');
+  
+  if (!previewElement || !previewContent) {
+    console.log('Preview elements not found, skipping update');
     return;
   }
   
   try {
-    // Preserve existing preview functionality
-    const previewContent = document.getElementById('previewContent');
-    if (!previewContent) {
-        console.warn('Preview content element not found');
-        return;
-    }
-    
     // Clear existing content
     previewContent.innerHTML = '';
     
@@ -1320,19 +1315,27 @@ function updatePreview() {
    *   Initializes the preview, fetches the PR number, and sets up any required default states.
    *******************************************************************************************/
   document.addEventListener('DOMContentLoaded', function() {
-    updatePreview();
-
-    // Fetch and display the PR number
-    google.script.run.withSuccessHandler(function(prNumber) {
-      document.getElementById('prNumber').textContent = prNumber;
-      formData.prNumber = prNumber; // Store in formData if needed
-    }).getPRNumber();
-
-    // Disable Section 4 button by default
+    const submitButton = document.querySelector('#rightSide button[onclick="submitForm()"]');
     const section4Button = document.querySelector('#sectionMenu button[onclick="showSection(\'section4\')"]');
-    section4Button.disabled = true;
+    const prNumberElement = document.getElementById('prNumber');
+    
+    if (submitButton) {
+        submitButton.disabled = true;
+    }
+    
+    if (section4Button) {
+        section4Button.disabled = true;
+    }
+    
+    if (prNumberElement) {
+        google.script.run.withSuccessHandler(function(prNumber) {
+            prNumberElement.textContent = prNumber;
+            formData.prNumber = prNumber;
+        }).getPRNumber();
+    }
 
-    updateSubmitButtonState(); // Initial state
+    updatePreview();
+    updateSubmitButtonState();
   });
 
   /**
