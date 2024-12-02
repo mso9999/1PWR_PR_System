@@ -90,24 +90,25 @@
             return `${url}${separator}sessionId=${encodeURIComponent(sessionId)}`;
         },
 
+        handleNavigation(url) {
+            try {
+                // Always use top-level navigation
+                window.top.location.href = url;
+            } catch (e) {
+                console.warn('Top navigation failed:', e);
+                // Fallback to current window
+                window.location.href = url;
+            }
+        },
+
         handleSessionExpiry() {
             console.log('Handling session expiry');
             this.clearSession();
             
-            // Notify server of session expiry
-            this.notifySessionExpiry();
-            
-            // Use google.script.run for navigation
             google.script.run
                 .withSuccessHandler((url) => {
-                    try {
-                        const loginUrl = url + '?page=login';
-                        // Use window.location.replace for consistent navigation
-                        window.location.replace(loginUrl);
-                    } catch (e) {
-                        console.warn('Navigation error:', e);
-                        window.location.reload();
-                    }
+                    const loginUrl = url + '?page=login';
+                    this.handleNavigation(loginUrl);
                 })
                 .withFailureHandler((error) => {
                     console.error('Failed to get login URL:', error);

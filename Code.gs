@@ -375,58 +375,24 @@ function verifyExecutionContext() {
 function doGet(e) {
     console.log('==================== START doGet ====================');
     console.log('Request received at:', new Date().toISOString());
-    console.log('Event object:', JSON.stringify(e));
-
+    
     try {
-        // If no parameters at all, default to login page
-        if (!e.parameter || Object.keys(e.parameter).length === 0) {
-            return serveLoginPage();
-        }
+        const output = HtmlService.createTemplateFromFile('Login')
+            .evaluate()
+            .setTitle('1PWR Procurement')
+            .setSandboxMode(HtmlService.SandboxMode.NATIVE)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)
+            .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 
-        // Handle logout
-        if (e.parameter.action === 'logout') {
-            const sessionId = e.parameter.sessionId;
-            console.log('Handling logout for session:', sessionId);
-            if (sessionId) {
-                removeSession(sessionId);
-            }
-            return serveLoginPage();
-        }
-
-        // If it's an explicit login page request, show login
-        if (e.parameter.page === 'login') {
-            return serveLoginPage();
-        }
-
-        // For all other pages, require valid session
-        const sessionId = e.parameter.sessionId;
-        const user = sessionId ? getCurrentUser(sessionId) : null;
+        // Set consistent security headers
+        output.addHeader('Content-Security-Policy', 
+            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval';");
+        output.addHeader('X-Frame-Options', 'SAMEORIGIN');
         
-        if (!user) {
-            return serveLoginPage();
-        }
-
-        // Handle different page requests
-        if (e.parameter.page === 'submitted') {
-            console.log('Handling submitted view request');
-            return serveSubmittedView(e);
-        }
-
-        if (e.parameter.page === 'prview') {
-            console.log('Handling PR view request');
-            return handlePRView(e.parameter.pr);
-        }
-
-        if (e.parameter.page === 'form') {
-            return serveFormPage(e, user);
-        }
-
-        // Default to dashboard
-        return serveDashboard(e, user);
-
+        return output;
     } catch (error) {
         console.error('Error in doGet:', error);
-        return createErrorPage(error.message);
+        return HtmlService.createHtmlOutput(error.message);
     }
 }
 

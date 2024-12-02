@@ -215,18 +215,9 @@ function handleLogin(event) {
     event.preventDefault();
     if (isLoginInProgress) return;
 
-    console.log('Starting login process');
     isLoginInProgress = true;
-
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    const errorDiv = document.getElementById('error');
-    const loadingDiv = document.getElementById('loading');
-    const loginButton = document.getElementById('loginButton');
-
-    errorDiv.classList.add('hidden');
-    loadingDiv.classList.remove('hidden');
-    loginButton.disabled = true;
 
     google.script.run
         .withSuccessHandler(function(response) {
@@ -243,8 +234,8 @@ function handleLogin(event) {
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            // Use window.location.replace for consistent navigation
-            window.location.replace(redirectUrl);
+            // Use SessionUtils for consistent navigation
+            SessionUtils.handleNavigation(redirectUrl);
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
