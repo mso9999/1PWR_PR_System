@@ -2,7 +2,7 @@
 /*******************************************************************************
 * File: Login.html
 * Purpose: Authentication interface for 1PWR Procurement System
-* Version: 2.1
+* Version: 2.2
 * Last Updated: 2024-12-01 23:40 GMT+2
 *
 * Integration Points:
@@ -243,17 +243,13 @@ function handleLogin(event) {
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            // Use google.script.host for navigation
-            google.script.host.close();
-            // Fallback chain
-            setTimeout(() => {
-                try {
-                    window.top.location.href = redirectUrl;
-                } catch (e) {
-                    console.warn('Top navigation failed:', e);
-                    window.location.href = redirectUrl;
-                }
-            }, 100);
+            // Use direct navigation with fallback
+            try {
+                window.top.location.href = redirectUrl;
+            } catch (e) {
+                console.warn('Top navigation failed:', e);
+                window.location.href = redirectUrl;
+            }
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
