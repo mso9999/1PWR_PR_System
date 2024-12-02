@@ -242,7 +242,12 @@ function handleLogin(event) {
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            window.location.href = redirectUrl;
+            // Use top-level navigation to avoid frame restrictions
+            if (window.top) {
+                window.top.location.href = redirectUrl;
+            } else {
+                window.location.href = redirectUrl;
+            }
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');

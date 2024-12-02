@@ -21,8 +21,12 @@
     function closeOrRedirect(redirectUrl) {
         console.log('Attempting navigation to:', redirectUrl);
         try {
-            // For same-origin navigation
-            window.location.replace(redirectUrl);
+            // Try top-level navigation first
+            if (window.top) {
+                window.top.location.href = redirectUrl;
+            } else {
+                window.location.replace(redirectUrl);
+            }
         } catch (e) {
             console.warn('Navigation fallback:', e);
             window.location.href = redirectUrl;
