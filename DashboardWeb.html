@@ -47,11 +47,14 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize session first
       const urlParams = new URLSearchParams(window.location.search);
       const sessionId = urlParams.get('sessionId');
       if (sessionId && typeof SessionUtils !== 'undefined') {
         SessionUtils.setSessionId(sessionId);
       }
+      
+      // Then run existing dashboard initialization
       if (typeof initializeDashboard === 'function') {
         initializeDashboard();
       }
