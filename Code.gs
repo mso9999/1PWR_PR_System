@@ -1,6 +1,6 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.6
+ * Version: 1.8
  * Last Updated: 2024-12-01 23:40 GMT+2
  *
  * Description:
@@ -378,6 +378,17 @@ function doGet(e) {
     console.log('Event object:', JSON.stringify(e));
 
     try {
+        // If no parameters at all, default to login page
+        if (!e.parameter || Object.keys(e.parameter).length === 0) {
+            console.log('No parameters - serving login page');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+                .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+        }
+
         // Create template
         const template = HtmlService.createTemplateFromFile('Login');
         
