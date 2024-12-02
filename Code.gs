@@ -430,17 +430,7 @@ function doGet(e) {
     }
 }
 
-// Version: 3.1
-function serveLoginPage() {
-    return HtmlService.createTemplateFromFile('Login')
-        .evaluate()
-        .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-}
-
-// Version: 3.2
+// Version: 3.3
 function serveDashboard(e, user) {
     console.log('Loading dashboard for user:', user.username);
     try {
@@ -452,12 +442,21 @@ function serveDashboard(e, user) {
         return template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setSandboxMode(HtmlService.SandboxMode.NATIVE)  // Changed to NATIVE
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
     }
+}
+
+function serveLoginPage() {
+    return HtmlService.createTemplateFromFile('Login')
+        .evaluate()
+        .setTitle('Login - 1PWR Procurement')
+        .setSandboxMode(HtmlService.SandboxMode.NATIVE)  // Changed to NATIVE
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
 function serveFormPage(e, user) {

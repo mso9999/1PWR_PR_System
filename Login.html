@@ -243,13 +243,8 @@ function handleLogin(event) {
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            // Use direct navigation with fallback
-            try {
-                window.top.location.href = redirectUrl;
-            } catch (e) {
-                console.warn('Top navigation failed:', e);
-                window.location.href = redirectUrl;
-            }
+            // Use window.location.replace for consistent navigation
+            window.location.replace(redirectUrl);
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
