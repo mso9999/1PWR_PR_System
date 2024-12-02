@@ -21,15 +21,17 @@
     function closeOrRedirect(redirectUrl) {
         console.log('Attempting navigation to:', redirectUrl);
         try {
-            // Try top-level navigation first
-            if (window.top) {
-                window.top.location.href = redirectUrl;
-            } else {
-                window.location.replace(redirectUrl);
-            }
+            // Try to close dialog and navigate
+            google.script.host.close();
+            window.open(redirectUrl, '_top');
         } catch (e) {
             console.warn('Navigation fallback:', e);
-            window.location.href = redirectUrl;
+            try {
+                window.location.replace(redirectUrl);
+            } catch (e2) {
+                console.warn('Replace fallback failed:', e2);
+                window.location.href = redirectUrl;
+            }
         }
     }
 

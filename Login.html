@@ -43,6 +43,9 @@
 <html>
 <head>
     <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;">
     <?!= include('SecurityHeaders'); ?>
     <?!= include('SessionUtilities'); ?>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -238,15 +241,18 @@ function handleLogin(event) {
                 SessionUtils.setSessionId(response.sessionId);
             }
 
-            const redirectUrl = response.redirectUrl + 
-                (response.redirectUrl.includes('?') ? '&' : '?') + 
-                'sessionId=' + encodeURIComponent(response.sessionId);
-
-            // Use top-level navigation to avoid frame restrictions
-            if (window.top) {
-                window.top.location.href = redirectUrl;
-            } else {
-                window.location.href = redirectUrl;
+            // Try to close dialog and navigate using google.script.host
+            try {
+                google.script.host.close();
+                const redirectUrl = response.redirectUrl + 
+                    (response.redirectUrl.includes('?') ? '&' : '?') + 
+                    'sessionId=' + encodeURIComponent(response.sessionId);
+                window.open(redirectUrl, '_top');
+            } catch (e) {
+                console.warn('Navigation fallback:', e);
+                window.location.href = response.redirectUrl + 
+                    (response.redirectUrl.includes('?') ? '&' : '?') + 
+                    'sessionId=' + encodeURIComponent(response.sessionId);
             }
         })
         .withFailureHandler(function(error) {
