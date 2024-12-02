@@ -423,15 +423,21 @@ function doGet(e) {
     }
 }
 
-// Version: 4.0
+// Version: 4.1
 function serveLoginPage() {
-    return HtmlService.createTemplateFromFile('Login')
+    const output = HtmlService.createTemplateFromFile('Login')
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+        
+    // Add security headers server-side
+    output.addHeader('Content-Security-Policy', 
+        "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;");
+    output.addHeader('X-Frame-Options', 'ALLOWALL');
+    
+    return output;
 }
 
 // Version: 3.3
@@ -443,12 +449,18 @@ function serveDashboard(e, user) {
         template.sessionId = e.parameter.sessionId;
         template.deploymentUrl = ScriptApp.getService().getUrl();
         
-        return template
+        const output = template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
             .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+            
+        // Add security headers server-side
+        output.addHeader('Content-Security-Policy', 
+            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;");
+        output.addHeader('X-Frame-Options', 'ALLOWALL');
+        
+        return output;
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
