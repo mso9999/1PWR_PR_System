@@ -423,19 +423,18 @@ function doGet(e) {
     }
 }
 
-// Version: 4.1
+// Version: 4.2
 function serveLoginPage() {
     const output = HtmlService.createTemplateFromFile('Login')
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setSandboxMode(HtmlService.SandboxMode.EMULATED)  // Changed from IFRAME
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
         
     // Add security headers server-side
     output.addHeader('Content-Security-Policy', 
-        "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;");
-    output.addHeader('X-Frame-Options', 'ALLOWALL');
+        "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';");
     
     return output;
 }
@@ -452,13 +451,12 @@ function serveDashboard(e, user) {
         const output = template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setSandboxMode(HtmlService.SandboxMode.EMULATED)  // Changed from IFRAME
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
             
         // Add security headers server-side
         output.addHeader('Content-Security-Policy', 
-            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors *;");
-        output.addHeader('X-Frame-Options', 'ALLOWALL');
+            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';");
         
         return output;
     } catch (error) {
