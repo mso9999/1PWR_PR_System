@@ -430,7 +430,7 @@ function doGet(e) {
     }
 }
 
-// Version: 3.0
+// Version: 3.1
 function serveLoginPage() {
     return HtmlService.createTemplateFromFile('Login')
         .evaluate()
@@ -2187,7 +2187,7 @@ function verifyPRTracker() {
     // Fix the syntax error in the comparison
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    );  // Remove the extra parenthesis
+    ));  // Remove the extra parenthesis
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');

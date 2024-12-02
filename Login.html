@@ -2,7 +2,7 @@
 /*******************************************************************************
 * File: Login.html
 * Purpose: Authentication interface for 1PWR Procurement System
-* Version: 2.0
+* Version: 2.1
 * Last Updated: 2024-12-01 23:40 GMT+2
 *
 * Integration Points:
@@ -213,11 +213,7 @@ let isLoginInProgress = false;
 
 function handleLogin(event) {
     event.preventDefault();
-
-    if (isLoginInProgress) {
-        console.log('Login already in progress');
-        return;
-    }
+    if (isLoginInProgress) return;
 
     console.log('Starting login process');
     isLoginInProgress = true;
@@ -228,57 +224,39 @@ function handleLogin(event) {
     const loadingDiv = document.getElementById('loading');
     const loginButton = document.getElementById('loginButton');
 
-    // Clear previous errors and show loading
     errorDiv.classList.add('hidden');
     loadingDiv.classList.remove('hidden');
     loginButton.disabled = true;
 
-    console.log('Sending verification request');
-    
     google.script.run
         .withSuccessHandler(function(response) {
-            console.log('Received server response:', response);
-            
             if (!response.success) {
-                console.log('Login failed:', response.message);
-                errorDiv.textContent = response.message || 'Login failed';
-                errorDiv.classList.remove('hidden');
-                loadingDiv.classList.add('hidden');
-                loginButton.disabled = false;
-                isLoginInProgress = false;
+                handleLoginError(response.message || 'Login failed');
                 return;
             }
 
-            console.log('Login successful, redirecting to:', response.redirectUrl);
-            
-            // Store session
             if (typeof SessionUtils !== 'undefined') {
-                console.log('Storing session ID:', response.sessionId);
                 SessionUtils.setSessionId(response.sessionId);
             }
 
-            // Construct redirect URL with session
             const redirectUrl = response.redirectUrl + 
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            console.log('Final redirect URL:', redirectUrl);
-            
-            // Direct navigation to top window
-            try {
-                window.top.location.href = redirectUrl;
-            } catch (e) {
-                console.warn('Top navigation failed:', e);
-                window.location.href = redirectUrl;
-            }
+            // Use google.script.host for navigation
+            google.script.host.close();
+            // Fallback chain
+            setTimeout(() => {
+                try {
+                    window.top.location.href = redirectUrl;
+                } catch (e) {
+                    console.warn('Top navigation failed:', e);
+                    window.location.href = redirectUrl;
+                }
+            }, 100);
         })
         .withFailureHandler(function(error) {
-            console.error('Login error:', error);
-            errorDiv.textContent = 'An error occurred during login';
-            errorDiv.classList.remove('hidden');
-            loadingDiv.classList.add('hidden');
-            loginButton.disabled = false;
-            isLoginInProgress = false;
+            handleLoginError('An error occurred during login');
         })
         .verifyUser(username, password);
 }
