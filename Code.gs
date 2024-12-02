@@ -440,7 +440,8 @@ function serveLoginPage() {
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
-// Version: 2.7
+// Version: 2.8
+// Only modify serveDashboard function
 function serveDashboard(e, user) {
     console.log('Loading dashboard for user:', user.username);
     try {
@@ -449,17 +450,12 @@ function serveDashboard(e, user) {
         template.sessionId = e.parameter.sessionId;
         template.deploymentUrl = ScriptApp.getService().getUrl();
         
-        const output = template.evaluate()
+        return template
+            .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)  // Changed from ALLOWALL
             .setSandboxMode(HtmlService.SandboxMode.IFRAME)
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-            
-        // Add CSP header server-side
-        output.addHeader('Content-Security-Policy', 
-            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval';");
-            
-        return output;
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
