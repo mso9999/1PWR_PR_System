@@ -47,16 +47,32 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize session first
-      const urlParams = new URLSearchParams(window.location.search);
-      const sessionId = urlParams.get('sessionId');
-      if (sessionId && typeof SessionUtils !== 'undefined') {
-        SessionUtils.setSessionId(sessionId);
-      }
-      
-      // Then run existing dashboard initialization
-      if (typeof initializeDashboard === 'function') {
-        initializeDashboard();
+      try {
+        // Initialize session first
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('sessionId');
+        if (sessionId && typeof SessionUtils !== 'undefined') {
+          SessionUtils.setSessionId(sessionId);
+        }
+        
+        // Then run existing dashboard initialization
+        if (typeof initializeDashboard === 'function') {
+          initializeDashboard();
+        }
+        
+        // Initialize any buttons with error handling
+        try {
+          const buttons = document.querySelectorAll('button');
+          buttons.forEach(button => {
+            if (button && button.hasAttribute('data-initial-state')) {
+              button.disabled = button.getAttribute('data-initial-state') === 'disabled';
+            }
+          });
+        } catch (buttonError) {
+          console.warn('Error initializing buttons:', buttonError);
+        }
+      } catch (e) {
+        console.warn('Error in dashboard initialization:', e);
       }
     });
   </script>

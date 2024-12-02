@@ -1380,11 +1380,20 @@ function checkAllFieldsComplete() {
  * Updates submit button appearance based on field completion
  */
 function updateSubmitButtonState() {
-  const submitButton = document.querySelector('#rightSide button[onclick="submitForm()"]');
-  if (checkAllFieldsComplete()) {
-    submitButton.classList.add('all-fields-complete');
-  } else {
-    submitButton.classList.remove('all-fields-complete');
+  try {
+    const submitButton = document.querySelector('#rightSide button[onclick="submitForm()"]');
+    if (!submitButton) {
+      console.log('Submit button not found, skipping state update');
+      return;
+    }
+    
+    if (checkAllFieldsComplete()) {
+      submitButton.classList.add('all-fields-complete');
+    } else {
+      submitButton.classList.remove('all-fields-complete');
+    }
+  } catch (e) {
+    console.warn('Error updating submit button state:', e);
   }
 }
 
