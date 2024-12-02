@@ -440,22 +440,21 @@ function serveLoginPage() {
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
+// Version: 2.0
 function serveDashboard(e, user) {
-    console.log('Loading dashboard for user');
+    console.log('Loading dashboard for user:', user.username);
     try {
-        console.log('Creating dashboard template');
         const template = HtmlService.createTemplateFromFile('DashboardWeb');
         template.user = user;
         template.sessionId = e.parameter.sessionId;
         template.deploymentUrl = ScriptApp.getService().getUrl();
-
+        
         return template
             .evaluate()
-            .setTitle('Dashboard')
+            .setTitle('Dashboard - 1PWR Procurement')
             .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-            .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-            .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+            .addMetaTag('viewport', 'width=device-width, initial-scale=1');
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
@@ -2189,7 +2188,7 @@ function verifyPRTracker() {
     
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    );
+    ));
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');
@@ -3082,7 +3081,6 @@ function navigateToUrl(url) {
         return false;
     }
 }
-
 
 
 
