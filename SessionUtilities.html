@@ -1,6 +1,6 @@
 <!-- SessionUtilities.html -->
 <!-- Last Updated: December 1, 2024 23:40 GMT+2 -->
-<!-- Version: 2.3 -->
+<!-- Version: 2.5 -->
 <!-- Description: Client-side session management utilities for the 1PWR PR System -->
 <!-- Author: [Your Name] -->
 
@@ -105,7 +105,6 @@
                         window.location.replace(loginUrl);
                     } catch (e) {
                         console.warn('Navigation error:', e);
-                        // Fallback to reload
                         window.location.reload();
                     }
                 })
@@ -121,75 +120,40 @@
             const currentUrl = window.location.href;
             console.log('Initializing session management on:', currentUrl);
             
-            // Check if we're in an iframe
-            const isInIframe = window !== window.top;
-            console.log('Is in iframe:', isInIframe);
-            
             // Get session from URL or storage
             let sessionId = this.getSessionId();
             console.log('Retrieved sessionId:', sessionId);
             
-            // If no session, try URL
-            if (!sessionId) {
-                const urlParams = new URLSearchParams(window.location.search);
-                sessionId = urlParams.get('sessionId');
-                if (sessionId) {
-                    console.log('Found session in URL:', sessionId);
-                    this.setSessionId(sessionId);
-                    return;
-                }
-            }
-            
-            // If in iframe, try to get session from parent
-            if (isInIframe) {
-                try {
-                    const parentUrl = document.referrer;
-                    console.log('Parent URL:', parentUrl);
-                    const parentParams = new URL(parentUrl).searchParams;
-                    const parentSessionId = parentParams.get('sessionId');
-                    
-                    if (parentSessionId) {
-                        console.log('Found parent session:', parentSessionId);
-                        this.setSessionId(parentSessionId);
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('Error getting parent session:', e);
-                }
-            }
-
             // Don't redirect to login if we're already there
             if (this.isLoginPage(currentUrl)) {
                 console.log('On login page, clearing any existing sessions');
                 this.clearSession();
                 return;
             }
+            
+            if (!sessionId) {
+                console.log('No session found, redirecting to login');
+                this.handleSessionExpiry();
+                return;
+            }
 
-            // Validate session without redirecting immediately
+            // Validate session
             google.script.run
                 .withSuccessHandler((isValid) => {
                     console.log('Session validation result:', isValid);
-                    if (!isValid && !this.isLoginPage(currentUrl)) {
-                        google.script.run
-                            .withSuccessHandler((url) => {
-                                try {
-                                    window.top.location.href = url + '?page=login';
-                                } catch (e) {
-                                    console.warn('Navigation fallback:', e);
-                                    window.location.href = url + '?page=login';
-                                }
-                            })
-                            .getWebAppUrl();
+                    if (!isValid) {
+                        this.handleSessionExpiry();
+                        return;
                     }
+                    // Setup monitoring only if session is valid
+                    this.setupSessionCheck(sessionId);
+                    this.initializeActivityTracking();
                 })
                 .withFailureHandler((error) => {
                     console.error('Session validation failed:', error);
+                    this.handleSessionExpiry();
                 })
                 .validateSession(sessionId);
-
-            console.log('Setting up session monitoring');
-            this.setupSessionCheck(sessionId);
-            this.initializeActivityTracking();
         },
 
         isLoginPage(url) {

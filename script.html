@@ -1126,106 +1126,37 @@ function copyToPreview() {
   
 
 function updatePreview() {
-  const previewContent = document.getElementById('previewContent');
+  const previewElement = document.getElementById('preview');
+  if (!previewElement) {
+    console.log('Preview element not found, skipping update');
+    return;
+  }
   
-  // Clear existing content
-  previewContent.innerHTML = '';
-  
-  // Create top row grid for Sections 1 and 7
-  const topGrid = document.createElement('div');
-  topGrid.className = 'top-section-grid';
-  
-  // Section 1
-  const section1 = document.createElement('div');
-  section1.className = 'top-section';
-  section1.innerHTML = `
-    <h3>Section 1: Requestor Information</h3>
-    <p><strong>Requestor Name:</strong> ${highlightField('requestorName')}</p>
-    <p><strong>Department:</strong> ${highlightField('department')}</p>
-    <p><strong>Email:</strong> ${highlightField('requestorEmail')}</p>
-    <p><strong>Request Short Description:</strong> ${highlightField('requestShortDescription')}</p>
-  `;
-
-  // Section 7
-  const section7 = document.createElement('div');
-  section7.className = 'top-section';
-  section7.innerHTML = `
-    <h3>Section 7: Additional Information</h3>
-    <p><strong>Vendor:</strong> ${formData.vendor || ''}</p>
-    <p><strong>If Vendor is Other:</strong> ${formData.vendorOther || ''}</p>
-    <p><strong>Urgency Status:</strong> ${formData.urgencyStatus || ''}</p>
-    <p><strong>Approver Selection:</strong> ${highlightField('approverSelection')}</p>
-    <p><strong>Requestor Notes:</strong> ${formData.requestorNotes || ''}</p>
-  `;
-
-  // Add sections to top grid
-  topGrid.appendChild(section1);
-  topGrid.appendChild(section7);
-  
-  // Add top grid to preview
-  previewContent.appendChild(topGrid);
-
-  // Create grid for Sections 2-5
-  const quadGrid = document.createElement('div');
-  quadGrid.className = 'quad-section-grid';
-  
-  // Section 2
-  const section2 = document.createElement('div');
-  section2.className = 'quad-section';
-  section2.innerHTML = `
-    <h3>Section 2: Project and Financial Details</h3>
-    <p><strong>Project Category:</strong> ${highlightField('projectCategory')}</p>
-    <p><strong>Acquiring Organization:</strong> ${highlightField('acquiringOrganization')}</p>
-    <p><strong>Currency:</strong> ${formData.currency === 'Other' ? formData.currencyOther || '' : formData.currency || ''}</p>
-    <p><strong>Payment Format:</strong> ${formData.paymentFormat === 'Other' ? formData.paymentFormatOther || '' : formData.paymentFormat || ''}</p>
-  `;
-
-  // Section 3
-  const section3 = document.createElement('div');
-  section3.className = 'quad-section';
-  section3.innerHTML = `
-    <h3>Section 3: Location and Type</h3>
-    <p><strong>Site Location:</strong> ${formData.siteLocation || ''}</p>
-    <p><strong>Expense Type:</strong> ${highlightField('expenseType')}</p>
-    <p><strong>If Expense Type is Other:</strong> ${formData.expenseTypeOther || ''}</p>
-  `;
-
-  // Section 4
-  const section4 = document.createElement('div');
-  section4.className = 'quad-section';
-  section4.innerHTML = `
-    <h3>Section 4: Vehicle Details</h3>
-    ${formData.requiresSection4 ? 
-      `<p><strong>Vehicle Selection:</strong> ${highlightField('vehicleSelection')}</p>` : 
-      '<p>Section not applicable.</p>'}
-  `;
-
-  // Section 5
-  const section5 = document.createElement('div');
-  section5.className = 'quad-section';
-  section5.innerHTML = `
-    <h3>Section 5: Budget and Timeline</h3>
-    <p><strong>Approved Budget:</strong> ${formData.approvedBudget === 'Other' ? formData.approvedBudgetOther || '' : formData.approvedBudget || ''}</p>
-    <p><strong>Deadline Date:</strong> ${formData.deadlineDate || ''}</p>
-  `;
-
-  // Add sections to quad grid
-  quadGrid.appendChild(section2);
-  quadGrid.appendChild(section3);
-  quadGrid.appendChild(section4);
-  quadGrid.appendChild(section5);
-  
-  // Add quad grid to preview
-  previewContent.appendChild(quadGrid);
-
-  // Section 6 (Line Items) - Full Width
-  const section6 = document.createElement('div');
-  section6.className = 'full-width-section';
-  section6.innerHTML = `
-    <h3>Section 6: Line Items</h3>
-    ${generateLineItemsPreview()}
-  `;
-  previewContent.appendChild(section6);
+  try {
+    // Preserve existing preview functionality
+    const previewContent = document.getElementById('previewContent');
+    if (!previewContent) {
+        console.warn('Preview content element not found');
+        return;
+    }
+    
+    // Clear existing content
+    previewContent.innerHTML = '';
+    
+    // Add sections to preview
+    addSection1Preview(previewContent);
+    addSection2Preview(previewContent);
+    addSection3Preview(previewContent);
+    if (formData.requiresSection4) {
+        addSection4Preview(previewContent);
+    }
+    addSection5Preview(previewContent);
+    addSection6Preview(previewContent);
+    addSection7Preview(previewContent);
+    
+  } catch (e) {
+    console.warn('Error updating preview:', e);
+  }
 }
 
   /*******************************************************************************************
