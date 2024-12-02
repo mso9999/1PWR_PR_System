@@ -423,20 +423,17 @@ function doGet(e) {
     }
 }
 
-// Version: 4.2
+// Version: 4.3
 function serveLoginPage() {
-    const output = HtmlService.createTemplateFromFile('Login')
+    return HtmlService.createTemplateFromFile('Login')
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.EMULATED)  // Changed from IFRAME
+        .setSandboxMode(HtmlService.SandboxMode.EMULATED)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+        .addMetaTag('Content-Security-Policy', 
+            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';")
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-        
-    // Add security headers server-side
-    output.addHeader('Content-Security-Policy', 
-        "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';");
-    
-    return output;
 }
 
 // Version: 3.3
@@ -448,17 +445,14 @@ function serveDashboard(e, user) {
         template.sessionId = e.parameter.sessionId;
         template.deploymentUrl = ScriptApp.getService().getUrl();
         
-        const output = template
+        return template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.EMULATED)  // Changed from IFRAME
-            .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-            
-        // Add security headers server-side
-        output.addHeader('Content-Security-Policy', 
-            "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';");
-        
-        return output;
+            .setSandboxMode(HtmlService.SandboxMode.EMULATED)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)
+            .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+            .addMetaTag('Content-Security-Policy', 
+                "default-src * data: blob: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self';");
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
