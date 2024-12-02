@@ -440,7 +440,7 @@ function serveLoginPage() {
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
-// Version: 2.0
+// Version: 2.3
 function serveDashboard(e, user) {
     console.log('Loading dashboard for user:', user.username);
     try {
@@ -2189,7 +2189,7 @@ function verifyPRTracker() {
     // Fix the syntax error in the comparison
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    );  // Remove extra parenthesis
+    );  // Remove the extra parenthesis
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');
