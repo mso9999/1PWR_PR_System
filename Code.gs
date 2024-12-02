@@ -2183,7 +2183,7 @@ function verifyPRTracker() {
     // Fix the syntax error in the comparison
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    )); 
+    ); 
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');
