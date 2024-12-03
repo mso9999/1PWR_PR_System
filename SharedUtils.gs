@@ -1430,3 +1430,51 @@ function loadUserOptions() {
     .getActiveRequestors();
 }
 
+/**
+ * Gets active requestors from the Requestor List sheet
+ * @returns {Array<Object>} Array of active requestor objects
+ */
+function getActiveRequestors() {
+  try {
+    // Open the spreadsheet and get the Requestor List sheet
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
+    if (!sheet) {
+      throw new Error('Requestor List sheet not found');
+    }
+
+    // Get all data from the sheet
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {  // Check if there's data beyond header row
+      return [];
+    }
+
+    // Log the headers for debugging
+    Logger.log('Sheet headers:', data[0]);
+
+    // Skip header row and filter active users
+    const users = data.slice(1)  // Skip header row
+      .filter(row => {
+        Logger.log('Processing row:', row);
+        return row[3].toString().toUpperCase() === 'Y';  // Active column (D)
+      })
+      .map(row => {
+        const user = {
+          name: row[0],  // Name column (A)
+          email: row[1], // Email column (B)
+          department: row[2], // Department column (C)
+          role: row[5]   // Role column (F)
+        };
+        Logger.log('Mapped user:', user);
+        return user;
+      });
+
+    Logger.log('Found ' + users.length + ' active users');
+    return users;
+
+  } catch (error) {
+    Logger.log('Error in getActiveRequestors: ' + error.message);
+    throw new Error('Failed to load users: ' + error.message);
+  }
+}
+
