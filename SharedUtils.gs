@@ -1436,16 +1436,23 @@ function loadUserOptions() {
  */
 function getActiveRequestors() {
   try {
+    Logger.log('Starting getActiveRequestors');
+    
     // Open the spreadsheet and get the Requestor List sheet
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    Logger.log('Opened spreadsheet');
+    
     const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
     if (!sheet) {
+      Logger.log('ERROR: Requestor List sheet not found');
       throw new Error('Requestor List sheet not found');
     }
+    Logger.log('Found Requestor List sheet');
 
     // Get all data from the sheet
     const data = sheet.getDataRange().getValues();
     if (data.length <= 1) {  // Check if there's data beyond header row
+      Logger.log('No data found in sheet');
       return [];
     }
 
