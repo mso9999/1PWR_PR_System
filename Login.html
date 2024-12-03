@@ -110,33 +110,32 @@
     <script>
         // Load active users when the page loads
         window.onload = function() {
+            console.log('Loading users...');
             const select = document.getElementById('username');
             select.innerHTML = '<option value="">Loading users...</option>';
-            select.disabled = true;
             
             google.script.run
                 .withSuccessHandler(function(users) {
+                    console.log('Loaded users:', users);
                     select.innerHTML = '<option value="">Select a user...</option>';
+                    
                     if (users && users.length > 0) {
                         users.forEach(function(user) {
                             const option = document.createElement('option');
-                            option.value = user.name;
-                            option.textContent = `${user.name} (${user.department})`;
+                            option.value = user.name;  // Change back to using object property
+                            option.textContent = `${user.name} (${user.department})`; // Change back to using object properties
                             select.appendChild(option);
                         });
-                        select.disabled = false;
                     } else {
-                        select.innerHTML = '<option value="">No active users found</option>';
-                        select.disabled = true;
-                        showError('No active users found in the system');
+                        select.innerHTML = '<option value="">No users found</option>';
                     }
                 })
                 .withFailureHandler(function(error) {
+                    console.error('Failed to load users:', error);
                     select.innerHTML = '<option value="">Error loading users</option>';
-                    select.disabled = true;
                     showError('Failed to load users: ' + error);
                 })
-                .getActiveRequestors();
+                .getActiveRequestors();  // This function should return array of user data from sheet
         };
 
         function setLoading(isLoading) {
