@@ -60,37 +60,214 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="bg-white rounded-lg shadow p-6">
-            <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-            <div id="content">Loading dashboard content...</div>
+        <!-- Organization Filter -->
+        <div class="mb-6">
+            <label for="orgFilter" class="block text-sm font-medium text-gray-700">Organization:</label>
+            <select id="orgFilter" onchange="filterByOrg(this.value)" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                <option value="all">All Organizations</option>
+                <option value="1PWR LESOTHO">1PWR LESOTHO</option>
+                <option value="SMP">SMP</option>
+                <option value="PUECO">PUECO</option>
+            </select>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Metrics Cards -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-indigo-500 rounded-md p-3">
+                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Total PRs</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="totalPRs">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-red-500 rounded-md p-3">
+                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Urgent PRs</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="urgentPRs">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-yellow-500 rounded-md p-3">
+                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Avg Days Open</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="avgDaysOpen">0</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-green-500 rounded-md p-3">
+                            <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500 truncate">Completion Rate</dt>
+                                <dd class="text-lg font-medium text-gray-900" id="completionRate">0%</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PR Lists -->
+        <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <!-- Submitted PRs -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Submitted PRs</h3>
+                    <div class="mt-4">
+                        <ul class="divide-y divide-gray-200" id="submittedList">
+                            <li class="text-gray-500 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress PRs -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">In Progress</h3>
+                    <div class="mt-4">
+                        <ul class="divide-y divide-gray-200" id="inProgressList">
+                            <li class="text-gray-500 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed PRs -->
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Completed</h3>
+                    <div class="mt-4">
+                        <ul class="divide-y divide-gray-200" id="completedList">
+                            <li class="text-gray-500 text-sm">Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        // Basic initialization
+        // Store session ID for use in API calls
+        const sessionId = '<?= sessionId ?>';
+        let dashboardData = <?!= JSON.stringify(dashboardData) ?>;
+
+        // Initialize dashboard on load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard loading...');
-            loadDashboardData();
+            console.log('Dashboard initializing...');
+            updateDashboard(dashboardData);
+            // Set up auto-refresh
+            setInterval(refreshDashboard, 60000); // Refresh every minute
         });
 
-        function loadDashboardData() {
-            console.log('Loading dashboard data...');
+        function updateDashboard(data) {
+            console.log('Updating dashboard with data:', data);
+            
+            // Update metrics
+            document.getElementById('totalPRs').textContent = data.metrics.total;
+            document.getElementById('urgentPRs').textContent = data.metrics.urgent;
+            document.getElementById('avgDaysOpen').textContent = data.metrics.avgDays;
+            document.getElementById('completionRate').textContent = data.metrics.completionRate + '%';
+
+            // Update PR lists
+            updatePRList('submittedList', data.submitted);
+            updatePRList('inProgressList', data.inProgress);
+            updatePRList('completedList', data.completed);
+        }
+
+        function updatePRList(listId, prs) {
+            const list = document.getElementById(listId);
+            if (!prs || prs.length === 0) {
+                list.innerHTML = '<li class="py-4 text-sm text-gray-500">No PRs found</li>';
+                return;
+            }
+
+            list.innerHTML = prs.map(pr => `
+                <li class="py-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 truncate">
+                                ${pr.number}
+                            </p>
+                            <p class="text-sm text-gray-500 truncate">
+                                ${pr.description}
+                            </p>
+                        </div>
+                        <div class="inline-flex items-center text-sm text-gray-500">
+                            ${pr.daysOpen} days
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        function filterByOrg(org) {
+            console.log('Filtering by organization:', org);
             google.script.run
                 .withSuccessHandler(function(data) {
-                    console.log('Data received:', data);
-                    document.getElementById('content').innerHTML = 'Dashboard loaded successfully!';
+                    dashboardData = data;
+                    updateDashboard(data);
                 })
                 .withFailureHandler(function(error) {
-                    console.error('Error:', error);
-                    document.getElementById('content').innerHTML = 'Error loading dashboard: ' + error;
+                    console.error('Filter error:', error);
                 })
-                .getDashboardData();
+                .getDashboardData(org);
+        }
+
+        function refreshDashboard() {
+            const org = document.getElementById('orgFilter').value;
+            filterByOrg(org);
         }
 
         function handleLogout() {
             google.script.run
                 .withSuccessHandler(function() {
-                    window.location.href = '?page=login';
+                    // Create a form for POST navigation
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = window.location.href;
+                    document.body.appendChild(form);
+                    form.submit();
                 })
                 .logout();
         }

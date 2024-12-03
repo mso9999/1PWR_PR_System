@@ -164,19 +164,21 @@
                     if (result.success) {
                         console.log('Login successful');
                         
-                        // Use google.script.run to get the dashboard content
-                        google.script.run
-                            .withSuccessHandler(function(html) {
-                                // Replace the entire content
-                                document.open();
-                                document.write(html);
-                                document.close();
-                            })
-                            .withFailureHandler(function(error) {
-                                console.error('Navigation error:', error);
-                                showError('Failed to navigate to dashboard');
-                            })
-                            .getDashboardHtml(result.sessionId);
+                        // Create a form to handle the navigation
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = window.location.href;
+
+                        // Add session ID
+                        const sessionInput = document.createElement('input');
+                        sessionInput.type = 'hidden';
+                        sessionInput.name = 'sessionId';
+                        sessionInput.value = result.sessionId;
+                        form.appendChild(sessionInput);
+
+                        // Submit the form
+                        document.body.appendChild(form);
+                        form.submit();
                     } else {
                         showError(result.message || 'Login failed');
                     }

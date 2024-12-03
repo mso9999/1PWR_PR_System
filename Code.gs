@@ -3210,28 +3210,35 @@ function getDashboardHtml(sessionId) {
             return HtmlService.createTemplateFromFile('Login')
                 .evaluate()
                 .setTitle('Login - 1PWR Procurement')
-                .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
                 .getContent();
         }
 
         // Parse user data
         const user = JSON.parse(sessionData);
-        console.log('User data:', JSON.stringify(user));
+        console.log('User data:', user);
 
-        // Create dashboard template
+        // Create dashboard template with user data
         const template = HtmlService.createTemplateFromFile('DashboardWeb');
         template.user = user;
         template.sessionId = sessionId;
-        
+
+        // Get initial dashboard data
+        const dashboardData = getDashboardData();
+        template.dashboardData = dashboardData;
+
         return template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .getContent();
 
     } catch (error) {
-        console.error('Error getting dashboard HTML:', error);
-        throw error;
+        console.error('Error in getDashboardHtml:', error);
+        return createErrorPage('Failed to load dashboard: ' + error.message)
+            .setTitle('Error')
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+            .getContent();
     }
 }
 
