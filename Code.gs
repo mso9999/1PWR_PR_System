@@ -3360,5 +3360,26 @@ function categorizePRs(data) {
   return { submitted, inProgress, completed };
 }
 
+/**
+ * Stores a new session in the cache
+ * @param {string} sessionId - The session ID to store
+ * @param {Object} user - The user object to store in the session
+ */
+function storeSession(sessionId, user) {
+  if (!sessionId || !user) {
+    throw new Error('Session ID and user are required');
+  }
+  
+  const cache = CacheService.getUserCache();
+  const sessionData = {
+    sessionId: sessionId,
+    user: user,
+    timestamp: new Date().getTime()
+  };
+  
+  // Store session for 24 hours
+  cache.put(sessionId, JSON.stringify(sessionData), 24 * 60 * 60);
+}
+
 
 

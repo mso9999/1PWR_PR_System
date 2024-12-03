@@ -163,15 +163,24 @@
                 .withSuccessHandler(function(result) {
                     if (result.success) {
                         console.log('Login successful');
-                        // Redirect to dashboard using Google Apps Script navigation
+                        
+                        // Store session in cache
                         google.script.run
                             .withSuccessHandler(function() {
-                                window.location.href = result.redirectUrl;
+                                // After session is stored, navigate to dashboard
+                                google.script.run
+                                    .withSuccessHandler(function(url) {
+                                        window.location.href = url;
+                                    })
+                                    .withFailureHandler(function(error) {
+                                        showError('Failed to redirect: ' + error);
+                                    })
+                                    .navigateToDashboard(result.sessionId);
                             })
                             .withFailureHandler(function(error) {
-                                showError('Failed to redirect: ' + error);
+                                showError('Failed to store session: ' + error);
                             })
-                            .navigateToDashboard(result.sessionId);
+                            .storeSession(result.sessionId, result.user);
                     } else {
                         showError(result.message || 'Login failed');
                     }
