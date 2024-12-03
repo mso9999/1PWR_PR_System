@@ -821,14 +821,13 @@ function getActiveRequestors() {
 
     // Skip header row and filter active users
     const users = data.slice(1)  // Skip header row
-      .filter(row => row[5].toString().toUpperCase() === 'Y')  // Check Active column
+      .filter(row => row[3].toString().toUpperCase() === 'Y')  // Check Active column (D)
       .map(row => ({
-        name: row[0],       // Name column
-        email: row[1],      // Email column
-        department: row[2],  // Department column
-        role: row[3]        // Role column
-      }))
-      .filter(user => user.name);  // Ensure name is not empty
+        name: row[0],  // Name column (A)
+        email: row[1], // Email column (B)
+        department: row[2], // Department column (C)
+        role: row[5]   // Role column (F)
+      }));
 
     Logger.log('Found ' + users.length + ' active users');
     return users;
