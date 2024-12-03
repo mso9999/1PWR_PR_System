@@ -425,12 +425,16 @@ function doGet(e) {
 
 // Version: 4.5
 function serveLoginPage() {
-    return HtmlService.createTemplateFromFile('Login')
-         .evaluate()
-         .setTitle('Login - 1PWR Procurement')
-         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+    const template = HtmlService.createTemplateFromFile('Login');
+    template.successUrl = ScriptApp.getService().getUrl() + '?page=dashboard';
+    
+    return template
+        .evaluate()
+        .setTitle('Login - 1PWR Procurement')
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
 // Version: 3.3
@@ -3072,6 +3076,29 @@ function navigateToUrl(url) {
     } catch (error) {
         console.error('Navigation error:', error);
         return false;
+    }
+}
+
+function verifyUser(username, password) {
+    try {
+        // ... existing verification code ...
+        
+        // On successful verification, return the success URL
+        const sessionId = createSession(username);
+        const successUrl = ScriptApp.getService().getUrl() + '?page=dashboard&sessionId=' + sessionId;
+        
+        return {
+            success: true,
+            sessionId: sessionId,
+            redirectUrl: successUrl,
+            message: 'Login successful'
+        };
+    } catch (error) {
+        console.error('Login error:', error);
+        return {
+            success: false,
+            message: error.toString()
+        };
     }
 }
 
