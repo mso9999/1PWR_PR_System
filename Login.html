@@ -245,16 +245,8 @@ function handleLogin(event) {
                 (response.redirectUrl.includes('?') ? '&' : '?') + 
                 'sessionId=' + encodeURIComponent(response.sessionId);
 
-            // Try to navigate using google.script.host.editor
-            try {
-                google.script.host.editor.focus();
-                window.open(redirectUrl, '_blank', 'noreferrer');
-                google.script.host.editor.focus();
-            } catch (e) {
-                console.warn('Navigation fallback:', e);
-                // Try direct navigation as fallback
-                window.location.href = redirectUrl;
-            }
+            // Simple top-level navigation
+            window.top.location.href = redirectUrl;
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');

@@ -428,7 +428,7 @@ function serveLoginPage() {
     return HtmlService.createTemplateFromFile('Login')
          .evaluate()
          .setTitle('Login - 1PWR Procurement')
-         .setSandboxMode(HtmlService.SandboxMode.NATIVE)
+         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
          .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
@@ -445,7 +445,7 @@ function serveDashboard(e, user) {
         return template
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.NATIVE)
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
     } catch (error) {
         console.error('Error serving dashboard:', error);
