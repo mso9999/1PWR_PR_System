@@ -226,14 +226,25 @@ function handleLogin(event) {
     const loadingDiv = document.getElementById('loading');
     const loginButton = document.getElementById('loginButton');
 
+    // Show loading state
     errorDiv.classList.add('hidden');
     loadingDiv.classList.remove('hidden');
     loginButton.disabled = true;
 
+    // Error handling function
+    function showError(message) {
+        console.error('Login error:', message);
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        loadingDiv.classList.add('hidden');
+        loginButton.disabled = false;
+        isLoginInProgress = false;
+    }
+
     google.script.run
         .withSuccessHandler(function(response) {
             if (!response.success) {
-                handleLoginError(response.message || 'Login failed');
+                showError(response.message || 'Login failed');
                 return;
             }
 
@@ -241,21 +252,26 @@ function handleLogin(event) {
 
             // Handle HTML redirect
             if (response.html) {
-                // Create temporary container
-                const container = document.createElement('div');
-                container.innerHTML = response.html;
-                
-                // Execute any scripts in the HTML
-                const scripts = container.getElementsByTagName('script');
-                for (let i = 0; i < scripts.length; i++) {
-                    eval(scripts[i].textContent);
+                try {
+                    // Create temporary container
+                    const container = document.createElement('div');
+                    container.innerHTML = response.html;
+                    
+                    // Execute any scripts in the HTML
+                    const scripts = container.getElementsByTagName('script');
+                    for (let i = 0; i < scripts.length; i++) {
+                        eval(scripts[i].textContent);
+                    }
+                } catch (error) {
+                    console.error('Redirect error:', error);
+                    showError('Error during redirect: ' + error.message);
                 }
             } else {
-                handleLoginError('Invalid server response');
+                showError('Invalid server response');
             }
         })
         .withFailureHandler(function(error) {
-            handleLoginError('An error occurred during login');
+            showError('An error occurred during login: ' + error.toString());
         })
         .verifyUser(username, password);
 }
