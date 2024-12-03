@@ -262,36 +262,26 @@ function handleLogin(event) {
                 console.log('Session ID stored:', response.sessionId);
             }
 
-            console.log('Creating redirect form to:', response.redirectUrl);
+            console.log('Redirecting to:', response.redirectUrl);
 
             // Create and submit form
             try {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = response.redirectUrl;
-                form.target = '_top';
-
-                // Add session ID
-                const sessionInput = document.createElement('input');
-                sessionInput.type = 'hidden';
-                sessionInput.name = 'sessionId';
-                sessionInput.value = response.sessionId;
-                form.appendChild(sessionInput);
-
-                // Add page parameter
-                const pageInput = document.createElement('input');
-                pageInput.type = 'hidden';
-                pageInput.name = 'page';
-                pageInput.value = 'dashboard';
-                form.appendChild(pageInput);
-
-                // Add to body and submit
-                document.body.appendChild(form);
-                console.log('Submitting redirect form...');
-                form.submit();
+                // Create a link and click it
+                const link = document.createElement('a');
+                link.href = response.redirectUrl;
+                link.target = '_top';
+                document.body.appendChild(link);
+                link.click();
             } catch (error) {
                 console.error('Redirect error:', error);
                 showError('Error during redirect: ' + error.message);
+                
+                // Fallback to direct navigation
+                try {
+                    window.location.href = response.redirectUrl;
+                } catch (e) {
+                    showError('All redirect attempts failed');
+                }
             }
         })
         .withFailureHandler(function(error) {
