@@ -3253,12 +3253,9 @@ function navigateToDashboard(sessionId) {
     throw new Error('Invalid session');
   }
   
-  // Get the deployment URL
-  const scriptId = ScriptApp.getScriptId();
-  const deploymentId = getDeploymentId(); // You'll need to implement this
-  
   // Return the URL for the dashboard page
-  return `https://script.google.com/macros/s/${deploymentId}/exec?page=dashboard&sessionId=${sessionId}&v=${new Date().getTime()}`;
+  // Use the current script URL which will handle the routing based on the page parameter
+  return ScriptApp.getService().getUrl();
 }
 
 /**
