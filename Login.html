@@ -167,11 +167,17 @@
                         // Store session in cache
                         google.script.run
                             .withSuccessHandler(function() {
-                                // Use Google's built-in redirection
-                                const scriptId = '<?!= scriptId ?>';
-                                console.log('Redirecting with script ID:', scriptId);
-                                const dashboardUrl = `https://script.google.com/macros/s/${scriptId}/exec?page=dashboard`;
-                                window.top.location.href = dashboardUrl;
+                                // Get script ID from server and redirect
+                                google.script.run
+                                    .withSuccessHandler(function(scriptId) {
+                                        console.log('Got script ID:', scriptId);
+                                        const dashboardUrl = `https://script.google.com/macros/s/${scriptId}/exec?page=dashboard`;
+                                        window.top.location.href = dashboardUrl;
+                                    })
+                                    .withFailureHandler(function(error) {
+                                        showError('Failed to get script ID: ' + error);
+                                    })
+                                    .getScriptId();
                             })
                             .withFailureHandler(function(error) {
                                 showError('Failed to store session: ' + error);

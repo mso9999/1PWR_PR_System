@@ -364,6 +364,14 @@ function verifyExecutionContext() {
  *******************************************************************************************/
 
 /**
+ * Gets the current script ID
+ * @return {string} The script ID
+ */
+function getScriptId() {
+  return ScriptApp.getScriptId();
+}
+
+/**
  * Handles HTTP GET requests
  * @param {Object} e - Event object from Apps Script
  * @return {HTMLOutput} The HTML page to display
@@ -379,9 +387,6 @@ function doGet(e) {
   } else {
     template = HtmlService.createTemplateFromFile('Login');
   }
-  
-  // Add common template variables
-  template.scriptId = ScriptApp.getScriptId();
   
   // Evaluate and configure the HTML output
   const html = template.evaluate()
