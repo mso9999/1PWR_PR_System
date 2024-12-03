@@ -164,24 +164,10 @@
                     if (result.success) {
                         console.log('Login successful');
                         
-                        // Use google.script.run to reload the page with success parameters
-                        google.script.run
-                            .withSuccessHandler(function(html) {
-                                // Replace the entire document content
-                                document.open();
-                                document.write(html);
-                                document.close();
-                            })
-                            .withFailureHandler(function(error) {
-                                console.error('Navigation error:', error);
-                                showError('Failed to navigate to dashboard');
-                            })
-                            .doGet({
-                                parameter: {
-                                    loginSuccess: true,
-                                    sessionId: result.sessionId
-                                }
-                            });
+                        // Redirect to dashboard with session ID
+                        const scriptUrl = window.location.href.split('?')[0];
+                        const redirectUrl = scriptUrl + '?sessionId=' + encodeURIComponent(result.sessionId);
+                        window.top.location.href = redirectUrl;
                     } else {
                         showError(result.message || 'Login failed');
                     }

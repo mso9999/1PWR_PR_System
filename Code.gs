@@ -377,21 +377,9 @@ function doGet(e) {
     console.log('Request parameters:', JSON.stringify(e.parameter));
 
     try {
-        // Handle login success redirect
-        if (e.parameter.loginSuccess && e.parameter.sessionId) {
-            console.log('Handling login success redirect');
-            return serveDashboard(e, getCurrentUser(e.parameter.sessionId));
-        }
-
         // If no parameters, show login
         if (!e.parameter || Object.keys(e.parameter).length === 0) {
             console.log('No parameters, serving login page');
-            return serveLoginPage();
-        }
-
-        // Handle explicit login page request
-        if (e.parameter.page === 'login') {
-            console.log('Login page requested');
             return serveLoginPage();
         }
 
@@ -418,21 +406,31 @@ function doGet(e) {
         const user = JSON.parse(sessionData);
         console.log('User data:', JSON.stringify(user));
 
-        // Route to appropriate page
-        switch(e.parameter.page) {
-            case 'dashboard':
-                console.log('Serving dashboard');
-                return serveDashboard(e, user);
-            case 'form':
-                return serveFormPage(e, user);
-            default:
-                console.log('Unknown page requested, defaulting to dashboard');
-                return serveDashboard(e, user);
-        }
+        // Serve dashboard by default after successful login
+        console.log('Serving dashboard for user:', user.username);
+        const template = HtmlService.createTemplateFromFile('DashboardWeb');
+        template.user = user;
+        template.sessionId = sessionId;
+        
+        return template
+            .evaluate()
+            .setTitle('Dashboard - 1PWR Procurement')
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+
     } catch (error) {
         console.error('Error in doGet:', error);
         return createErrorPage(error.message);
     }
+}
+
+function serveLoginPage() {
+    console.log('Serving login page');
+    return HtmlService.createTemplateFromFile('Login')
+        .evaluate()
+        .setTitle('Login - 1PWR Procurement')
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
 function serveDashboard(e, user) {
@@ -451,15 +449,6 @@ function serveDashboard(e, user) {
         console.error('Error serving dashboard:', error);
         throw error;
     }
-}
-
-function serveLoginPage() {
-    console.log('Serving login page');
-    return HtmlService.createTemplateFromFile('Login')
-        .evaluate()
-        .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
 function serveFormPage(e, user) {
@@ -3123,11 +3112,9 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Return success with loginSuccess parameter
                 return {
                     success: true,
-                    sessionId: sessionId,
-                    loginSuccess: true
+                    sessionId: sessionId
                 };
             }
         }
