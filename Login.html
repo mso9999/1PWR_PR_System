@@ -164,13 +164,12 @@
                     if (result.success) {
                         console.log('Login successful, preparing redirect');
                         
-                        // Use google.script.url for navigation
-                        const currentUrl = google.script.url.getLocation(function(location) {
-                            const baseUrl = location.parameter.base || location.protocol + '//' + location.host + location.pathname;
-                            const redirectUrl = baseUrl + result.successUrl;
-                            console.log('Redirecting to:', redirectUrl);
-                            window.top.location.href = redirectUrl;
-                        });
+                        // Simplified redirect using the successUrl from the server
+                        const redirectUrl = result.successUrl;
+                        console.log('Redirecting to:', redirectUrl);
+                        
+                        // Use window.top.location.href for navigation
+                        window.top.location.href = redirectUrl;
                     } else {
                         showError(result.message || 'Login failed');
                     }
