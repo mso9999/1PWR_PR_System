@@ -34,7 +34,7 @@
 *
 * Dependencies:
 * -----------
-* - Tailwind CSS 2.2.19 for styling
+* - Bootstrap 4.5.2 for styling
 * - SharedUtils.gs for authentication functions
 * - Code.gs for routing after login
 *******************************************************************************/
@@ -109,20 +109,22 @@
 
     <script>
         // Load active users when the page loads
-        google.script.run
-            .withSuccessHandler(function(users) {
-                const select = document.getElementById('username');
-                users.forEach(function(user) {
-                    const option = document.createElement('option');
-                    option.value = user;
-                    option.textContent = user;
-                    select.appendChild(option);
-                });
-            })
-            .withFailureHandler(function(error) {
-                showError('Failed to load users: ' + error);
-            })
-            .getActiveRequestors();
+        window.onload = function() {
+            google.script.run
+                .withSuccessHandler(function(users) {
+                    const select = document.getElementById('username');
+                    users.forEach(function(user) {
+                        const option = document.createElement('option');
+                        option.value = user.name;
+                        option.textContent = user.name;
+                        select.appendChild(option);
+                    });
+                })
+                .withFailureHandler(function(error) {
+                    showError('Failed to load users: ' + error);
+                })
+                .getActiveRequestors();
+        };
 
         function setLoading(isLoading) {
             const form = document.getElementById('loginForm');
