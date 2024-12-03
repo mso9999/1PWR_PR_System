@@ -84,7 +84,9 @@
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label for="username">Username:</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <select class="form-control" id="username" name="username" required>
+                        <option value="">Select a user...</option>
+                    </select>
                 </div>
                 
                 <div class="form-group">
@@ -106,6 +108,22 @@
     </div>
 
     <script>
+        // Load active users when the page loads
+        google.script.run
+            .withSuccessHandler(function(users) {
+                const select = document.getElementById('username');
+                users.forEach(function(user) {
+                    const option = document.createElement('option');
+                    option.value = user;
+                    option.textContent = user;
+                    select.appendChild(option);
+                });
+            })
+            .withFailureHandler(function(error) {
+                showError('Failed to load users: ' + error);
+            })
+            .getActiveRequestors();
+
         function setLoading(isLoading) {
             const form = document.getElementById('loginForm');
             const loadingSpan = form.querySelector('.loading');
