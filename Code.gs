@@ -3106,45 +3106,42 @@ function verifyUser(username, password) {
         // Find user
         for (let i = 1; i < data.length; i++) {
             if (data[i][nameCol] === username && 
+                data[i][passwordCol] === password && 
                 data[i][activeCol].toString().toUpperCase() === 'Y') {
                 
-                // Verify password
-                if (data[i][passwordCol] === password) {
-                    // Create session
-                    const sessionId = Utilities.getUuid();
-                    const userEmail = data[i][emailCol];
-                    
-                    // Store session in cache
-                    const cache = CacheService.getUserCache();
-                    const sessionData = JSON.stringify({
-                        username: username,
-                        email: userEmail,
-                        timestamp: new Date().toISOString()
-                    });
-                    cache.put(sessionId, sessionData, 21600); // 6 hours
-                    
-                    // Log successful login
-                    console.log('Login successful for user:', username);
-                    
-                    // Construct redirect URL
-                    const baseUrl = ScriptApp.getService().getUrl();
-                    const redirectUrl = baseUrl + 
-                        (baseUrl.includes('?') ? '&' : '?') + 
-                        'page=dashboard&sessionId=' + encodeURIComponent(sessionId);
-                    
-                    console.log('Redirect URL:', redirectUrl);
-                    
-                    return {
-                        success: true,
-                        sessionId: sessionId,
-                        redirectUrl: redirectUrl,
-                        message: 'Login successful'
-                    };
-                }
+                // Create session
+                const sessionId = Utilities.getUuid();
+                const userEmail = data[i][emailCol];
+                
+                // Store session in cache
+                const userCache = CacheService.getUserCache();
+                const sessionData = JSON.stringify({
+                    username: username,
+                    email: userEmail,
+                    timestamp: new Date().toISOString()
+                });
+                userCache.put(sessionId, sessionData, 3600); // 1 hour expiry
+                
+                // Log successful login
+                console.log('Login successful for user:', username);
+                
+                // Construct redirect URL with session ID
+                const baseUrl = ScriptApp.getService().getUrl();
+                const redirectUrl = baseUrl + '?page=dashboard&sessionId=' + encodeURIComponent(sessionId);
+                
+                return {
+                    success: true,
+                    sessionId: sessionId,
+                    redirectUrl: redirectUrl,
+                    message: 'Login successful'
+                };
             }
         }
         
-        throw new Error('Invalid username or password');
+        return {
+            success: false,
+            message: 'Invalid username or password'
+        };
         
     } catch (error) {
         console.error('Login error:', error);

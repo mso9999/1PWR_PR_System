@@ -237,25 +237,24 @@ function handleLogin(event) {
                 return;
             }
 
-            console.log('Login successful, preparing redirect...');
+            console.log('Login successful, preparing redirect');
             
             // Store session ID
             if (typeof SessionUtils !== 'undefined') {
                 SessionUtils.setSessionId(response.sessionId);
+                console.log('Session ID stored');
             }
 
-            // Log the redirect URL
+            // Ensure we have a valid redirect URL
+            if (!response.redirectUrl) {
+                handleLoginError('Invalid redirect URL');
+                return;
+            }
+
             console.log('Redirecting to:', response.redirectUrl);
 
-            // Perform the redirect
-            try {
-                // Try direct navigation first
-                window.location.replace(response.redirectUrl);
-            } catch (e) {
-                console.warn('Direct navigation failed, trying fallback:', e);
-                // Fallback to regular navigation
-                window.location.href = response.redirectUrl;
-            }
+            // Use window.location.replace for clean redirect
+            window.location.replace(response.redirectUrl);
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
