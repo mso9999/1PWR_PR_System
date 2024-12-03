@@ -1137,7 +1137,7 @@ function getActiveApprovers() {
             const name = String(row[nameCol] || '').trim();
             const email = String(row[emailCol] || '').trim();
             const dept = String(row[deptCol] || '').trim();
-            const active = String(row[activeCol] || '').trim().toUpperCase(); // Normalize to uppercase for comparison
+            const active = String(row[activeCol] || '').trim().toUpperCase()); // Normalize to uppercase for comparison
 
             Logger.log('Extracted values:', { name, email, dept, active });
 
@@ -3247,8 +3247,9 @@ function getDashboardHtml(sessionId) {
  * @return {string} The URL to redirect to
  */
 function navigateToDashboard(sessionId) {
-  // Verify session is valid
-  if (!verifySession(sessionId)) {
+  // Verify session is valid using existing SharedUtils function
+  const user = getCurrentUser(sessionId);
+  if (!user) {
     throw new Error('Invalid session');
   }
   
