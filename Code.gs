@@ -3087,19 +3087,65 @@ function navigateToUrl(url) {
 }
 
 function verifyUser(username, password) {
+    console.log('Verifying user:', username);
     try {
-        // ... existing verification code ...
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const sheet = ss.getSheetByName('Requestor List');
         
-        // On successful verification, return the success URL
-        const sessionId = createSession(username);
-        const successUrl = ScriptApp.getService().getUrl() + '?page=dashboard&sessionId=' + sessionId;
+        if (!sheet) {
+            throw new Error('User list not found');
+        }
+
+        const data = sheet.getDataRange().getValues();
+        const headers = data[0].map(header => header.toString().toLowerCase());
+        const nameCol = headers.indexOf('name');
+        const emailCol = headers.indexOf('email');
+        const passwordCol = headers.indexOf('password');
+        const activeCol = headers.indexOf('active (y/n)');
+
+        // Find user
+        for (let i = 1; i < data.length; i++) {
+            if (data[i][nameCol] === username && 
+                data[i][activeCol].toString().toUpperCase() === 'Y') {
+                
+                // Verify password
+                if (data[i][passwordCol] === password) {
+                    // Create session
+                    const sessionId = Utilities.getUuid();
+                    const userEmail = data[i][emailCol];
+                    
+                    // Store session in cache
+                    const cache = CacheService.getUserCache();
+                    const sessionData = JSON.stringify({
+                        username: username,
+                        email: userEmail,
+                        timestamp: new Date().toISOString()
+                    });
+                    cache.put(sessionId, sessionData, 21600); // 6 hours
+                    
+                    // Log successful login
+                    console.log('Login successful for user:', username);
+                    
+                    // Construct redirect URL
+                    const baseUrl = ScriptApp.getService().getUrl();
+                    const redirectUrl = baseUrl + 
+                        (baseUrl.includes('?') ? '&' : '?') + 
+                        'page=dashboard&sessionId=' + encodeURIComponent(sessionId);
+                    
+                    console.log('Redirect URL:', redirectUrl);
+                    
+                    return {
+                        success: true,
+                        sessionId: sessionId,
+                        redirectUrl: redirectUrl,
+                        message: 'Login successful'
+                    };
+                }
+            }
+        }
         
-        return {
-            success: true,
-            sessionId: sessionId,
-            redirectUrl: successUrl,
-            message: 'Login successful'
-        };
+        throw new Error('Invalid username or password');
+        
     } catch (error) {
         console.error('Login error:', error);
         return {

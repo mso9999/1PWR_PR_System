@@ -237,17 +237,25 @@ function handleLogin(event) {
                 return;
             }
 
+            console.log('Login successful, preparing redirect...');
+            
             // Store session ID
             if (typeof SessionUtils !== 'undefined') {
                 SessionUtils.setSessionId(response.sessionId);
             }
 
-            // Construct redirect URL
-            const redirectUrl = response.redirectUrl;
-            console.log('Redirecting to:', redirectUrl);
+            // Log the redirect URL
+            console.log('Redirecting to:', response.redirectUrl);
 
-            // Use direct location change
-            window.location = redirectUrl;
+            // Perform the redirect
+            try {
+                // Try direct navigation first
+                window.location.replace(response.redirectUrl);
+            } catch (e) {
+                console.warn('Direct navigation failed, trying fallback:', e);
+                // Fallback to regular navigation
+                window.location.href = response.redirectUrl;
+            }
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
