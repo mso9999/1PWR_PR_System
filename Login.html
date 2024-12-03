@@ -248,26 +248,34 @@ function handleLogin(event) {
                 return;
             }
 
-            console.log('Login successful, handling redirect');
+            console.log('Login successful, preparing redirect');
 
-            // Handle HTML redirect
-            if (response.html) {
-                try {
-                    // Create temporary container
-                    const container = document.createElement('div');
-                    container.innerHTML = response.html;
-                    
-                    // Execute any scripts in the HTML
-                    const scripts = container.getElementsByTagName('script');
-                    for (let i = 0; i < scripts.length; i++) {
-                        eval(scripts[i].textContent);
-                    }
-                } catch (error) {
-                    console.error('Redirect error:', error);
-                    showError('Error during redirect: ' + error.message);
+            // Validate response
+            if (!response.redirectUrl || !response.sessionId) {
+                showError('Invalid server response: missing redirect URL or session ID');
+                return;
+            }
+
+            // Store session ID
+            if (typeof SessionUtils !== 'undefined') {
+                SessionUtils.setSessionId(response.sessionId);
+                console.log('Session ID stored:', response.sessionId);
+            }
+
+            console.log('Redirecting to:', response.redirectUrl);
+
+            // Attempt redirect
+            try {
+                // Try window.top first
+                if (window.top) {
+                    window.top.location.href = response.redirectUrl;
+                } else {
+                    // Fallback to current window
+                    window.location.href = response.redirectUrl;
                 }
-            } else {
-                showError('Invalid server response');
+            } catch (error) {
+                console.error('Redirect error:', error);
+                showError('Error during redirect: ' + error.message);
             }
         })
         .withFailureHandler(function(error) {
