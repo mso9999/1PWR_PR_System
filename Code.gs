@@ -3133,5 +3133,70 @@ function verifyUser(username, password) {
     }
 }
 
+function getDashboardData(orgFilter = 'all') {
+    console.log('Getting dashboard data for org:', orgFilter);
+    try {
+        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const sheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
+        
+        if (!sheet) {
+            throw new Error('Master Log sheet not found');
+        }
+
+        const data = sheet.getDataRange().getValues();
+        const headers = data[0];
+        
+        // Filter and process PRs
+        const prs = data.slice(1)
+            .filter(row => orgFilter === 'all' || row[COL.ORGANIZATION] === orgFilter)
+            .map(row => ({
+                number: row[COL.PR_NUMBER],
+                description: row[COL.DESCRIPTION],
+                requestor: row[COL.REQUESTOR_NAME],
+                status: row[COL.PR_STATUS],
+                daysOpen: calculateDaysOpen(row[COL.TIMESTAMP]),
+                isUrgent: row[COL.URGENCY] === 'Y'
+            }));
+
+        // Group PRs by status
+        const submitted = prs.filter(pr => pr.status === 'Submitted');
+        const inProgress = prs.filter(pr => ['In Queue', 'Ordered'].includes(pr.status));
+        const completed = prs.filter(pr => pr.status === 'Completed');
+
+        // Calculate metrics
+        const metrics = {
+            total: prs.length,
+            urgent: prs.filter(pr => pr.isUrgent).length,
+            avgDays: Math.round(prs.reduce((sum, pr) => sum + pr.daysOpen, 0) / prs.length || 0),
+            completionRate: Math.round((completed.length / prs.length) * 100) || 0
+        };
+
+        return {
+            submitted: submitted,
+            inProgress: inProgress,
+            completed: completed,
+            metrics: metrics
+        };
+
+    } catch (error) {
+        console.error('Error getting dashboard data:', error);
+        throw error;
+    }
+}
+
+function logout() {
+    try {
+        const userCache = CacheService.getUserCache();
+        const sessionId = getSessionId();
+        if (sessionId) {
+            userCache.remove(sessionId);
+        }
+        return true;
+    } catch (error) {
+        console.error('Error during logout:', error);
+        return false;
+    }
+}
+
 
 

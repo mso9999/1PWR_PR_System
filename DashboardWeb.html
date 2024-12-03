@@ -35,46 +35,218 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
-  <?!= include('SecurityHeaders'); ?>
-  <?!= include('SessionUtilities'); ?>
-  <?!= include('DashboardStyles'); ?>
-  <title>Dashboard - 1PWR Procurement</title>
+    <base target="_top">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dashboard-container {
+            padding: 20px;
+        }
+        .status-card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-user {
+            margin-left: auto;
+        }
+    </style>
 </head>
 <body>
-  <?!= include('script'); ?>
-  <?!= include('style'); ?>
-  
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      try {
-        // Initialize session first
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('sessionId');
-        if (sessionId && typeof SessionUtils !== 'undefined') {
-          SessionUtils.setSessionId(sessionId);
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">
+            <img src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" height="30" alt="1PWR Logo">
+            Procurement System
+        </a>
+        <div class="nav-user">
+            <span class="navbar-text mr-3">
+                Welcome, <?= user.username ?>
+            </span>
+            <button class="btn btn-outline-light btn-sm" onclick="handleLogout()">Logout</button>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-container">
+        <!-- Organization Filter -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Organization Filter</h5>
+                        <select class="form-control" id="orgFilter" onchange="filterByOrg(this.value)">
+                            <option value="all">All Organizations</option>
+                            <option value="1PWR LESOTHO">1PWR LESOTHO</option>
+                            <option value="SMP">SMP</option>
+                            <option value="PUECO">PUECO</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Grid -->
+        <div class="row">
+            <!-- Submitted PRs -->
+            <div class="col-md-4">
+                <div class="card status-card">
+                    <div class="card-header bg-info text-white">
+                        Submitted
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="submittedCount">Loading...</h5>
+                        <div id="submittedList" class="list-group">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress PRs -->
+            <div class="col-md-4">
+                <div class="card status-card">
+                    <div class="card-header bg-warning">
+                        In Progress
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="inProgressCount">Loading...</h5>
+                        <div id="inProgressList" class="list-group">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed PRs -->
+            <div class="col-md-4">
+                <div class="card status-card">
+                    <div class="card-header bg-success text-white">
+                        Completed
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title" id="completedCount">Loading...</h5>
+                        <div id="completedList" class="list-group">
+                            <!-- Will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Total PRs</h6>
+                        <h4 class="card-title" id="totalPRs">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Urgent PRs</h6>
+                        <h4 class="card-title" id="urgentPRs">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Avg Days Open</h6>
+                        <h4 class="card-title" id="avgDaysOpen">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">Completion Rate</h6>
+                        <h4 class="card-title" id="completionRate">Loading...</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard data
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            // Refresh every 5 minutes
+            setInterval(loadDashboardData, 300000);
+        });
+
+        function loadDashboardData() {
+            const orgFilter = document.getElementById('orgFilter').value;
+            
+            google.script.run
+                .withSuccessHandler(updateDashboard)
+                .withFailureHandler(handleError)
+                .getDashboardData(orgFilter);
         }
-        
-        // Then run existing dashboard initialization
-        if (typeof initializeDashboard === 'function') {
-          initializeDashboard();
+
+        function updateDashboard(data) {
+            // Update counts
+            document.getElementById('submittedCount').textContent = `${data.submitted.length} PRs`;
+            document.getElementById('inProgressCount').textContent = `${data.inProgress.length} PRs`;
+            document.getElementById('completedCount').textContent = `${data.completed.length} PRs`;
+            
+            // Update metrics
+            document.getElementById('totalPRs').textContent = data.metrics.total;
+            document.getElementById('urgentPRs').textContent = data.metrics.urgent;
+            document.getElementById('avgDaysOpen').textContent = data.metrics.avgDays;
+            document.getElementById('completionRate').textContent = data.metrics.completionRate + '%';
+            
+            // Update lists
+            updatePRList('submittedList', data.submitted);
+            updatePRList('inProgressList', data.inProgress);
+            updatePRList('completedList', data.completed);
         }
-        
-        // Initialize any buttons with error handling
-        try {
-          const buttons = document.querySelectorAll('button');
-          buttons.forEach(button => {
-            if (button && button.hasAttribute('data-initial-state')) {
-              button.disabled = button.getAttribute('data-initial-state') === 'disabled';
-            }
-          });
-        } catch (buttonError) {
-          console.warn('Error initializing buttons:', buttonError);
+
+        function updatePRList(elementId, prs) {
+            const listElement = document.getElementById(elementId);
+            listElement.innerHTML = '';
+            
+            prs.forEach(pr => {
+                const item = document.createElement('a');
+                item.href = '#';
+                item.className = 'list-group-item list-group-item-action';
+                item.onclick = () => viewPR(pr.number);
+                item.innerHTML = `
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${pr.number}</h6>
+                        <small>${pr.daysOpen} days</small>
+                    </div>
+                    <p class="mb-1">${pr.description}</p>
+                    <small>${pr.requestor}</small>
+                `;
+                listElement.appendChild(item);
+            });
         }
-      } catch (e) {
-        console.warn('Error in dashboard initialization:', e);
-      }
-    });
-  </script>
+
+        function filterByOrg(org) {
+            loadDashboardData();
+        }
+
+        function viewPR(prNumber) {
+            google.script.run
+                .withSuccessHandler(url => window.location.href = url)
+                .withFailureHandler(handleError)
+                .generateViewLink(prNumber);
+        }
+
+        function handleLogout() {
+            google.script.run
+                .withSuccessHandler(() => window.location.href = '?page=login')
+                .withFailureHandler(handleError)
+                .logout();
+        }
+
+        function handleError(error) {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        }
+    </script>
 </body>
 </html>
