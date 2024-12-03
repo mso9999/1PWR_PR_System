@@ -806,93 +806,36 @@ function formatPRDataForDisplay(rowData) {
  *******************************************************************************************/
 function getActiveRequestors() {
   try {
-    Logger.log('getActiveRequestors: Function started.');
-
-    // Accessing CONFIG object
-    if (typeof CONFIG === 'undefined') {
-      Logger.log('ERROR: CONFIG object is not defined.');
-      return [];
-    }
-
-    const spreadsheetId = CONFIG.SPREADSHEET_ID;
-    const sheetName = CONFIG.REQUESTOR_SHEET_NAME;
-
-    Logger.log(`getActiveRequestors: Using Spreadsheet ID: ${spreadsheetId}`);
-    Logger.log(`getActiveRequestors: Using Sheet Name: ${sheetName}`);
-
-    // Open the spreadsheet
-    const ss = SpreadsheetApp.openById(spreadsheetId);
-    if (!ss) {
-      Logger.log('ERROR: Unable to open spreadsheet. Check the Spreadsheet ID.');
-      return [];
-    }
-
-    // Get the sheet
-    const sheet = ss.getSheetByName(sheetName);
+    // Open the spreadsheet and get the Requestor List sheet
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
     if (!sheet) {
-      Logger.log(`WARNING: Sheet "${sheetName}" not found.`);
-      return [];
-    } else {
-      Logger.log(`getActiveRequestors: Sheet "${sheetName}" found.`);
+      throw new Error('Requestor List sheet not found');
     }
 
-    // Get data range and values
-    const dataRange = sheet.getDataRange();
-    const dataValues = dataRange.getValues();
-    Logger.log(`getActiveRequestors: Retrieved ${dataValues.length} rows from the sheet.`);
-
-    if (dataValues.length < 2) {
-      Logger.log('WARNING: No data found in the sheet beyond headers.');
+    // Get all data from the sheet
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) {  // Check if there's data beyond header row
       return [];
     }
 
-    // Process headers: trim and convert to lowercase
-    const headers = dataValues[0].map(header => header.toString().trim().toLowerCase());
-    Logger.log(`getActiveRequestors: Headers found: ${headers.join(', ')}`);
+    // Skip header row and filter active users
+    const users = data.slice(1)  // Skip header row
+      .filter(row => row[5].toString().toUpperCase() === 'Y')  // Check Active column
+      .map(row => ({
+        name: row[0],       // Name column
+        email: row[1],      // Email column
+        department: row[2],  // Department column
+        role: row[3]        // Role column
+      }))
+      .filter(user => user.name);  // Ensure name is not empty
 
-    const nameIndex = headers.indexOf('name');
-    const departmentIndex = headers.indexOf('department');
-    const emailIndex = headers.indexOf('email');
-    const activeIndex = headers.indexOf('active (y/n)');
+    Logger.log('Found ' + users.length + ' active users');
+    return users;
 
-    Logger.log(`getActiveRequestors: Column Indices - Name: ${nameIndex}, Department: ${departmentIndex}, Email: ${emailIndex}, Active: ${activeIndex}`);
-
-    // Check for required columns
-    if (nameIndex === -1 || departmentIndex === -1 || emailIndex === -1 || activeIndex === -1) {
-      Logger.log('WARNING: One or more required columns (Name, Department, Email, Active (Y/N)) not found in the sheet.');
-      return [];
-    }
-
-    const requestors = [];
-    let activeCount = 0;
-
-    for (let i = 1; i < dataValues.length; i++) {
-      const row = dataValues[i];
-      const name = row[nameIndex];
-      const department = row[departmentIndex];
-      const email = row[emailIndex];
-      const isActive = row[activeIndex];
-
-      Logger.log(`getActiveRequestors: Processing row ${i + 1}: Name="${name}", Department="${department}", Email="${email}", Active="${isActive}"`);
-
-      if (isActive && isActive.toString().trim().toUpperCase() === 'Y') {
-        requestors.push({
-          name: name,
-          department: department,
-          email: email
-        });
-        activeCount++;
-        Logger.log(`getActiveRequestors: Added active requestor from row ${i + 1}.`);
-      }
-    }
-
-    Logger.log(`getActiveRequestors: Total active requestors found: ${activeCount}`);
-    Logger.log('getActiveRequestors: Function completed successfully.');
-
-    return requestors;
   } catch (error) {
-    Logger.log(`ERROR in getActiveRequestors: ${error}`);
-    return [];
+    Logger.log('Error in getActiveRequestors: ' + error.message);
+    throw new Error('Failed to load users: ' + error.message);
   }
 }
 

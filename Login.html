@@ -110,17 +110,30 @@
     <script>
         // Load active users when the page loads
         window.onload = function() {
+            const select = document.getElementById('username');
+            select.innerHTML = '<option value="">Loading users...</option>';
+            select.disabled = true;
+            
             google.script.run
                 .withSuccessHandler(function(users) {
-                    const select = document.getElementById('username');
-                    users.forEach(function(user) {
-                        const option = document.createElement('option');
-                        option.value = user.name;
-                        option.textContent = user.name;
-                        select.appendChild(option);
-                    });
+                    select.innerHTML = '<option value="">Select a user...</option>';
+                    if (users && users.length > 0) {
+                        users.forEach(function(user) {
+                            const option = document.createElement('option');
+                            option.value = user.name;
+                            option.textContent = `${user.name} (${user.department})`;
+                            select.appendChild(option);
+                        });
+                        select.disabled = false;
+                    } else {
+                        select.innerHTML = '<option value="">No active users found</option>';
+                        select.disabled = true;
+                        showError('No active users found in the system');
+                    }
                 })
                 .withFailureHandler(function(error) {
+                    select.innerHTML = '<option value="">Error loading users</option>';
+                    select.disabled = true;
                     showError('Failed to load users: ' + error);
                 })
                 .getActiveRequestors();
