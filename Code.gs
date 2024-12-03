@@ -3126,14 +3126,11 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Create redirect URL
-                const baseUrl = ScriptApp.getService().getUrl();
-                const redirectUrl = baseUrl + '?page=dashboard&sessionId=' + encodeURIComponent(sessionId);
-                
+                // Return success with URL
                 return {
                     success: true,
                     sessionId: sessionId,
-                    redirectUrl: redirectUrl
+                    successUrl: '?page=dashboard&sessionId=' + encodeURIComponent(sessionId)
                 };
             }
         }
