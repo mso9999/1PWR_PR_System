@@ -3124,15 +3124,26 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Construct redirect URL with session ID
-                const baseUrl = ScriptApp.getService().getUrl();
-                const redirectUrl = baseUrl + '?page=dashboard&sessionId=' + encodeURIComponent(sessionId);
+                // Return HTML for redirect
+                const redirectHtml = HtmlService.createHtmlOutput(
+                    `<!DOCTYPE html>
+                    <html>
+                        <head>
+                            <title>Redirecting...</title>
+                            <script>
+                                window.top.location.href = "${ScriptApp.getService().getUrl()}?page=dashboard&sessionId=${sessionId}";
+                            </script>
+                        </head>
+                        <body>
+                            <p>Redirecting to dashboard...</p>
+                        </body>
+                    </html>`
+                )
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
                 
                 return {
                     success: true,
-                    sessionId: sessionId,
-                    redirectUrl: redirectUrl,
-                    message: 'Login successful'
+                    html: redirectHtml.getContent()
                 };
             }
         }
