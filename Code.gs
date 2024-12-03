@@ -1162,7 +1162,6 @@ function getActiveApprovers() {
 
 
 
-
 /**
  * Test function with explicit value checks
  */
@@ -3240,6 +3239,125 @@ function getDashboardHtml(sessionId) {
             .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .getContent();
     }
+}
+
+/**
+ * Handles navigation to the dashboard
+ * @param {string} sessionId - The session ID from successful login
+ * @return {string} The URL to redirect to
+ */
+function navigateToDashboard(sessionId) {
+  // Verify session is valid
+  if (!verifySession(sessionId)) {
+    throw new Error('Invalid session');
+  }
+  
+  // Return the URL for the dashboard page
+  return ScriptApp.getService().getUrl() + '?page=dashboard&v=' + new Date().getTime();
+}
+
+/**
+ * Gets the initial dashboard data
+ * @return {Object} Dashboard data including user info and metrics
+ */
+function getDashboardData() {
+  // Get current user from session
+  const user = getCurrentUser();
+  if (!user) {
+    throw new Error('Not authenticated');
+  }
+
+  // Get dashboard metrics and data
+  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  const sheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
+  const data = sheet.getDataRange().getValues();
+  
+  // Process data and calculate metrics
+  const metrics = calculateMetrics(data);
+  const lists = categorizePRs(data);
+  
+  return {
+    user: {
+      username: user.name,
+      department: user.department
+    },
+    dashboard: {
+      metrics: metrics,
+      submitted: lists.submitted,
+      inProgress: lists.inProgress,
+      completed: lists.completed
+    }
+  };
+}
+
+/**
+ * Calculate dashboard metrics from data
+ * @param {Array} data - Raw sheet data
+ * @return {Object} Calculated metrics
+ */
+function calculateMetrics(data) {
+  let total = 0;
+  let urgent = 0;
+  let completed = 0;
+  let totalDays = 0;
+  
+  // Skip header row
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (row[COL.PR_NUMBER]) {  // Only count rows with PR numbers
+      total++;
+      if (row[COL.URGENCY] === 'Urgent') urgent++;
+      if (row[COL.COMPLETION] === '100%') completed++;
+      totalDays += parseInt(row[COL.DAYS_OPEN] || 0);
+    }
+  }
+  
+  return {
+    total: total,
+    urgent: urgent,
+    avgDays: total ? Math.round(totalDays / total) : 0,
+    completionRate: total ? Math.round((completed / total) * 100) : 0
+  };
+}
+
+/**
+ * Categorize PRs into lists
+ * @param {Array} data - Raw sheet data
+ * @return {Object} Categorized PR lists
+ */
+function categorizePRs(data) {
+  const submitted = [];
+  const inProgress = [];
+  const completed = [];
+  
+  // Skip header row
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    if (!row[COL.PR_NUMBER]) continue;  // Skip rows without PR numbers
+    
+    const pr = {
+      number: row[COL.PR_NUMBER],
+      description: row[COL.DESCRIPTION],
+      daysOpen: parseInt(row[COL.DAYS_OPEN] || 0)
+    };
+    
+    // Categorize based on status
+    switch(row[COL.PR_STATUS]) {
+      case 'Submitted':
+        submitted.push(pr);
+        break;
+      case 'In Progress':
+      case 'In Queue':
+      case 'Ordered':
+        inProgress.push(pr);
+        break;
+      case 'Completed':
+        completed.push(pr);
+        break;
+    }
+  }
+  
+  return { submitted, inProgress, completed };
 }
 
 

@@ -163,22 +163,15 @@
                 .withSuccessHandler(function(result) {
                     if (result.success) {
                         console.log('Login successful');
-                        
-                        // Create a form to handle the navigation
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = window.location.href;
-
-                        // Add session ID
-                        const sessionInput = document.createElement('input');
-                        sessionInput.type = 'hidden';
-                        sessionInput.name = 'sessionId';
-                        sessionInput.value = result.sessionId;
-                        form.appendChild(sessionInput);
-
-                        // Submit the form
-                        document.body.appendChild(form);
-                        form.submit();
+                        // Redirect to dashboard using Google Apps Script navigation
+                        google.script.run
+                            .withSuccessHandler(function() {
+                                window.location.href = result.redirectUrl;
+                            })
+                            .withFailureHandler(function(error) {
+                                showError('Failed to redirect: ' + error);
+                            })
+                            .navigateToDashboard(result.sessionId);
                     } else {
                         showError(result.message || 'Login failed');
                     }

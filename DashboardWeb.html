@@ -50,7 +50,7 @@
                         <img src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" alt="1PWR Logo" class="h-10 w-auto">
                     </div>
                     <div class="flex items-center space-x-4">
-                        <span class="text-gray-600">Welcome, <?= user.username ?></span>
+                        <span class="text-gray-600" id="userWelcome">Welcome</span>
                         <button onclick="handleLogout()" class="text-red-600 hover:text-red-800">Logout</button>
                     </div>
                 </div>
@@ -188,17 +188,46 @@
     </main>
 
     <script>
-        // Store session ID for use in API calls
-        const sessionId = '<?= sessionId ?>';
-        let dashboardData = <?!= JSON.stringify(dashboardData) ?>;
-
+        // Initialize with empty data first
+        let dashboardData = {
+            metrics: { total: 0, urgent: 0, avgDays: 0, completionRate: 0 },
+            submitted: [],
+            inProgress: [],
+            completed: []
+        };
+        
         // Initialize dashboard on load
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Dashboard initializing...');
-            updateDashboard(dashboardData);
+            
+            // Get initial data from server
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    console.log('Received initial data:', data);
+                    if (data.user) {
+                        document.getElementById('userWelcome').textContent = 'Welcome, ' + data.user.username;
+                    }
+                    if (data.dashboard) {
+                        dashboardData = data.dashboard;
+                        updateDashboard(dashboardData);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Failed to load dashboard:', error);
+                    showError('Failed to load dashboard data. Please try refreshing the page.');
+                })
+                .getDashboardData();
+
             // Set up auto-refresh
             setInterval(refreshDashboard, 60000); // Refresh every minute
         });
+
+        function showError(message) {
+            // You can implement this to show errors to the user
+            console.error(message);
+            // For example, show a toast or alert
+            alert(message);
+        }
 
         function updateDashboard(data) {
             console.log('Updating dashboard with data:', data);
