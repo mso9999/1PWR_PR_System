@@ -3198,5 +3198,42 @@ function logout() {
     }
 }
 
+function getDashboardHtml(sessionId) {
+    console.log('Getting dashboard HTML for session:', sessionId);
+    try {
+        // Validate session
+        const userCache = CacheService.getUserCache();
+        const sessionData = userCache.get(sessionId);
+        
+        if (!sessionData) {
+            console.log('Invalid or expired session');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+                .getContent();
+        }
+
+        // Parse user data
+        const user = JSON.parse(sessionData);
+        console.log('User data:', JSON.stringify(user));
+
+        // Create dashboard template
+        const template = HtmlService.createTemplateFromFile('DashboardWeb');
+        template.user = user;
+        template.sessionId = sessionId;
+        
+        return template
+            .evaluate()
+            .setTitle('Dashboard - 1PWR Procurement')
+            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .getContent();
+
+    } catch (error) {
+        console.error('Error getting dashboard HTML:', error);
+        throw error;
+    }
+}
+
 
 

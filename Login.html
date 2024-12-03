@@ -164,10 +164,19 @@
                     if (result.success) {
                         console.log('Login successful');
                         
-                        // Redirect to dashboard with session ID
-                        const scriptUrl = window.location.href.split('?')[0];
-                        const redirectUrl = scriptUrl + '?sessionId=' + encodeURIComponent(result.sessionId);
-                        window.top.location.href = redirectUrl;
+                        // Use google.script.run to get the dashboard content
+                        google.script.run
+                            .withSuccessHandler(function(html) {
+                                // Replace the entire content
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            })
+                            .withFailureHandler(function(error) {
+                                console.error('Navigation error:', error);
+                                showError('Failed to navigate to dashboard');
+                            })
+                            .getDashboardHtml(result.sessionId);
                     } else {
                         showError(result.message || 'Login failed');
                     }
