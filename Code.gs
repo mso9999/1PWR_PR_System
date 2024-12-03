@@ -377,6 +377,12 @@ function doGet(e) {
     console.log('Request parameters:', JSON.stringify(e.parameter));
 
     try {
+        // Handle login success redirect
+        if (e.parameter.loginSuccess && e.parameter.sessionId) {
+            console.log('Handling login success redirect');
+            return serveDashboard(e, getCurrentUser(e.parameter.sessionId));
+        }
+
         // If no parameters, show login
         if (!e.parameter || Object.keys(e.parameter).length === 0) {
             console.log('No parameters, serving login page');
@@ -450,9 +456,7 @@ function serveDashboard(e, user) {
 
 function serveLoginPage() {
     console.log('Serving login page');
-    const template = HtmlService.createTemplateFromFile('Login');
-    
-    return template
+    return HtmlService.createTemplateFromFile('Login')
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)

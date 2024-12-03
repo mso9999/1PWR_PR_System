@@ -251,38 +251,15 @@ function handleLogin(event) {
             console.log('Login successful, preparing redirect');
 
             // Validate response
-            if (!response.redirectUrl || !response.sessionId) {
-                showError('Invalid server response: missing redirect URL or session ID');
+            if (!response.redirectUrl) {
+                showError('Invalid server response: missing redirect URL');
                 return;
-            }
-
-            // Store session ID
-            if (typeof SessionUtils !== 'undefined') {
-                SessionUtils.setSessionId(response.sessionId);
-                console.log('Session ID stored:', response.sessionId);
             }
 
             console.log('Redirecting to:', response.redirectUrl);
 
-            // Create and submit form
-            try {
-                // Create a link and click it
-                const link = document.createElement('a');
-                link.href = response.redirectUrl;
-                link.target = '_top';
-                document.body.appendChild(link);
-                link.click();
-            } catch (error) {
-                console.error('Redirect error:', error);
-                showError('Error during redirect: ' + error.message);
-                
-                // Fallback to direct navigation
-                try {
-                    window.location.href = response.redirectUrl;
-                } catch (e) {
-                    showError('All redirect attempts failed');
-                }
-            }
+            // Use window.location for navigation
+            window.location.href = response.redirectUrl;
         })
         .withFailureHandler(function(error) {
             showError('An error occurred during login: ' + error.toString());
