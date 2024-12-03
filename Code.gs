@@ -3126,11 +3126,10 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Return success with relative URL
+                // Return success with session ID
                 return {
                     success: true,
-                    sessionId: sessionId,
-                    redirectPath: '?page=dashboard&sessionId=' + encodeURIComponent(sessionId)
+                    sessionId: sessionId
                 };
             }
         }

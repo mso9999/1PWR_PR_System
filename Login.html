@@ -162,14 +162,23 @@
             google.script.run
                 .withSuccessHandler(function(result) {
                     if (result.success) {
-                        console.log('Login successful, preparing redirect');
+                        console.log('Login successful');
                         
-                        // Get the current script URL
-                        const scriptUrl = window.location.href.split('?')[0];
-                        const redirectUrl = scriptUrl + result.redirectPath;
+                        // Create a form to handle the redirect
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '';
                         
-                        console.log('Redirecting to:', redirectUrl);
-                        window.top.location.href = redirectUrl;
+                        // Add session ID as hidden input
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'sessionId';
+                        input.value = result.sessionId;
+                        form.appendChild(input);
+                        
+                        // Submit the form
+                        document.body.appendChild(form);
+                        form.submit();
                     } else {
                         showError(result.message || 'Login failed');
                     }
