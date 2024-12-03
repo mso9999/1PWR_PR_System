@@ -364,6 +364,25 @@ function verifyExecutionContext() {
  *******************************************************************************************/
 
 /**
+ * Handles HTTP GET requests
+ * @param {Object} e - Event object from Apps Script
+ * @return {HTMLOutput} The HTML page to display
+ */
+function doGet(e) {
+  const page = e.parameter.page || 'login';
+  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardWeb' : 'Login');
+  
+  // Add script ID for client-side navigation
+  template.scriptId = ScriptApp.getScriptId();
+  
+  const html = template.evaluate()
+    .setTitle('1PWR Procurement System')
+    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png');
+  
+  return html;
+}
+
+/**
  * doGet handles all web app requests 
  * @param {Object} e Event object containing request parameters
  * @returns {HtmlOutput} Rendered page
@@ -1137,7 +1156,7 @@ function getActiveApprovers() {
             const name = String(row[nameCol] || '').trim();
             const email = String(row[emailCol] || '').trim();
             const dept = String(row[deptCol] || '').trim();
-            const active = String(row[activeCol] || '').trim().toUpperCase(); // Normalize to uppercase for comparison
+            const active = String(row[activeCol] || '').trim().toUpperCase()); // Normalize to uppercase for comparison
 
             Logger.log('Extracted values:', { name, email, dept, active });
 
