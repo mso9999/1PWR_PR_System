@@ -1137,7 +1137,7 @@ function getActiveApprovers() {
             const name = String(row[nameCol] || '').trim();
             const email = String(row[emailCol] || '').trim();
             const dept = String(row[deptCol] || '').trim();
-            const active = String(row[activeCol] || '').trim().toUpperCase()); // Normalize to uppercase for comparison
+            const active = String(row[activeCol] || '').trim().toUpperCase(); // Normalize to uppercase for comparison
 
             Logger.log('Extracted values:', { name, email, dept, active });
 
