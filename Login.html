@@ -164,11 +164,11 @@
                     if (result.success) {
                         console.log('Login successful, preparing redirect');
                         
-                        // Simplified redirect using the successUrl from the server
-                        const redirectUrl = result.successUrl;
-                        console.log('Redirecting to:', redirectUrl);
+                        // Get the current script URL
+                        const scriptUrl = window.location.href.split('?')[0];
+                        const redirectUrl = scriptUrl + result.redirectPath;
                         
-                        // Use window.top.location.href for navigation
+                        console.log('Redirecting to:', redirectUrl);
                         window.top.location.href = redirectUrl;
                     } else {
                         showError(result.message || 'Login failed');

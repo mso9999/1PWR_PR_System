@@ -3126,15 +3126,11 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Get the deployment URL for the redirect
-                const webAppUrl = ScriptApp.getService().getUrl();
-                const successUrl = `${webAppUrl}?page=dashboard&sessionId=${encodeURIComponent(sessionId)}`;
-                
-                // Return success with complete URL
+                // Return success with relative URL
                 return {
                     success: true,
                     sessionId: sessionId,
-                    successUrl: successUrl
+                    redirectPath: '?page=dashboard&sessionId=' + encodeURIComponent(sessionId)
                 };
             }
         }
