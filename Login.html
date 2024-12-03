@@ -242,29 +242,12 @@ function handleLogin(event) {
                 SessionUtils.setSessionId(response.sessionId);
             }
 
-            // Create and submit a form to handle the redirect
-            const form = document.createElement('form');
-            form.method = 'GET';
-            form.action = response.redirectUrl;
-            form.target = '_top';
+            // Construct redirect URL
+            const redirectUrl = response.redirectUrl;
+            console.log('Redirecting to:', redirectUrl);
 
-            // Add session ID as hidden input
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'sessionId';
-            input.value = response.sessionId;
-            form.appendChild(input);
-
-            // Add page parameter
-            const pageInput = document.createElement('input');
-            pageInput.type = 'hidden';
-            pageInput.name = 'page';
-            pageInput.value = 'dashboard';
-            form.appendChild(pageInput);
-
-            // Submit the form
-            document.body.appendChild(form);
-            form.submit();
+            // Use direct location change
+            window.location = redirectUrl;
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
