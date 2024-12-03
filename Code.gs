@@ -374,47 +374,53 @@ function verifyExecutionContext() {
  */
 function doGet(e) {
     console.log('==================== START doGet ====================');
-    console.log('Request received at:', new Date().toISOString());
-    console.log('Event object:', JSON.stringify(e));
+    console.log('Request parameters:', JSON.stringify(e.parameter));
 
     try {
-        // If no parameters at all, default to login page
+        // If no parameters, show login
         if (!e.parameter || Object.keys(e.parameter).length === 0) {
+            console.log('No parameters, serving login page');
             return serveLoginPage();
         }
 
-        // Handle logout
-        if (e.parameter.action === 'logout') {
-            const sessionId = e.parameter.sessionId;
-            console.log('Handling logout for session:', sessionId);
-            if (sessionId) {
-                removeSession(sessionId);
-            }
-            return serveLoginPage();
-        }
-
-        // If it's an explicit login page request, show login
+        // Handle explicit login page request
         if (e.parameter.page === 'login') {
+            console.log('Login page requested');
             return serveLoginPage();
         }
 
-        // For all other pages, require valid session
+        // Check for session ID
         const sessionId = e.parameter.sessionId;
-        const user = sessionId ? getCurrentUser(sessionId) : null;
-        
-        if (!user) {
+        console.log('Session ID from request:', sessionId);
+
+        if (!sessionId) {
+            console.log('No session ID, redirecting to login');
             return serveLoginPage();
         }
 
-        // Handle different page requests
+        // Validate session
+        const userCache = CacheService.getUserCache();
+        const sessionData = userCache.get(sessionId);
+        console.log('Session data retrieved:', sessionData);
+
+        if (!sessionData) {
+            console.log('Invalid or expired session');
+            return serveLoginPage();
+        }
+
+        // Parse user data
+        const user = JSON.parse(sessionData);
+        console.log('User data:', JSON.stringify(user));
+
+        // Route to appropriate page
         switch(e.parameter.page) {
-            case 'submitted':
-                return serveSubmittedView(e);
-            case 'prview':
-                return handlePRView(e.parameter.pr);
+            case 'dashboard':
+                console.log('Serving dashboard');
+                return serveDashboard(e, user);
             case 'form':
                 return serveFormPage(e, user);
             default:
+                console.log('Unknown page requested, defaulting to dashboard');
                 return serveDashboard(e, user);
         }
     } catch (error) {
@@ -423,28 +429,6 @@ function doGet(e) {
     }
 }
 
-// Version: 4.5
-function serveLoginPage() {
-    const template = HtmlService.createTemplateFromFile('Login');
-    template.successUrl = ScriptApp.getService().getUrl() + '?page=dashboard';
-    
-    const output = template.evaluate()
-        .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-    
-    // Add sandbox permissions
-    output.setContent(output.getContent().replace(
-        '<iframe',
-        '<iframe sandbox="allow-scripts allow-forms allow-top-navigation allow-same-origin"'
-    ));
-    
-    return output;
-}
-
-// Version: 3.3
 function serveDashboard(e, user) {
     console.log('Loading dashboard for user:', user.username);
     try {
@@ -457,11 +441,26 @@ function serveDashboard(e, user) {
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
             .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
             .addMetaTag('viewport', 'width=device-width, initial-scale=1');
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
     }
+}
+
+function serveLoginPage() {
+    console.log('Serving login page');
+    const template = HtmlService.createTemplateFromFile('Login');
+    template.successUrl = ScriptApp.getService().getUrl() + '?page=dashboard';
+    
+    return template
+        .evaluate()
+        .setTitle('Login - 1PWR Procurement')
+        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
 }
 
 function serveFormPage(e, user) {

@@ -242,19 +242,24 @@ function handleLogin(event) {
             // Store session ID
             if (typeof SessionUtils !== 'undefined') {
                 SessionUtils.setSessionId(response.sessionId);
-                console.log('Session ID stored');
+                console.log('Session ID stored:', response.sessionId);
             }
 
-            // Ensure we have a valid redirect URL
-            if (!response.redirectUrl) {
-                handleLoginError('Invalid redirect URL');
+            // Ensure we have a valid redirect URL and session ID
+            if (!response.redirectUrl || !response.sessionId) {
+                handleLoginError('Invalid redirect URL or session ID');
                 return;
             }
 
-            console.log('Redirecting to:', response.redirectUrl);
+            // Construct the redirect URL with session ID
+            const redirectUrl = response.redirectUrl + 
+                (response.redirectUrl.includes('?') ? '&' : '?') + 
+                'sessionId=' + encodeURIComponent(response.sessionId);
 
-            // Use window.location.replace for clean redirect
-            window.location.replace(response.redirectUrl);
+            console.log('Redirecting to:', redirectUrl);
+
+            // Use window.top for navigation
+            window.top.location.href = redirectUrl;
         })
         .withFailureHandler(function(error) {
             handleLoginError('An error occurred during login');
