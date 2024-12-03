@@ -446,8 +446,7 @@ function serveDashboard(e, user) {
             .evaluate()
             .setTitle('Dashboard - 1PWR Procurement')
             .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)
-            .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
     } catch (error) {
         console.error('Error serving dashboard:', error);
         throw error;
@@ -460,9 +459,7 @@ function serveLoginPage() {
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
 }
 
 function serveFormPage(e, user) {
@@ -3126,10 +3123,11 @@ function verifyUser(username, password) {
                 // Log successful login
                 console.log('Login successful for user:', username);
                 
-                // Return success with session ID
+                // Return success with loginSuccess parameter
                 return {
                     success: true,
-                    sessionId: sessionId
+                    sessionId: sessionId,
+                    loginSuccess: true
                 };
             }
         }

@@ -164,21 +164,24 @@
                     if (result.success) {
                         console.log('Login successful');
                         
-                        // Create a form to handle the redirect
-                        const form = document.createElement('form');
-                        form.method = 'POST';
-                        form.action = '';
-                        
-                        // Add session ID as hidden input
-                        const input = document.createElement('input');
-                        input.type = 'hidden';
-                        input.name = 'sessionId';
-                        input.value = result.sessionId;
-                        form.appendChild(input);
-                        
-                        // Submit the form
-                        document.body.appendChild(form);
-                        form.submit();
+                        // Use google.script.run to reload the page with success parameters
+                        google.script.run
+                            .withSuccessHandler(function(html) {
+                                // Replace the entire document content
+                                document.open();
+                                document.write(html);
+                                document.close();
+                            })
+                            .withFailureHandler(function(error) {
+                                console.error('Navigation error:', error);
+                                showError('Failed to navigate to dashboard');
+                            })
+                            .doGet({
+                                parameter: {
+                                    loginSuccess: true,
+                                    sessionId: result.sessionId
+                                }
+                            });
                     } else {
                         showError(result.message || 'Login failed');
                     }
