@@ -40,6 +40,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
   <?!= include('DashboardStyles'); ?>
   <?!= include('SessionUtilities'); ?>
+  <?!= include('script'); ?>
 </head>
 <body class="bg-gray-100">
   <!-- Header Section -->
@@ -55,6 +56,11 @@
               alt="1PWR Logo" 
               class="h-10 w-auto"
             />
+          </div>
+          <!-- User Info -->
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-600">Welcome, <?= user.username ?></span>
+            <button onclick="handleLogout()" class="text-red-600 hover:text-red-800">Logout</button>
           </div>
         </div>
         
@@ -91,7 +97,34 @@
   </div>
 
   <script>
-    <?!= include('DashboardScripts'); ?>
+    // Initialize dashboard with session handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const sessionId = '<?= sessionId ?>';
+        if (!sessionId) {
+            window.location.href = '?page=login';
+            return;
+        }
+        
+        // Store session ID
+        if (typeof SessionUtils !== 'undefined') {
+            SessionUtils.setSessionId(sessionId);
+        }
+        
+        // Initialize dashboard
+        console.log('Document ready, initializing dashboard...');
+        initializeDashboard();
+        loadOrganizations();
+        loadDashboardData();
+    });
+
+    function handleLogout() {
+        google.script.run
+            .withSuccessHandler(function() {
+                window.location.href = '?page=login';
+            })
+            .logout();
+    }
   </script>
+  <?!= include('DashboardScripts'); ?>
 </body>
 </html>
