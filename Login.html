@@ -262,17 +262,33 @@ function handleLogin(event) {
                 console.log('Session ID stored:', response.sessionId);
             }
 
-            console.log('Redirecting to:', response.redirectUrl);
+            console.log('Creating redirect form to:', response.redirectUrl);
 
-            // Attempt redirect
+            // Create and submit form
             try {
-                // Try window.top first
-                if (window.top) {
-                    window.top.location.href = response.redirectUrl;
-                } else {
-                    // Fallback to current window
-                    window.location.href = response.redirectUrl;
-                }
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = response.redirectUrl;
+                form.target = '_top';
+
+                // Add session ID
+                const sessionInput = document.createElement('input');
+                sessionInput.type = 'hidden';
+                sessionInput.name = 'sessionId';
+                sessionInput.value = response.sessionId;
+                form.appendChild(sessionInput);
+
+                // Add page parameter
+                const pageInput = document.createElement('input');
+                pageInput.type = 'hidden';
+                pageInput.name = 'page';
+                pageInput.value = 'dashboard';
+                form.appendChild(pageInput);
+
+                // Add to body and submit
+                document.body.appendChild(form);
+                console.log('Submitting redirect form...');
+                form.submit();
             } catch (error) {
                 console.error('Redirect error:', error);
                 showError('Error during redirect: ' + error.message);

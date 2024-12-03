@@ -454,13 +454,22 @@ function serveLoginPage() {
     const template = HtmlService.createTemplateFromFile('Login');
     template.successUrl = ScriptApp.getService().getUrl() + '?page=dashboard';
     
-    return template
+    const output = template
         .evaluate()
         .setTitle('Login - 1PWR Procurement')
         .setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+
+    // Add sandbox permissions
+    const content = output.getContent().replace(
+        '<iframe',
+        '<iframe sandbox="allow-scripts allow-forms allow-same-origin allow-top-navigation allow-popups"'
+    );
+    output.setContent(content);
+    
+    return output;
 }
 
 function serveFormPage(e, user) {
