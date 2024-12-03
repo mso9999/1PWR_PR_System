@@ -35,218 +35,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <base target="_top">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .dashboard-container {
-            padding: 20px;
-        }
-        .status-card {
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .nav-user {
-            margin-left: auto;
-        }
-    </style>
+  <base target="_top">
+  <title>1PWR Procurement Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+  <?!= include('DashboardStyles'); ?>
+  <?!= include('SessionUtilities'); ?>
 </head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="#">
-            <img src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" height="30" alt="1PWR Logo">
-            Procurement System
-        </a>
-        <div class="nav-user">
-            <span class="navbar-text mr-3">
-                Welcome, <?= user.username ?>
-            </span>
-            <button class="btn btn-outline-light btn-sm" onclick="handleLogout()">Logout</button>
+<body class="bg-gray-100">
+  <!-- Header Section -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="py-4">
+        <!-- Top row with logo and user info -->
+        <div class="flex justify-between items-center mb-4">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <img 
+              src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" 
+              alt="1PWR Logo" 
+              class="h-10 w-auto"
+            />
+          </div>
+          <!-- User Info -->
+          <div class="flex items-center space-x-4">
+            <span class="text-gray-600">Welcome, <?= user.username ?></span>
+            <button onclick="handleLogout()" class="text-red-600 hover:text-red-800">Logout</button>
+          </div>
         </div>
-    </nav>
-
-    <!-- Main Dashboard Content -->
-    <div class="dashboard-container">
-        <!-- Organization Filter -->
-        <div class="row mb-4">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Organization Filter</h5>
-                        <select class="form-control" id="orgFilter" onchange="filterByOrg(this.value)">
-                            <option value="all">All Organizations</option>
-                            <option value="1PWR LESOTHO">1PWR LESOTHO</option>
-                            <option value="SMP">SMP</option>
-                            <option value="PUECO">PUECO</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Bottom row with existing functionality -->
+        <div class="flex justify-end items-center">
+          <!-- Submit New PR Button -->
+          <button
+            onclick="submitNewPR()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center font-medium no-underline cursor-pointer"
+            title="Create new Purchase Requisition"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Submit New PR
+          </button>
+          <!-- Last Update Timestamp -->
+          <div class="text-sm text-gray-500 ml-6">
+            Last updated: <span id="lastUpdate"></span>
+          </div>
         </div>
-
-        <!-- Status Grid -->
-        <div class="row">
-            <!-- Submitted PRs -->
-            <div class="col-md-4">
-                <div class="card status-card">
-                    <div class="card-header bg-info text-white">
-                        Submitted
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="submittedCount">Loading...</h5>
-                        <div id="submittedList" class="list-group">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- In Progress PRs -->
-            <div class="col-md-4">
-                <div class="card status-card">
-                    <div class="card-header bg-warning">
-                        In Progress
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="inProgressCount">Loading...</h5>
-                        <div id="inProgressList" class="list-group">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Completed PRs -->
-            <div class="col-md-4">
-                <div class="card status-card">
-                    <div class="card-header bg-success text-white">
-                        Completed
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title" id="completedCount">Loading...</h5>
-                        <div id="completedList" class="list-group">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Metrics Row -->
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Total PRs</h6>
-                        <h4 class="card-title" id="totalPRs">Loading...</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Urgent PRs</h6>
-                        <h4 class="card-title" id="urgentPRs">Loading...</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Avg Days Open</h6>
-                        <h4 class="card-title" id="avgDaysOpen">Loading...</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">Completion Rate</h6>
-                        <h4 class="card-title" id="completionRate">Loading...</h4>
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </header>
 
-    <script>
-        // Initialize dashboard data
-        document.addEventListener('DOMContentLoaded', function() {
-            loadDashboardData();
-            // Refresh every 5 minutes
-            setInterval(loadDashboardData, 300000);
-        });
+  <!-- Rest of the archived HTML content -->
+  <?!= include('DashboardContent'); ?>
 
-        function loadDashboardData() {
-            const orgFilter = document.getElementById('orgFilter').value;
-            
-            google.script.run
-                .withSuccessHandler(updateDashboard)
-                .withFailureHandler(handleError)
-                .getDashboardData(orgFilter);
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-4 flex items-center space-x-3">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <span class="text-gray-700 font-medium">Loading...</span>
+    </div>
+  </div>
+
+  <script>
+    // Initialize dashboard with session handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const sessionId = '<?= sessionId ?>';
+        if (!sessionId) {
+            window.location.href = '?page=login';
+            return;
         }
-
-        function updateDashboard(data) {
-            // Update counts
-            document.getElementById('submittedCount').textContent = `${data.submitted.length} PRs`;
-            document.getElementById('inProgressCount').textContent = `${data.inProgress.length} PRs`;
-            document.getElementById('completedCount').textContent = `${data.completed.length} PRs`;
-            
-            // Update metrics
-            document.getElementById('totalPRs').textContent = data.metrics.total;
-            document.getElementById('urgentPRs').textContent = data.metrics.urgent;
-            document.getElementById('avgDaysOpen').textContent = data.metrics.avgDays;
-            document.getElementById('completionRate').textContent = data.metrics.completionRate + '%';
-            
-            // Update lists
-            updatePRList('submittedList', data.submitted);
-            updatePRList('inProgressList', data.inProgress);
-            updatePRList('completedList', data.completed);
+        
+        // Store session ID
+        if (typeof SessionUtils !== 'undefined') {
+            SessionUtils.setSessionId(sessionId);
         }
+        
+        // Initialize dashboard
+        console.log('Document ready, initializing dashboard...');
+        initializeDashboard();
+        loadOrganizations();
+        loadDashboardData();
+    });
 
-        function updatePRList(elementId, prs) {
-            const listElement = document.getElementById(elementId);
-            listElement.innerHTML = '';
-            
-            prs.forEach(pr => {
-                const item = document.createElement('a');
-                item.href = '#';
-                item.className = 'list-group-item list-group-item-action';
-                item.onclick = () => viewPR(pr.number);
-                item.innerHTML = `
-                    <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1">${pr.number}</h6>
-                        <small>${pr.daysOpen} days</small>
-                    </div>
-                    <p class="mb-1">${pr.description}</p>
-                    <small>${pr.requestor}</small>
-                `;
-                listElement.appendChild(item);
-            });
-        }
+    function handleLogout() {
+        google.script.run
+            .withSuccessHandler(function() {
+                window.location.href = '?page=login';
+            })
+            .logout();
+    }
 
-        function filterByOrg(org) {
-            loadDashboardData();
-        }
-
-        function viewPR(prNumber) {
-            google.script.run
-                .withSuccessHandler(url => window.location.href = url)
-                .withFailureHandler(handleError)
-                .generateViewLink(prNumber);
-        }
-
-        function handleLogout() {
-            google.script.run
-                .withSuccessHandler(() => window.location.href = '?page=login')
-                .withFailureHandler(handleError)
-                .logout();
-        }
-
-        function handleError(error) {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        }
-    </script>
+    // Rest of the archived JavaScript content
+    <?!= include('DashboardScripts'); ?>
+  </script>
 </body>
 </html>
