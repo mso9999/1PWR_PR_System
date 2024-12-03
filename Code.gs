@@ -3389,37 +3389,5 @@ function getDeploymentId() {
   return deploymentId;
 }
 
-// Global exports for web app access
-function doGet(e) {
-  try {
-    Logger.log('==================== START doGet ====================');
-    Logger.log('Request parameters:', e.parameter);
-    
-    // Check if specific page is requested
-    const page = e.parameter.page;
-    
-    if (!page) {
-      Logger.log('No parameters, serving login page');
-      return HtmlService.createHtmlOutputFromFile('Login')
-        .setTitle('1PWR Procurement System')
-        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png');
-    }
-    
-    Logger.log('Page requested:', page);
-    
-    // Add other page routing logic here
-    
-  } catch (error) {
-    Logger.log('Error in doGet:', error);
-    return HtmlService.createHtmlOutput('An error occurred: ' + error.message);
-  }
-}
-
-// Make getActiveRequestors accessible to HTML
-global.getActiveRequestors = getActiveRequestors;
-global.verifyUser = verifyUser;
-global.getScriptId = getScriptId;
-global.storeSession = storeSession;
-
 
 
