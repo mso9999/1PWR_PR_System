@@ -168,9 +168,10 @@
                         google.script.run
                             .withSuccessHandler(function() {
                                 // Use Google's built-in redirection
-                                google.script.host.close();
-                                const scriptId = '<?= scriptId ?>';
-                                window.location.assign(`https://script.google.com/macros/s/${scriptId}/exec?page=dashboard`);
+                                const scriptId = '<?!= scriptId ?>';
+                                console.log('Redirecting with script ID:', scriptId);
+                                const dashboardUrl = `https://script.google.com/macros/s/${scriptId}/exec?page=dashboard`;
+                                window.top.location.href = dashboardUrl;
                             })
                             .withFailureHandler(function(error) {
                                 showError('Failed to store session: ' + error);

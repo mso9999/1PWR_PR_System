@@ -387,7 +387,8 @@ function doGet(e) {
   const html = template.evaluate()
     .setTitle('1PWR Procurement System')
     .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   
   return html;
 }
