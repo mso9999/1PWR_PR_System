@@ -167,10 +167,11 @@
                         // Store session in cache
                         google.script.run
                             .withSuccessHandler(function() {
-                                // After session is stored, navigate to dashboard
+                                // Get the deployment URL and navigate directly
                                 google.script.run
                                     .withSuccessHandler(function(url) {
-                                        window.location.href = url;
+                                        // Use direct navigation instead of iframe
+                                        window.top.location.href = url;
                                     })
                                     .withFailureHandler(function(error) {
                                         showError('Failed to redirect: ' + error);

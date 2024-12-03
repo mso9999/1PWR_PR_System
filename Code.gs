@@ -3253,8 +3253,12 @@ function navigateToDashboard(sessionId) {
     throw new Error('Invalid session');
   }
   
+  // Get the deployment URL
+  const scriptId = ScriptApp.getScriptId();
+  const deploymentId = getDeploymentId(); // You'll need to implement this
+  
   // Return the URL for the dashboard page
-  return ScriptApp.getService().getUrl() + '?page=dashboard&v=' + new Date().getTime();
+  return `https://script.google.com/macros/s/${deploymentId}/exec?page=dashboard&sessionId=${sessionId}&v=${new Date().getTime()}`;
 }
 
 /**
@@ -3380,6 +3384,22 @@ function storeSession(sessionId, user) {
   
   // Store session for 24 hours
   cache.put(sessionId, JSON.stringify(sessionData), 24 * 60 * 60);
+}
+
+/**
+ * Gets the current deployment ID
+ * @return {string} The deployment ID
+ */
+function getDeploymentId() {
+  // Get the current deployment ID from Properties Service
+  const scriptProperties = PropertiesService.getScriptProperties();
+  const deploymentId = scriptProperties.getProperty('DEPLOYMENT_ID');
+  
+  if (!deploymentId) {
+    throw new Error('Deployment ID not set. Please set it in script properties.');
+  }
+  
+  return deploymentId;
 }
 
 
