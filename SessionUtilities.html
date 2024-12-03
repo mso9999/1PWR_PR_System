@@ -21,9 +21,10 @@
     function closeOrRedirect(redirectUrl) {
         console.log('Attempting navigation to:', redirectUrl);
         try {
-            // Try to close dialog and navigate
-            google.script.host.close();
-            window.open(redirectUrl, '_top');
+            // Try to navigate using google.script.host.editor
+            google.script.host.editor.focus();
+            window.open(redirectUrl, '_blank', 'noreferrer');
+            google.script.host.editor.focus();
         } catch (e) {
             console.warn('Navigation fallback:', e);
             try {
