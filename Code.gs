@@ -369,15 +369,25 @@ function verifyExecutionContext() {
  * @return {HTMLOutput} The HTML page to display
  */
 function doGet(e) {
+  // Get the requested page or default to login
   const page = e.parameter.page || 'login';
-  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardWeb' : 'Login');
   
-  // Add script ID for client-side navigation
+  // Create template from the appropriate file
+  let template;
+  if (page === 'dashboard') {
+    template = HtmlService.createTemplateFromFile('DashboardWeb');
+  } else {
+    template = HtmlService.createTemplateFromFile('Login');
+  }
+  
+  // Add common template variables
   template.scriptId = ScriptApp.getScriptId();
   
+  // Evaluate and configure the HTML output
   const html = template.evaluate()
     .setTitle('1PWR Procurement System')
-    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png');
+    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   
   return html;
 }

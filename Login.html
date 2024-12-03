@@ -169,7 +169,8 @@
                             .withSuccessHandler(function() {
                                 // Use Google's built-in redirection
                                 google.script.host.close();
-                                window.location.assign('https://script.google.com/macros/s/<?= scriptId ?>/exec?page=dashboard');
+                                const scriptId = '<?= scriptId ?>';
+                                window.location.assign(`https://script.google.com/macros/s/${scriptId}/exec?page=dashboard`);
                             })
                             .withFailureHandler(function(error) {
                                 showError('Failed to store session: ' + error);
