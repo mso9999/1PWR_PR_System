@@ -35,96 +35,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base target="_top">
-  <title>1PWR Procurement Dashboard</title>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-  <?!= include('DashboardStyles'); ?>
-  <?!= include('SessionUtilities'); ?>
-  <?!= include('script'); ?>
+    <base target="_top">
+    <title>1PWR Procurement Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
-  <!-- Header Section -->
-  <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="py-4">
-        <!-- Top row with logo -->
-        <div class="flex justify-between items-center mb-4">
-          <!-- Logo -->
-          <div class="flex items-center">
-            <img 
-              src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" 
-              alt="1PWR Logo" 
-              class="h-10 w-auto"
-            />
-          </div>
-          <!-- User Info -->
-          <div class="flex items-center space-x-4">
-            <span class="text-gray-600">Welcome, <?= user.username ?></span>
-            <button onclick="handleLogout()" class="text-red-600 hover:text-red-800">Logout</button>
-          </div>
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-4">
+                <!-- Logo and User Info -->
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <img src="https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png" alt="1PWR Logo" class="h-10 w-auto">
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Welcome, <?= user.username ?></span>
+                        <button onclick="handleLogout()" class="text-red-600 hover:text-red-800">Logout</button>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Bottom row with existing functionality -->
-        <div class="flex justify-end items-center">
-          <!-- Submit New PR Button -->
-          <button
-            onclick="submitNewPR()"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center font-medium no-underline cursor-pointer"
-            title="Create new Purchase Requisition"
-          >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Submit New PR
-          </button>
-          <!-- Last Update Timestamp -->
-          <div class="text-sm text-gray-500 ml-6">
-            Last updated: <span id="lastUpdate"></span>
-          </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+            <div id="content">Loading dashboard content...</div>
         </div>
-      </div>
-    </div>
-  </header>
+    </main>
 
-  <?!= include('DashboardContent'); ?>
+    <script>
+        // Basic initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard loading...');
+            loadDashboardData();
+        });
 
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg p-4 flex items-center space-x-3">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      <span class="text-gray-700 font-medium">Loading...</span>
-    </div>
-  </div>
-
-  <script>
-    // Initialize dashboard with session handling
-    document.addEventListener('DOMContentLoaded', function() {
-        const sessionId = '<?= sessionId ?>';
-        if (!sessionId) {
-            window.location.href = '?page=login';
-            return;
+        function loadDashboardData() {
+            console.log('Loading dashboard data...');
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    console.log('Data received:', data);
+                    document.getElementById('content').innerHTML = 'Dashboard loaded successfully!';
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error:', error);
+                    document.getElementById('content').innerHTML = 'Error loading dashboard: ' + error;
+                })
+                .getDashboardData();
         }
-        
-        // Store session ID
-        if (typeof SessionUtils !== 'undefined') {
-            SessionUtils.setSessionId(sessionId);
-        }
-        
-        // Initialize dashboard
-        console.log('Document ready, initializing dashboard...');
-        initializeDashboard();
-        loadOrganizations();
-        loadDashboardData();
-    });
 
-    function handleLogout() {
-        google.script.run
-            .withSuccessHandler(function() {
-                window.location.href = '?page=login';
-            })
-            .logout();
-    }
-  </script>
-  <?!= include('DashboardScripts'); ?>
+        function handleLogout() {
+            google.script.run
+                .withSuccessHandler(function() {
+                    window.location.href = '?page=login';
+                })
+                .logout();
+        }
+    </script>
 </body>
 </html>
