@@ -401,29 +401,12 @@ function doGet(e) {
   const template = HtmlService.createTemplateFromFile('Login');
   template.nonce = nonce;
   
-  const output = template.evaluate()
+  return HtmlService.createHtmlOutput(template.evaluate().getContent())
     .setTitle('1PWR Purchase Request System')
     .setFaviconUrl('https://www.google.com/images/favicon.ico')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
-    .addMetaTag('charset', 'UTF-8')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-
-  // Set security headers
-  const headers = output.getHeaders();
-  headers['X-Content-Type-Options'] = 'nosniff';
-  headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
-  headers['X-XSS-Protection'] = '1; mode=block';
-  headers['Content-Security-Policy'] = `
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'nonce-${nonce}' https://script.google.com https://*.googleusercontent.com;
-    style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com;
-    frame-ancestors 'self' https://script.google.com;
-    form-action 'self' https://script.google.com;
-    base-uri 'self';
-    connect-src 'self' https://script.google.com https://*.googleusercontent.com
-  `.replace(/\s+/g, ' ').trim();
-
-  return output;
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
 }
 
 /**
