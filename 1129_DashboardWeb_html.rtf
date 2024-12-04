@@ -1,0 +1,842 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red109\green109\blue109;\red246\green247\blue249;\red251\green0\blue7;
+\red46\green49\blue51;\red42\green42\blue42;\red20\green67\blue174;\red18\green115\blue126;\red162\green0\blue16;
+\red21\green98\blue39;\red77\green80\blue85;\red24\green25\blue27;\red186\green6\blue115;}
+{\*\expandedcolortbl;;\cssrgb\c50196\c50196\c50196;\cssrgb\c97255\c97647\c98039;\cssrgb\c100000\c0\c0;
+\cssrgb\c23529\c25098\c26275;\cssrgb\c21961\c21961\c21961;\cssrgb\c9412\c35294\c73725;\cssrgb\c3529\c52157\c56863;\cssrgb\c70196\c7843\c7059;
+\cssrgb\c7451\c45098\c20000;\cssrgb\c37255\c38824\c40784;\cssrgb\c12549\c12941\c14118;\cssrgb\c78824\c15294\c52549;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 <!DOCTYPE\cf4 \strokec4  html\cf2 \strokec2 >\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 <\cf7 \strokec7 html\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cf6 \cb3 \strokec6 <\cf7 \strokec7 head\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf6 \strokec6 <\cf7 \strokec7 base\cf5 \strokec5  \cf8 \strokec8 target\cf6 \strokec6 =\cf9 \strokec9 "_top"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 title\cf6 \strokec6 >\cf5 \strokec5 1PWR Procurement Dashboard\cf6 \strokec6 </\cf7 \strokec7 title\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 link\cf5 \strokec5  \cf8 \strokec8 href\cf6 \strokec6 =\cf9 \strokec9 "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"\cf5 \strokec5  \cf8 \strokec8 rel\cf6 \strokec6 =\cf9 \strokec9 "stylesheet"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf5 \strokec5 ?!= include('DashboardStyles'); ?>\cb1 \
+\cb3   \cf6 \strokec6 <\cf5 \strokec5 ?!= include('SessionUtilities'); ?>\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 </\cf7 \strokec7 head\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cf6 \cb3 \strokec6 <\cf7 \strokec7 body\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "bg-gray-100"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf10 \strokec10 <!-- Header Section -->\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 header\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "bg-white shadow-sm"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "py-4"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf10 \strokec10 <!-- Top row with logo -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "flex justify-between items-center mb-4"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf10 \strokec10 <!-- Logo -->\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "flex items-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             \cf6 \strokec6 <\cf7 \strokec7 img\cf5 \strokec5  \cb1 \
+\cb3               \cf8 \strokec8 src\cf6 \strokec6 =\cf9 \strokec9 "https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png"\cf5 \strokec5  \cb1 \
+\cb3               \cf8 \strokec8 alt\cf6 \strokec6 =\cf9 \strokec9 "1PWR Logo"\cf5 \strokec5  \cb1 \
+\cb3               \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "h-10 w-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf6 \strokec6 />\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cb1 \
+\cb3         \cf10 \strokec10 <!-- Bottom row with existing functionality -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "flex justify-end items-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf10 \strokec10 <!-- Submit New PR Button -->\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 button\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 onclick\cf6 \strokec6 =\cf9 \strokec9 "submitNewPR()"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center font-medium no-underline cursor-pointer"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 title\cf6 \strokec6 =\cf9 \strokec9 "Create new Purchase Requisition"\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             \cf6 \strokec6 <\cf7 \strokec7 svg\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "w-5 h-5 mr-2"\cf5 \strokec5  \cf8 \strokec8 fill\cf6 \strokec6 =\cf9 \strokec9 "none"\cf5 \strokec5  \cf8 \strokec8 stroke\cf6 \strokec6 =\cf9 \strokec9 "currentColor"\cf5 \strokec5  \cf8 \strokec8 viewBox\cf6 \strokec6 =\cf9 \strokec9 "0 0 24 24"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3               \cf6 \strokec6 <\cf7 \strokec7 path\cf5 \strokec5  \cf8 \strokec8 stroke-linecap\cf6 \strokec6 =\cf9 \strokec9 "round"\cf5 \strokec5  \cf8 \strokec8 stroke-linejoin\cf6 \strokec6 =\cf9 \strokec9 "round"\cf5 \strokec5  \cf8 \strokec8 stroke-width\cf6 \strokec6 =\cf9 \strokec9 "2"\cf5 \strokec5  \cf8 \strokec8 d\cf6 \strokec6 =\cf9 \strokec9 "M12 4v16m8-8H4"\cf6 \strokec6 />\cf5 \cb1 \strokec5 \
+\cb3             \cf6 \strokec6 </\cf7 \strokec7 svg\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Submit New PR\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 button\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf10 \strokec10 <!-- Last Update Timestamp -->\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-sm text-gray-500 ml-6"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Last updated: \cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "lastUpdate"\cf6 \strokec6 ></\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 </\cf7 \strokec7 header\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3   \cf10 \strokec10 <!-- Organization Toggle Section -->\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "flex justify-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "relative w-64"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 select\cf5 \strokec5  \cb1 \
+\cb3           \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "orgSelect"\cf5 \strokec5  \cb1 \
+\cb3           \cf8 \strokec8 onchange\cf6 \strokec6 =\cf9 \strokec9 "handleOrgChange(this.value)"\cf5 \cb1 \strokec5 \
+\cb3           \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 pl-3 pr-10 text-base"\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 option\cf5 \strokec5  \cf8 \strokec8 value\cf6 \strokec6 =\cf9 \strokec9 ""\cf6 \strokec6 >\cf5 \strokec5 All Organizations\cf6 \strokec6 </\cf7 \strokec7 option\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf10 \strokec10 <!-- Options will be populated dynamically -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 select\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3   \cf10 \strokec10 <!-- Main Dashboard Content -->\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "bg-white rounded-lg shadow"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf10 \strokec10 <!-- Status Grid Layout -->\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "grid grid-cols-7 gap-4 p-6"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf10 \strokec10 <!-- Submitted Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             \cf6 \strokec6 <\cf7 \strokec7 a\cf5 \strokec5  \cf8 \strokec8 href\cf6 \strokec6 =\cf9 \strokec9 "#"\cf5 \strokec5  \cf8 \strokec8 onclick\cf6 \strokec6 =\cf9 \strokec9 "viewSubmitted(); return false;"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "cursor-pointer"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3               Submitted [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "submittedCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-blue-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3             \cf6 \strokec6 </\cf7 \strokec7 a\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "submittedList"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "Submitted"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- In Queue Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             In Queue [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "inQueueCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-yellow-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "inQueueList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "In Queue"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- Ordered Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Ordered [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "orderedCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-green-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "orderedList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "Ordered"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- Completed Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Completed [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "completedCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-gray-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "completedList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "Completed"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- R&R Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             R&R [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "rAndRCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-orange-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "rAndRList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "R&R"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- Rejected Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Rejected [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "rejectedCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-red-600"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "rejectedList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "Rejected"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3         \cf10 \strokec10 <!-- Canceled Status Section -->\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-center"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 h3\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-lg font-semibold"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3             Canceled [\cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "canceledCount"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-gray-400"\cf6 \strokec6 >\cf5 \strokec5 0\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \strokec5 ]\cb1 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 h3\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "canceledList"\cf5 \strokec5  \cb1 \
+\cb3             \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"\cf5 \cb1 \strokec5 \
+\cb3             \cf8 \strokec8 data-status\cf6 \strokec6 =\cf9 \strokec9 "Canceled"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3           \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3         \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3   \cf10 \strokec10 <!-- Loading Overlay -->\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 id\cf6 \strokec6 =\cf9 \strokec9 "loadingOverlay"\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "bg-white rounded-lg p-4 flex items-center space-x-3"\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 <\cf7 \strokec7 div\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"\cf6 \strokec6 ></\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3       \cf6 \strokec6 <\cf7 \strokec7 span\cf5 \strokec5  \cf8 \strokec8 class\cf6 \strokec6 =\cf9 \strokec9 "text-gray-700 font-medium"\cf6 \strokec6 >\cf5 \strokec5 Loading...\cf6 \strokec6 </\cf7 \strokec7 span\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3   \cf6 \strokec6 </\cf7 \strokec7 div\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\
+\cb3   \cb1 \
+\cb3   \cf6 \strokec6 <\cf7 \strokec7 script\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * 1PWR Procurement System - Dashboard JavaScript\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * --------------------------------------------\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * This script handles all client-side functionality for the procurement dashboard,\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * including organization filtering, data loading, auto-refresh, and UI updates.\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * \cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Main Components:\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 1. Organization Selection & Filtering\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 2. Dashboard Data Management\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 3. Auto-refresh System\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 4. UI Update Handlers\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 5. Error Handling & Loading States\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * 6. Utility Functions\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Global State Management\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf7 \strokec7 let\cf5 \strokec5  \cf12 \strokec12 selectedOrg\cf5 \strokec5  = \cf9 \strokec9 '1PWR LESOTHO'\cf5 \strokec5 ; \cf11 \strokec11 // Current selected organization (empty for all)\cf5 \cb1 \strokec5 \
+\cb3     \cf7 \strokec7 let\cf5 \strokec5  \cf12 \strokec12 refreshInterval\cf5 \strokec5  = \cf7 \strokec7 null\cf5 \strokec5 ; \cf11 \strokec11 // Auto-refresh interval handler\cf5 \cb1 \strokec5 \
+\cb3     \cf7 \strokec7 let\cf5 \strokec5  \cf12 \strokec12 lastUpdateTime\cf5 \strokec5  = \cf7 \strokec7 null\cf5 \strokec5 ; \cf11 \strokec11 // Last data update timestamp\cf5 \cb1 \strokec5 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Status to Element ID Mapping\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Mapping of status to count element IDs\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 statusCountIdMap\cf5 \strokec5  = \{\cb1 \
+\cb3         \cf9 \strokec9 'Submitted'\cf5 \strokec5 : \cf9 \strokec9 'submittedCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'In Queue'\cf5 \strokec5 : \cf9 \strokec9 'inQueueCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Ordered'\cf5 \strokec5 : \cf9 \strokec9 'orderedCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Completed'\cf5 \strokec5 : \cf9 \strokec9 'completedCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'R&R'\cf5 \strokec5 : \cf9 \strokec9 'rAndRCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Rejected'\cf5 \strokec5 : \cf9 \strokec9 'rejectedCount'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Canceled'\cf5 \strokec5 : \cf9 \strokec9 'canceledCount'\cf5 \cb1 \strokec5 \
+\cb3     \};\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Mapping of status to list element IDs\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 statusListIdMap\cf5 \strokec5  = \{\cb1 \
+\cb3         \cf9 \strokec9 'Submitted'\cf5 \strokec5 : \cf9 \strokec9 'submittedList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'In Queue'\cf5 \strokec5 : \cf9 \strokec9 'inQueueList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Ordered'\cf5 \strokec5 : \cf9 \strokec9 'orderedList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Completed'\cf5 \strokec5 : \cf9 \strokec9 'completedList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'R&R'\cf5 \strokec5 : \cf9 \strokec9 'rAndRList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Rejected'\cf5 \strokec5 : \cf9 \strokec9 'rejectedList'\cf5 \strokec5 ,\cb1 \
+\cb3         \cf9 \strokec9 'Canceled'\cf5 \strokec5 : \cf9 \strokec9 'canceledList'\cf5 \cb1 \strokec5 \
+\cb3     \};\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Gets count element ID for status\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} status - PR status\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} Element ID for count display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 getCountId\cf5 \strokec5 (\cf12 \strokec12 status\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 statusCountIdMap\cf5 \strokec5 [\cf12 \strokec12 status\cf5 \strokec5 ] || \cf9 \strokec9 ''\cf5 \strokec5 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Gets list element ID for status\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} status - PR status\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} Element ID for PR list\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 getListId\cf5 \strokec5 (\cf12 \strokec12 status\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 statusListIdMap\cf5 \strokec5 [\cf12 \strokec12 status\cf5 \strokec5 ] || \cf9 \strokec9 ''\cf5 \strokec5 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Initialization & Setup\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Initialize dashboard when document is ready\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Sets up event listeners, loads initial data, and starts refresh cycle\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 addEventListener\cf5 \strokec5 (\cf9 \strokec9 'DOMContentLoaded'\cf5 \strokec5 , \cf7 \strokec7 function\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Document ready, initializing dashboard...'\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 initializeDashboard\cf5 \strokec5 ();\cb1 \
+\cb3         \cf12 \strokec12 loadOrganizations\cf5 \strokec5 ();\cb1 \
+\cb3         \cf12 \strokec12 loadDashboardData\cf5 \strokec5 (); \cf11 \strokec11 // Load data initially\cf5 \cb1 \strokec5 \
+\cb3     \});\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Main dashboard initialization\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Coordinates all startup processes\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 initializeDashboard\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Starting dashboard initialization'\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 setupEventListeners\cf5 \strokec5 ();\cb1 \
+\cb3         \cf12 \strokec12 startAutoRefresh\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Sets up all event listeners for dashboard interactivity\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 setupEventListeners\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Setting up event listeners'\cf5 \strokec5 );\cb1 \
+\
+\cb3         \cf11 \strokec11 // Organization selection handling\cf5 \cb1 \strokec5 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 orgSelect\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf9 \strokec9 'orgSelect'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 orgSelect\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 orgSelect\cf5 \strokec5 .\cf12 \strokec12 addEventListener\cf5 \strokec5 (\cf9 \strokec9 'change'\cf5 \strokec5 , \cf7 \strokec7 function\cf5 \strokec5 () \{\cb1 \
+\cb3                 \cf12 \strokec12 handleOrgChange\cf5 \strokec5 (\cf7 \strokec7 this\cf5 \strokec5 .\cf12 \strokec12 value\cf5 \strokec5 );\cb1 \
+\cb3             \});\cb1 \
+\cb3         \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3             \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 warn\cf5 \strokec5 (\cf9 \strokec9 'Organization select element not found'\cf5 \strokec5 );\cb1 \
+\cb3         \}\cb1 \
+\
+\cb3         \cf11 \strokec11 // PR list item clicks\cf5 \cb1 \strokec5 \
+\cb3         \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 querySelectorAll\cf5 \strokec5 (\cf9 \strokec9 '[id$="List"]'\cf5 \strokec5 ).\cf12 \strokec12 forEach\cf5 \strokec5 (\cf12 \strokec12 list\cf5 \strokec5  => \{\cb1 \
+\cb3             \cf12 \strokec12 list\cf5 \strokec5 .\cf12 \strokec12 addEventListener\cf5 \strokec5 (\cf9 \strokec9 'click'\cf5 \strokec5 , \cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 e\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 prItem\cf5 \strokec5  = \cf12 \strokec12 e\cf5 \strokec5 .\cf12 \strokec12 target\cf5 \strokec5 .\cf12 \strokec12 closest\cf5 \strokec5 (\cf9 \strokec9 '.pr-item'\cf5 \strokec5 );\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 prItem\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 prNumber\cf5 \strokec5  = \cf12 \strokec12 prItem\cf5 \strokec5 .\cf12 \strokec12 getAttribute\cf5 \strokec5 (\cf9 \strokec9 'data-pr'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 prNumber\cf5 \strokec5 ) \{\cb1 \
+\cb3                         \cf12 \strokec12 viewPRDetails\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3                     \}\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \});\cb1 \
+\cb3         \});\cb1 \
+\
+\cb3         \cf11 \strokec11 // Visibility change handling for refresh management\cf5 \cb1 \strokec5 \
+\cb3         \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 addEventListener\cf5 \strokec5 (\cf9 \strokec9 'visibilitychange'\cf5 \strokec5 , \cf12 \strokec12 handleVisibilityChange\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Organization Management\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Loads organization list from server\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Populates organization dropdown with active organizations\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 loadOrganizations\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Loading organizations from server'\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 orgs\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Received organizations:'\cf5 \strokec5 , \cf12 \strokec12 orgs\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 populateOrgDropdown\cf5 \strokec5 (\cf12 \strokec12 orgs\cf5 \strokec5 );\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to load organizations:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to load organizations. Please refresh the page.'\cf5 \strokec5 );\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 getActiveOrganizations\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Populates organization dropdown with received data\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Sets default to 1PWR LESOTHO\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{Array<string>\} orgs - List of active organizations\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 populateOrgDropdown\cf5 \strokec5 (\cf12 \strokec12 orgs\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 select\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf9 \strokec9 'orgSelect'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 select\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Organization select element not found'\cf5 \strokec5 );\cb1 \
+\cb3             \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3         \}\cb1 \
+\
+\cb3         \cf11 \strokec11 // Start with "All Organizations" option\cf5 \cb1 \strokec5 \
+\cb3         \cf12 \strokec12 select\cf5 \strokec5 .\cf12 \strokec12 innerHTML\cf5 \strokec5  = \cf9 \strokec9 '<option value="">All Organizations</option>'\cf5 \strokec5 ;\cb1 \
+\
+\cb3         \cf11 \strokec11 // Add organizations from the sheet\cf5 \cb1 \strokec5 \
+\cb3         \cf12 \strokec12 orgs\cf5 \strokec5 .\cf12 \strokec12 forEach\cf5 \strokec5 (\cf12 \strokec12 org\cf5 \strokec5  => \{\cb1 \
+\cb3             \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 option\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 createElement\cf5 \strokec5 (\cf9 \strokec9 'option'\cf5 \strokec5 );\cb1 \
+\cb3             \cf12 \strokec12 option\cf5 \strokec5 .\cf12 \strokec12 value\cf5 \strokec5  = \cf12 \strokec12 org\cf5 \strokec5 ;\cb1 \
+\cb3             \cf12 \strokec12 option\cf5 \strokec5 .\cf12 \strokec12 textContent\cf5 \strokec5  = \cf12 \strokec12 org\cf5 \strokec5 ;\cb1 \
+\cb3             \cf11 \strokec11 // Set selected attribute for 1PWR LESOTHO\cf5 \cb1 \strokec5 \
+\cb3             \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 org\cf5 \strokec5  === \cf9 \strokec9 '1PWR LESOTHO'\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 option\cf5 \strokec5 .\cf12 \strokec12 selected\cf5 \strokec5  = \cf7 \strokec7 true\cf5 \strokec5 ;\cb1 \
+\cb3             \}\cb1 \
+\cb3             \cf12 \strokec12 select\cf5 \strokec5 .\cf12 \strokec12 appendChild\cf5 \strokec5 (\cf12 \strokec12 option\cf5 \strokec5 );\cb1 \
+\cb3         \});\cb1 \
+\
+\cb3         \cf11 \strokec11 // Ensure the selection triggers initial data load\cf5 \cb1 \strokec5 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 selectedOrg\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 selectedOrg\cf5 \strokec5  = \cf9 \strokec9 '1PWR LESOTHO'\cf5 \strokec5 ;\cb1 \
+\cb3             \cf12 \strokec12 loadDashboardData\cf5 \strokec5 ();\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Handles organization selection change\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} org - Selected organization\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 handleOrgChange\cf5 \strokec5 (\cf12 \strokec12 org\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Organization change:'\cf5 \strokec5 , \cf12 \strokec12 org\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 selectedOrg\cf5 \strokec5  === \cf12 \strokec12 org\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\
+\cb3         \cf12 \strokec12 selectedOrg\cf5 \strokec5  = \cf12 \strokec12 org\cf5 \strokec5 ;\cb1 \
+\cb3         \cf12 \strokec12 loadDashboardData\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Data Loading & Dashboard Updates\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Loads dashboard data from server based on selected organization\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 loadDashboardData\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Loading dashboard data for org:'\cf5 \strokec5 , \cf12 \strokec12 selectedOrg\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 showLoading\cf5 \strokec5 ();\cb1 \
+\
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Received response:'\cf5 \strokec5 , \cf12 \strokec12 response\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 hideLoading\cf5 \strokec5 ();\cb1 \
+\
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 response\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'No response received from server'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3                 \}\cb1 \
+\
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 success\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5  || \cf9 \strokec9 'Failed to load dashboard data'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3                 \}\cb1 \
+\
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 data\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Response missing data structure'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3                 \}\cb1 \
+\
+\cb3                 \cf12 \strokec12 updateDashboard\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 data\cf5 \strokec5 );\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 timestamp\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 updateLastUpdated\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 timestamp\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to load dashboard data:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Error loading dashboard data: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 hideLoading\cf5 \strokec5 ();\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 getDashboardData\cf5 \strokec5 (\cf12 \strokec12 selectedOrg\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Updates dashboard UI with received data\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{Object\} data - Dashboard data from server\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 updateDashboard\cf5 \strokec5 (\cf12 \strokec12 data\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Updating dashboard with data:'\cf5 \strokec5 , \cf12 \strokec12 data\cf5 \strokec5 );\cb1 \
+\
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 data\cf5 \strokec5  || !\cf12 \strokec12 data\cf5 \strokec5 .\cf12 \strokec12 countsByStatus\cf5 \strokec5  || !\cf12 \strokec12 data\cf5 \strokec5 .\cf12 \strokec12 prs\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Invalid data structure received:'\cf5 \strokec5 , \cf12 \strokec12 data\cf5 \strokec5 );\cb1 \
+\cb3             \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Invalid data structure received'\cf5 \strokec5 );\cb1 \
+\cb3             \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3         \}\cb1 \
+\
+\cb3         \cf11 \strokec11 // Update status counts using countsByStatus\cf5 \cb1 \strokec5 \
+\cb3         \cf13 \strokec13 Object\cf5 \strokec5 .\cf12 \strokec12 entries\cf5 \strokec5 (\cf12 \strokec12 data\cf5 \strokec5 .\cf12 \strokec12 countsByStatus\cf5 \strokec5 ).\cf12 \strokec12 forEach\cf5 \strokec5 (([\cf12 \strokec12 status\cf5 \strokec5 , \cf12 \strokec12 count\cf5 \strokec5 ]) => \{\cb1 \
+\cb3             \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 countElementId\cf5 \strokec5  = \cf12 \strokec12 getCountId\cf5 \strokec5 (\cf12 \strokec12 status\cf5 \strokec5 );\cb1 \
+\cb3             \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 countElementId\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 countElement\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf12 \strokec12 countElementId\cf5 \strokec5 );\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 countElement\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 countElement\cf5 \strokec5 .\cf12 \strokec12 textContent\cf5 \strokec5  = \cf12 \strokec12 count\cf5 \strokec5 ;\cb1 \
+\cb3                 \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 warn\cf5 \strokec5 (\cf9 \strokec9 `Count element with ID '\cf5 \strokec5 $\{\cf12 \strokec12 countElementId\cf5 \strokec5 \}\cf9 \strokec9 ' not found for status '\cf5 \strokec5 $\{\cf12 \strokec12 status\cf5 \strokec5 \}\cf9 \strokec9 '`\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 warn\cf5 \strokec5 (\cf9 \strokec9 `No mapping found for status '\cf5 \strokec5 $\{\cf12 \strokec12 status\cf5 \strokec5 \}\cf9 \strokec9 '`\cf5 \strokec5 );\cb1 \
+\cb3             \}\cb1 \
+\cb3         \});\cb1 \
+\
+\cb3         \cf11 \strokec11 // Update PR lists\cf5 \cb1 \strokec5 \
+\cb3         \cf13 \strokec13 Object\cf5 \strokec5 .\cf12 \strokec12 entries\cf5 \strokec5 (\cf12 \strokec12 data\cf5 \strokec5 .\cf12 \strokec12 prs\cf5 \strokec5 ).\cf12 \strokec12 forEach\cf5 \strokec5 (([\cf12 \strokec12 status\cf5 \strokec5 , \cf12 \strokec12 prs\cf5 \strokec5 ]) => \{\cb1 \
+\cb3             \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 listElementId\cf5 \strokec5  = \cf12 \strokec12 getListId\cf5 \strokec5 (\cf12 \strokec12 status\cf5 \strokec5 );\cb1 \
+\cb3             \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 listElementId\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 listElement\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf12 \strokec12 listElementId\cf5 \strokec5 );\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 listElement\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 listElement\cf5 \strokec5 .\cf12 \strokec12 innerHTML\cf5 \strokec5  = \cf12 \strokec12 generatePRList\cf5 \strokec5 (\cf12 \strokec12 prs\cf5 \strokec5 );\cb1 \
+\cb3                 \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 warn\cf5 \strokec5 (\cf9 \strokec9 `List element with ID '\cf5 \strokec5 $\{\cf12 \strokec12 listElementId\cf5 \strokec5 \}\cf9 \strokec9 ' not found for status '\cf5 \strokec5 $\{\cf12 \strokec12 status\cf5 \strokec5 \}\cf9 \strokec9 '`\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 warn\cf5 \strokec5 (\cf9 \strokec9 `No mapping found for status '\cf5 \strokec5 $\{\cf12 \strokec12 status\cf5 \strokec5 \}\cf9 \strokec9 '`\cf5 \strokec5 );\cb1 \
+\cb3             \}\cb1 \
+\cb3         \});\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Generates HTML for PR list items with proper links\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{Array<Object>\} prs - List of PRs to display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} HTML string for PR list\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 generatePRList\cf5 \strokec5 (\cf12 \strokec12 prs\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 prs\cf5 \strokec5 .\cf12 \strokec12 length\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf7 \strokec7 return\cf5 \strokec5  \cf9 \strokec9 '<p class="text-gray-500 text-sm">No PRs</p>'\cf5 \strokec5 ;\cb1 \
+\cb3         \}\cb1 \
+\
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 prs\cf5 \strokec5 .\cf12 \strokec12 map\cf5 \strokec5 (\cf12 \strokec12 pr\cf5 \strokec5  => \cf9 \strokec9 `\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9             <div class="pr-item hover:bg-gray-50 p-2 rounded mb-2" data-pr="\cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 prNumber\cf5 \strokec5 \}\cf9 \strokec9 ">\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                 <div class="text-left">\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                     <a href="#" onclick="openPRView('\cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 prNumber\cf5 \strokec5 \}\cf9 \strokec9 '); return false;" \cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                        class="font-medium text-blue-600 hover:text-blue-900">\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                         \cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 prNumber\cf5 \strokec5 \}\cb1 \
+\cf9 \cb3 \strokec9                     </a>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                     <div class="text-sm text-gray-600 truncate" title="\cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 description\cf5 \strokec5 \}\cf9 \strokec9 ">\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                         \cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 description\cf5 \strokec5 \}\cb1 \
+\cf9 \cb3 \strokec9                     </div>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                     <div class="text-xs text-gray-500">\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                         \cf5 \strokec5 $\{\cf12 \strokec12 formatDate\cf5 \strokec5 (\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 timestamp\cf5 \strokec5 )\}\cf9 \strokec9  - \cf5 \strokec5 $\{\cf12 \strokec12 pr\cf5 \strokec5 .\cf12 \strokec12 requestor\cf5 \strokec5 \}\cb1 \
+\cf9 \cb3 \strokec9                     </div>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9                 </div>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9             </div>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9         `\cf5 \strokec5 ).\cf12 \strokec12 join\cf5 \strokec5 (\cf9 \strokec9 ''\cf5 \strokec5 );\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Opens PR details view\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} prNumber - PR number to view\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 openPRView\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Opening PR view for:'\cf5 \strokec5 , \cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?pr='\cf5 \strokec5  + \cf12 \strokec12 encodeURIComponent\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3                 \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Navigation failed:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to navigate: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 generateViewLink\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Retrieves the script URL for building links\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} The script URL\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 getScriptUrl\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf11 \strokec11 // Corrected to use window.location.origin + window.location.pathname\cf5 \cb1 \strokec5 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 origin\cf5 \strokec5  + \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 pathname\cf5 \strokec5 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Navigates to the "Submitted" PRs page\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 viewSubmitted\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'viewSubmitted clicked'\cf5 \strokec5 );\cb1 \
+\cb3         \cf11 \strokec11 // Show loading state\cf5 \cb1 \strokec5 \
+\cb3         \cf12 \strokec12 showLoading\cf5 \strokec5 ();\cb1 \
+\cb3         \cb1 \
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Navigating to:'\cf5 \strokec5 , \cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?page=submitted'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?page=submitted'\cf5 \strokec5 ;\cb1 \
+\cb3                 \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Navigation failed:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to navigate: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 getWebAppUrl\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // Auto-refresh & Visibility Management\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Starts auto-refresh cycle for dashboard data\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 startAutoRefresh\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 refreshInterval\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 clearInterval\cf5 \strokec5 (\cf12 \strokec12 refreshInterval\cf5 \strokec5 );\cb1 \
+\cb3         \}\cb1 \
+\
+\cb3         \cf12 \strokec12 refreshInterval\cf5 \strokec5  = \cf12 \strokec12 setInterval\cf5 \strokec5 (() => \{\cb1 \
+\cb3             \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 hidden\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 loadDashboardData\cf5 \strokec5 ();\cb1 \
+\cb3             \}\cb1 \
+\cb3         \}, \cf8 \strokec8 300000\cf5 \strokec5 ); \cf11 \strokec11 // 5 minutes\cf5 \cb1 \strokec5 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Handles page visibility changes\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * Pauses refresh when page is hidden, resumes when visible\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 handleVisibilityChange\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 hidden\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 refreshInterval\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 clearInterval\cf5 \strokec5 (\cf12 \strokec12 refreshInterval\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 refreshInterval\cf5 \strokec5  = \cf7 \strokec7 null\cf5 \strokec5 ;\cb1 \
+\cb3             \}\cb1 \
+\cb3         \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3             \cf12 \strokec12 loadDashboardData\cf5 \strokec5 ();\cb1 \
+\cb3             \cf12 \strokec12 startAutoRefresh\cf5 \strokec5 ();\cb1 \
+\cb3         \}\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 // UI Utilities & Helpers\cf5 \cb1 \strokec5 \
+\cb3     \cf11 \strokec11 //==============================================================================\cf5 \cb1 \strokec5 \
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Updates last update timestamp display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} timestamp - ISO timestamp string\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 updateLastUpdated\cf5 \strokec5 (\cf12 \strokec12 timestamp\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 element\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf9 \strokec9 'lastUpdate'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 element\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 element\cf5 \strokec5 .\cf12 \strokec12 textContent\cf5 \strokec5  = \cf12 \strokec12 formatDateTime\cf5 \strokec5 (\cf7 \strokec7 new\cf5 \strokec5  \cf13 \strokec13 Date\cf5 \strokec5 (\cf12 \strokec12 timestamp\cf5 \strokec5 ));\cb1 \
+\cb3         \}\cb1 \
+\cb3         \cf12 \strokec12 lastUpdateTime\cf5 \strokec5  = \cf12 \strokec12 timestamp\cf5 \strokec5 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Shows loading overlay\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 showLoading\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 overlay\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf9 \strokec9 'loadingOverlay'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 overlay\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 overlay\cf5 \strokec5 .\cf12 \strokec12 classList\cf5 \strokec5 .\cf12 \strokec12 remove\cf5 \strokec5 (\cf9 \strokec9 'hidden'\cf5 \strokec5 );\cb1 \
+\cb3         \}\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Loading overlay shown'\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Hides loading overlay\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 hideLoading\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 overlay\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 getElementById\cf5 \strokec5 (\cf9 \strokec9 'loadingOverlay'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 overlay\cf5 \strokec5 ) \{\cb1 \
+\cb3             \cf12 \strokec12 overlay\cf5 \strokec5 .\cf12 \strokec12 classList\cf5 \strokec5 .\cf12 \strokec12 add\cf5 \strokec5 (\cf9 \strokec9 'hidden'\cf5 \strokec5 );\cb1 \
+\cb3         \}\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Loading overlay hidden'\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Displays error message to user\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} message - Error message to display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 showError\cf5 \strokec5 (\cf12 \strokec12 message\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Error:'\cf5 \strokec5 , \cf12 \strokec12 message\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 errorDiv\cf5 \strokec5  = \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 createElement\cf5 \strokec5 (\cf9 \strokec9 'div'\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 errorDiv\cf5 \strokec5 .\cf12 \strokec12 className\cf5 \strokec5  = \cf9 \strokec9 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50'\cf5 \strokec5 ;\cb1 \
+\cb3         \cf12 \strokec12 errorDiv\cf5 \strokec5 .\cf12 \strokec12 innerHTML\cf5 \strokec5  = \cf9 \strokec9 `\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf9 \cb3 \strokec9             <strong class="font-bold">Error:</strong>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9             <span class="block sm:inline">\cf5 \strokec5 $\{\cf12 \strokec12 message\cf5 \strokec5 \}\cf9 \strokec9 </span>\cf5 \cb1 \strokec5 \
+\cf9 \cb3 \strokec9         `\cf5 \strokec5 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3         \cf12 \strokec12 document\cf5 \strokec5 .\cf12 \strokec12 body\cf5 \strokec5 .\cf12 \strokec12 appendChild\cf5 \strokec5 (\cf12 \strokec12 errorDiv\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 setTimeout\cf5 \strokec5 (() => \cf12 \strokec12 errorDiv\cf5 \strokec5 .\cf12 \strokec12 remove\cf5 \strokec5 (), \cf8 \strokec8 5000\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Formats date for display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{Date|string\} date - Date to format\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} Formatted date string\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 formatDate\cf5 \strokec5 (\cf12 \strokec12 date\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 date\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf9 \strokec9 ''\cf5 \strokec5 ;\cb1 \
+\cb3         \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 dateObj\cf5 \strokec5  = \cf7 \strokec7 new\cf5 \strokec5  \cf13 \strokec13 Date\cf5 \strokec5 (\cf12 \strokec12 date\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 isNaN\cf5 \strokec5 (\cf12 \strokec12 dateObj\cf5 \strokec5 .\cf12 \strokec12 getTime\cf5 \strokec5 ())) \cf7 \strokec7 return\cf5 \strokec5  \cf9 \strokec9 ''\cf5 \strokec5 ;\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 dateObj\cf5 \strokec5 .\cf12 \strokec12 toLocaleDateString\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Formats date and time for display\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{Date|string\} date - Date to format\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @returns \{string\} Formatted date and time string\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 formatDateTime\cf5 \strokec5 (\cf12 \strokec12 date\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 date\cf5 \strokec5 ) \cf7 \strokec7 return\cf5 \strokec5  \cf9 \strokec9 ''\cf5 \strokec5 ;\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5  \cf12 \strokec12 date\cf5 \strokec5 .\cf12 \strokec12 toLocaleString\cf5 \strokec5 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3   \cb1 \
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Submits a new Purchase Requisition\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 submitNewPR\cf5 \strokec5 () \{\cb1 \
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?page=form'\cf5 \strokec5 ;\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 getWebAppUrl\cf5 \strokec5 (\cf9 \strokec9 'form'\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\
+\
+\cb3     \cf10 \strokec10 /**\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10      * Opens PR details view\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      * @param \{string\} prNumber - PR number to view\cf5 \cb1 \strokec5 \
+\cf10 \cb3 \strokec10      */\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3     \cf7 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 openPRView\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Opening PR view for:'\cf5 \strokec5 , \cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3         \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3             .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3                     \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?pr='\cf5 \strokec5  + \cf12 \strokec12 encodeURIComponent\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3                 \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3                     \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                     \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3                 \}\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Navigation failed:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3                 \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to navigate: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf12 \strokec12 generateViewLink\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 // Modified loadDashboardData to include session ID\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 loadDashboardData\cf5 \strokec5 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Loading dashboard data'\cf5 \strokec5 );\cb1 \
+\cb3   \cf12 \strokec12 showLoading\cf5 \strokec5 ();\cb1 \
+\cb3   \cb1 \
+\cb3   \cf7 \strokec7 const\cf5 \strokec5  \cf12 \strokec12 sessionId\cf5 \strokec5  = \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 getSessionId\cf5 \strokec5 ();\cb1 \
+\cb3   \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 sessionId\cf5 \strokec5 ) \{\cb1 \
+\cb3     \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 handleSessionExpiry\cf5 \strokec5 ();\cb1 \
+\cb3     \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3   \}\cb1 \
+\
+\cb3   \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3     .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 log\cf5 \strokec5 (\cf9 \strokec9 'Received response:'\cf5 \strokec5 , \cf12 \strokec12 response\cf5 \strokec5 );\cb1 \
+\cb3       \cf12 \strokec12 hideLoading\cf5 \strokec5 ();\cb1 \
+\cb3       \cb1 \
+\cb3       \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 response\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'No response received from server'\cf5 \strokec5 );\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3       \}\cb1 \
+\cb3       \cb1 \
+\cb3       \cf7 \strokec7 if\cf5 \strokec5  (!\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 success\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 sessionExpired\cf5 \strokec5 ) \{\cb1 \
+\cb3           \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 handleSessionExpiry\cf5 \strokec5 ();\cb1 \
+\cb3         \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3           \cf12 \strokec12 showError\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5  || \cf9 \strokec9 'Failed to load dashboard data'\cf5 \strokec5 );\cb1 \
+\cb3         \}\cb1 \
+\cb3         \cf7 \strokec7 return\cf5 \strokec5 ;\cb1 \
+\cb3       \}\cb1 \
+\cb3       \cb1 \
+\cb3       \cf12 \strokec12 updateDashboard\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 data\cf5 \strokec5 );\cb1 \
+\cb3       \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 timestamp\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 updateLastUpdated\cf5 \strokec5 (\cf12 \strokec12 response\cf5 \strokec5 .\cf12 \strokec12 timestamp\cf5 \strokec5 );\cb1 \
+\cb3       \}\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Failed to load dashboard data:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3       \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Error loading dashboard data: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3       \cf12 \strokec12 hideLoading\cf5 \strokec5 ();\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 getDashboardData\cf5 \strokec5 (\cf12 \strokec12 sessionId\cf5 \strokec5 , \cf12 \strokec12 selectedOrg\cf5 \strokec5 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 // Modified navigation functions to include session\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 submitNewPR\cf5 \strokec5 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3     .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 appendSessionToUrl\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5  + \cf9 \strokec9 '?page=form'\cf5 \strokec5 );\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 getWebAppUrl\cf5 \strokec5 ();\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 viewPRDetails\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3     .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf7 \strokec7 if\cf5 \strokec5  (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3         \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 appendSessionToUrl\cf5 \strokec5 (\cb1 \
+\cb3           \cf9 \strokec9 `\cf5 \strokec5 $\{\cf12 \strokec12 url\cf5 \strokec5 \}\cf9 \strokec9 ?page=prview&pr=\cf5 \strokec5 $\{\cf12 \strokec12 encodeURIComponent\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 )\}\cf9 \strokec9 `\cf5 \cb1 \strokec5 \
+\cb3         );\cb1 \
+\cb3       \} \cf7 \strokec7 else\cf5 \strokec5  \{\cb1 \
+\cb3         \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to get application URL'\cf5 \strokec5 );\cb1 \
+\cb3       \}\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 withFailureHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 error\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf12 \strokec12 console\cf5 \strokec5 .\cf12 \strokec12 error\cf5 \strokec5 (\cf9 \strokec9 'Navigation failed:'\cf5 \strokec5 , \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3       \cf12 \strokec12 showError\cf5 \strokec5 (\cf9 \strokec9 'Failed to navigate: '\cf5 \strokec5  + \cf12 \strokec12 error\cf5 \strokec5 );\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 generateViewLink\cf5 \strokec5 (\cf12 \strokec12 prNumber\cf5 \strokec5 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 // Modified returnToDashboard to include session\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 function\cf5 \strokec5  \cf12 \strokec12 returnToDashboard\cf5 \strokec5 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3   \cf12 \strokec12 google\cf5 \strokec5 .\cf12 \strokec12 script\cf5 \strokec5 .\cf12 \strokec12 run\cf5 \cb1 \strokec5 \
+\cb3     .\cf12 \strokec12 withSuccessHandler\cf5 \strokec5 (\cf7 \strokec7 function\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 ) \{\cb1 \
+\cb3       \cf12 \strokec12 window\cf5 \strokec5 .\cf12 \strokec12 top\cf5 \strokec5 .\cf12 \strokec12 location\cf5 \strokec5 .\cf12 \strokec12 href\cf5 \strokec5  = \cf13 \strokec13 SessionUtils\cf5 \strokec5 .\cf12 \strokec12 appendSessionToUrl\cf5 \strokec5 (\cf12 \strokec12 url\cf5 \strokec5 );\cb1 \
+\cb3     \})\cb1 \
+\cb3     .\cf12 \strokec12 getWebAppUrl\cf5 \strokec5 ();\cb1 \
+\cb3 \}\cb1 \
+\
+\cb3   \cf6 \strokec6 </\cf7 \strokec7 script\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\pard\pardeftab720\partightenfactor0
+\cf6 \cb3 \strokec6 </\cf7 \strokec7 body\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+\cf6 \cb3 \strokec6 </\cf7 \strokec7 html\cf6 \strokec6 >\cf5 \cb1 \strokec5 \
+}

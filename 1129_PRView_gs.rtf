@@ -1,0 +1,233 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red21\green98\blue39;\red246\green247\blue249;\red46\green49\blue51;
+\red20\green67\blue174;\red24\green25\blue27;\red18\green115\blue126;\red186\green6\blue115;\red77\green80\blue85;
+\red162\green0\blue16;}
+{\*\expandedcolortbl;;\cssrgb\c7451\c45098\c20000;\cssrgb\c97255\c97647\c98039;\cssrgb\c23529\c25098\c26275;
+\cssrgb\c9412\c35294\c73725;\cssrgb\c12549\c12941\c14118;\cssrgb\c3529\c52157\c56863;\cssrgb\c78824\c15294\c52549;\cssrgb\c37255\c38824\c40784;
+\cssrgb\c70196\c7843\c7059;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * 241107_PRView.gs\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * ================\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Part of 1PWR Procurement System\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Version: 1.0\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Last Updated: 2024-11-07\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Purpose:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * --------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Handles the retrieval and display of individual Purchase Request (PR) details.\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Provides the server-side functionality for the PR view page, which shows\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * comprehensive information about a specific PR including its status history\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * and all related documentation.\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Integration Points:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * ------------------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Code.gs: Uses CONFIG and COL constants for sheet structure\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - StatusWorkflow.gs: References status information and history\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Master Log Sheet: Primary data source for PR details\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Audit Log Sheet: Source for PR status history\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Sheet Dependencies:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * -----------------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Master Log Tab Columns:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Uses column mapping from COL constant in Code.gs\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Requires all standard PR fields as defined in Master Sheet Structure\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Audit Log Tab Columns:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Timestamp (A)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - User (B)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Action (C)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - PR Number (D)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Details (E)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - Old Status (F)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * - New Status (G)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Usage:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * ------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Called by doGet() when URL includes pr parameter\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Example: ?pr=PR-202411-001\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\
+\
+\
+\
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Calculates business days a PR has been open\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * @param \{Date\} timestamp - PR submission date\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * @returns \{number\} Number of business days\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 function\cf4 \strokec4  \cf6 \strokec6 calculateDaysOpen\cf4 \strokec4 (\cf6 \strokec6 timestamp\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 timestamp\cf4 \strokec4 ) \cf5 \strokec5 return\cf4 \strokec4  \cf7 \strokec7 0\cf4 \strokec4 ;\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 today\cf4 \strokec4  = \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Date\cf4 \strokec4 ();\cb1 \
+\cb3   \cf5 \strokec5 let\cf4 \strokec4  \cf6 \strokec6 count\cf4 \strokec4  = \cf7 \strokec7 0\cf4 \strokec4 ;\cb1 \
+\cb3   \cf5 \strokec5 let\cf4 \strokec4  \cf6 \strokec6 current\cf4 \strokec4  = \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Date\cf4 \strokec4 (\cf6 \strokec6 timestamp\cf4 \strokec4 );\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 while\cf4 \strokec4  (\cf6 \strokec6 current\cf4 \strokec4  <= \cf6 \strokec6 today\cf4 \strokec4 ) \{\cb1 \
+\cb3     \cf9 \strokec9 // Skip weekends (0 = Sunday, 6 = Saturday)\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (\cf6 \strokec6 current\cf4 \strokec4 .\cf6 \strokec6 getDay\cf4 \strokec4 () !== \cf7 \strokec7 0\cf4 \strokec4  && \cf6 \strokec6 current\cf4 \strokec4 .\cf6 \strokec6 getDay\cf4 \strokec4 () !== \cf7 \strokec7 6\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf6 \strokec6 count\cf4 \strokec4 ++;\cb1 \
+\cb3     \}\cb1 \
+\cb3     \cf6 \strokec6 current\cf4 \strokec4 .\cf6 \strokec6 setDate\cf4 \strokec4 (\cf6 \strokec6 current\cf4 \strokec4 .\cf6 \strokec6 getDate\cf4 \strokec4 () + \cf7 \strokec7 1\cf4 \strokec4 );\cb1 \
+\cb3   \}\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 count\cf4 \strokec4 ;\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Enhanced PRView.gs with session management\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Maintains existing functionality while adding session validation\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Serves the PR view page with role-based access and session validation\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * @param \{Object\} e - Event object containing PR number and session ID\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * @returns \{HtmlOutput\} The formatted PR view page\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 function\cf4 \strokec4  \cf6 \strokec6 servePRView\cf4 \strokec4 (\cf6 \strokec6 e\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 log\cf4 \strokec4 (\cf10 \strokec10 'Starting PR view request'\cf4 \strokec4 );\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 try\cf4 \strokec4  \{\cb1 \
+\cb3     \cf9 \strokec9 // Validate session\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 sessionId\cf4 \strokec4  = \cf6 \strokec6 e\cf4 \strokec4 .\cf6 \strokec6 parameter\cf4 \strokec4 .\cf6 \strokec6 sessionId\cf4 \strokec4 ;\cb1 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 user\cf4 \strokec4  = \cf6 \strokec6 getCurrentUser\cf4 \strokec4 (\cf6 \strokec6 sessionId\cf4 \strokec4 );\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 user\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 log\cf4 \strokec4 (\cf10 \strokec10 'No valid session found'\cf4 \strokec4 );\cb1 \
+\cb3       \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 createLoginRedirect\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 prNumber\cf4 \strokec4  = \cf6 \strokec6 e\cf4 \strokec4 .\cf6 \strokec6 parameter\cf4 \strokec4 .\cf6 \strokec6 pr\cf4 \strokec4 ;\cb1 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 prNumber\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf5 \strokec5 throw\cf4 \strokec4  \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Error\cf4 \strokec4 (\cf10 \strokec10 'No PR number provided'\cf4 \strokec4 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 prDetails\cf4 \strokec4  = \cf6 \strokec6 getPRDetails\cf4 \strokec4 (\cf6 \strokec6 prNumber\cf4 \strokec4 );\cb1 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 prDetails\cf4 \strokec4 .\cf6 \strokec6 success\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf5 \strokec5 throw\cf4 \strokec4  \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Error\cf4 \strokec4 (\cf6 \strokec6 prDetails\cf4 \strokec4 .\cf6 \strokec6 error\cf4 \strokec4 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf9 \strokec9 // Create and populate template with user context\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 template\cf4 \strokec4  = \cf8 \strokec8 HtmlService\cf4 \strokec4 .\cf6 \strokec6 createTemplateFromFile\cf4 \strokec4 (\cf10 \strokec10 'PRView'\cf4 \strokec4 );\cb1 \
+\cb3     \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 prData\cf4 \strokec4  = \cf6 \strokec6 prDetails\cf4 \strokec4 .\cf6 \strokec6 data\cf4 \strokec4 ;\cb1 \
+\cb3     \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 userRole\cf4 \strokec4  = \cf6 \strokec6 user\cf4 \strokec4 .\cf6 \strokec6 role\cf4 \strokec4 ;\cb1 \
+\cb3     \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 canUpdateStatus\cf4 \strokec4  = \cf6 \strokec6 isAuthorized\cf4 \strokec4 (\cf6 \strokec6 user\cf4 \strokec4 , \cf10 \strokec10 'procurement'\cf4 \strokec4 );\cb1 \
+\cb3     \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 sessionId\cf4 \strokec4  = \cf6 \strokec6 sessionId\cf4 \strokec4 ; \cf9 \strokec9 // Pass session ID to template\cf4 \cb1 \strokec4 \
+\
+\cb3     \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 evaluate\cf4 \strokec4 ()\cb1 \
+\cb3       .\cf6 \strokec6 setTitle\cf4 \strokec4 (\cf10 \strokec10 `PR \cf4 \strokec4 $\{\cf6 \strokec6 prNumber\cf4 \strokec4 \}\cf10 \strokec10 `\cf4 \strokec4 )\cb1 \
+\cb3       .\cf6 \strokec6 setFaviconUrl\cf4 \strokec4 (\cf10 \strokec10 'https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png'\cf4 \strokec4 );\cb1 \
+\
+\cb3   \} \cf5 \strokec5 catch\cf4 \strokec4  (\cf6 \strokec6 error\cf4 \strokec4 ) \{\cb1 \
+\cb3     \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 error\cf4 \strokec4 (\cf10 \strokec10 'Error serving PR view:'\cf4 \strokec4 , \cf6 \strokec6 error\cf4 \strokec4 );\cb1 \
+\cb3     \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 createErrorPage\cf4 \strokec4 (\cf10 \strokec10 'Error displaying Purchase Request details.'\cf4 \strokec4 );\cb1 \
+\cb3   \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Enhanced status update handler with session validation\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 function\cf4 \strokec4  \cf6 \strokec6 updateStatus\cf4 \strokec4 (\cf6 \strokec6 prNumber\cf4 \strokec4 , \cf6 \strokec6 newStatus\cf4 \strokec4 , \cf6 \strokec6 notes\cf4 \strokec4 , \cf6 \strokec6 sessionId\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 log\cf4 \strokec4 (\cf10 \strokec10 'Processing status update request'\cf4 \strokec4 );\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 try\cf4 \strokec4  \{\cb1 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 user\cf4 \strokec4  = \cf6 \strokec6 getCurrentUser\cf4 \strokec4 (\cf6 \strokec6 sessionId\cf4 \strokec4 );\cb1 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 user\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf5 \strokec5 return\cf4 \strokec4  \{\cb1 \
+\cb3         \cf6 \strokec6 success\cf4 \strokec4 : \cf5 \strokec5 false\cf4 \strokec4 ,\cb1 \
+\cb3         \cf6 \strokec6 sessionExpired\cf4 \strokec4 : \cf5 \strokec5 true\cf4 \cb1 \strokec4 \
+\cb3       \};\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 isAuthorized\cf4 \strokec4 (\cf6 \strokec6 user\cf4 \strokec4 , \cf10 \strokec10 'procurement'\cf4 \strokec4 )) \{\cb1 \
+\cb3       \cf5 \strokec5 throw\cf4 \strokec4  \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Error\cf4 \strokec4 (\cf10 \strokec10 'Not authorized to update status'\cf4 \strokec4 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf9 \strokec9 // Use existing workflow manager for status update\cf4 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 workflow\cf4 \strokec4  = \cf6 \strokec6 getStatusWorkflowManager\cf4 \strokec4 ();\cb1 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 result\cf4 \strokec4  = \cf6 \strokec6 workflow\cf4 \strokec4 .\cf6 \strokec6 updateStatus\cf4 \strokec4 (\cf6 \strokec6 prNumber\cf4 \strokec4 , \cf6 \strokec6 newStatus\cf4 \strokec4 , \cf6 \strokec6 notes\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (\cf6 \strokec6 result\cf4 \strokec4 .\cf6 \strokec6 success\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf9 \strokec9 // Log the status change\cf4 \cb1 \strokec4 \
+\cb3       \cf6 \strokec6 logStatusChange\cf4 \strokec4 (\cf6 \strokec6 prNumber\cf4 \strokec4 , \cf6 \strokec6 newStatus\cf4 \strokec4 , \cf6 \strokec6 notes\cf4 \strokec4 , \cf6 \strokec6 user\cf4 \strokec4 );\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 result\cf4 \strokec4 ;\cb1 \
+\
+\cb3   \} \cf5 \strokec5 catch\cf4 \strokec4  (\cf6 \strokec6 error\cf4 \strokec4 ) \{\cb1 \
+\cb3     \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 error\cf4 \strokec4 (\cf10 \strokec10 'Error updating status:'\cf4 \strokec4 , \cf6 \strokec6 error\cf4 \strokec4 );\cb1 \
+\cb3     \cf5 \strokec5 return\cf4 \strokec4  \{\cb1 \
+\cb3       \cf6 \strokec6 success\cf4 \strokec4 : \cf5 \strokec5 false\cf4 \strokec4 ,\cb1 \
+\cb3       \cf6 \strokec6 error\cf4 \strokec4 : \cf6 \strokec6 error\cf4 \strokec4 .\cf6 \strokec6 message\cf4 \cb1 \strokec4 \
+\cb3     \};\cb1 \
+\cb3   \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Creates login redirect page\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * @returns \{HtmlOutput\} Login page redirect\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 function\cf4 \strokec4  \cf6 \strokec6 createLoginRedirect\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 template\cf4 \strokec4  = \cf8 \strokec8 HtmlService\cf4 \strokec4 .\cf6 \strokec6 createTemplate\cf4 \strokec4 (\cb1 \
+\cb3     \cf10 \strokec10 `<!DOCTYPE html>\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb3 \strokec10     <html>\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10       <head>\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10         <base target="_top">\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10         <script>\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10           window.top.location.href = '<?= getWebAppUrl() ?>?page=login';\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10         </script>\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10       </head>\cf4 \cb1 \strokec4 \
+\cf10 \cb3 \strokec10     </html>`\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   );\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 return\cf4 \strokec4  \cf6 \strokec6 template\cf4 \strokec4 .\cf6 \strokec6 evaluate\cf4 \strokec4 ();\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 /**\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  * Logs status changes with user context\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2  */\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 function\cf4 \strokec4  \cf6 \strokec6 logStatusChange\cf4 \strokec4 (\cf6 \strokec6 prNumber\cf4 \strokec4 , \cf6 \strokec6 newStatus\cf4 \strokec4 , \cf6 \strokec6 notes\cf4 \strokec4 , \cf6 \strokec6 user\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf5 \strokec5 try\cf4 \strokec4  \{\cb1 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 ss\cf4 \strokec4  = \cf8 \strokec8 SpreadsheetApp\cf4 \strokec4 .\cf6 \strokec6 openById\cf4 \strokec4 (\cf8 \strokec8 SPREADSHEET_ID\cf4 \strokec4 );\cb1 \
+\cb3     \cf5 \strokec5 const\cf4 \strokec4  \cf6 \strokec6 logSheet\cf4 \strokec4  = \cf6 \strokec6 ss\cf4 \strokec4 .\cf6 \strokec6 getSheetByName\cf4 \strokec4 (\cf10 \strokec10 'Status Change Log'\cf4 \strokec4 );\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 if\cf4 \strokec4  (!\cf6 \strokec6 logSheet\cf4 \strokec4 ) \{\cb1 \
+\cb3       \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 warn\cf4 \strokec4 (\cf10 \strokec10 'Status Change Log sheet not found'\cf4 \strokec4 );\cb1 \
+\cb3       \cf5 \strokec5 return\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf6 \strokec6 logSheet\cf4 \strokec4 .\cf6 \strokec6 appendRow\cf4 \strokec4 ([\cb1 \
+\cb3       \cf5 \strokec5 new\cf4 \strokec4  \cf8 \strokec8 Date\cf4 \strokec4 (),\cb1 \
+\cb3       \cf6 \strokec6 prNumber\cf4 \strokec4 ,\cb1 \
+\cb3       \cf6 \strokec6 user\cf4 \strokec4 .\cf6 \strokec6 username\cf4 \strokec4 ,\cb1 \
+\cb3       \cf6 \strokec6 user\cf4 \strokec4 .\cf6 \strokec6 email\cf4 \strokec4 ,\cb1 \
+\cb3       \cf6 \strokec6 newStatus\cf4 \strokec4 ,\cb1 \
+\cb3       \cf6 \strokec6 notes\cf4 \cb1 \strokec4 \
+\cb3     ]);\cb1 \
+\
+\cb3   \} \cf5 \strokec5 catch\cf4 \strokec4  (\cf6 \strokec6 error\cf4 \strokec4 ) \{\cb1 \
+\cb3     \cf6 \strokec6 console\cf4 \strokec4 .\cf6 \strokec6 error\cf4 \strokec4 (\cf10 \strokec10 'Error logging status change:'\cf4 \strokec4 , \cf6 \strokec6 error\cf4 \strokec4 );\cb1 \
+\cb3   \}\cb1 \
+\cb3 \}\cb1 \
+}

@@ -1,8 +1,5 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.9
- * Last Updated: 2024-12-01 23:40 GMT+2
- *
  * Description:
  *   This server-side script file contains all the Google Apps Script functions that handle
  *   data processing, retrieval, and storage for the custom purchase request web app. It
@@ -24,7 +21,8 @@
  *   - Data is fetched, processed, and returned to the client-side scripts for dynamic content
  *     rendering.
  *
- *
+ * Author: [Your Name]
+ * Date: [Date]
  *******************************************************************************************/
 
 // Replace with your actual Spreadsheet ID
@@ -364,60 +362,6 @@ function verifyExecutionContext() {
  *******************************************************************************************/
 
 /**
- * Gets the current script ID
- * @return {string} The script ID
- */
-function getScriptId() {
-  return ScriptApp.getScriptId();
-}
-
-/**
- * Handles HTTP GET requests
- * @param {Object} e - Event object from Apps Script
- * @return {HTMLOutput} The HTML page to display
- */
-function doGet(e) {
-  try {
-    Logger.log('==================== START doGet ====================');
-    Logger.log('Request parameters:', e.parameter);
-    
-    // If no parameters, serve login page
-    if (!e.parameter.page) {
-      Logger.log('No parameters, serving login page');
-      const template = HtmlService.createTemplateFromFile('Login');
-      return template
-        .evaluate()
-        .setTitle('1PWR Procurement System - Login')
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-    }
-    
-    // Handle other pages based on parameter
-    switch(e.parameter.page.toLowerCase()) {
-      case 'dashboard':
-        Logger.log('Serving dashboard');
-        const dashTemplate = HtmlService.createTemplateFromFile('DashboardWeb');
-        return dashTemplate
-          .evaluate()
-          .setTitle('1PWR Procurement System - Dashboard')
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-      default:
-        Logger.log('Invalid page parameter, redirecting to login');
-        const defaultTemplate = HtmlService.createTemplateFromFile('Login');
-        return defaultTemplate
-          .evaluate()
-          .setTitle('1PWR Procurement System - Login')
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-    }
-  } catch (error) {
-    Logger.log('Error in doGet:', error.message);
-    throw error;
-  }
-}
-
-/**
  * doGet handles all web app requests 
  * @param {Object} e Event object containing request parameters
  * @returns {HtmlOutput} Rendered page
@@ -428,93 +372,158 @@ function doGet(e) {
  */
 function doGet(e) {
     console.log('==================== START doGet ====================');
-    console.log('Request parameters:', JSON.stringify(e.parameter));
+    console.log('Request received at:', new Date().toISOString());
+    console.log('Event object:', JSON.stringify(e));
 
     try {
-        // If no parameters, show login
-        if (!e.parameter || Object.keys(e.parameter).length === 0) {
-            console.log('No parameters, serving login page');
-            return serveLoginPage();
+        // Handle logout action first
+        if (e.parameter.action === 'logout') {
+            const sessionId = e.parameter.sessionId;
+            console.log('Handling logout for session:', sessionId);
+            if (sessionId) {
+                removeSession(sessionId);
+            }
+            const userCache = CacheService.getUserCache();
+            userCache.remove('userSession');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
         }
 
-        // Check for session ID
+        // Get and validate session
         const sessionId = e.parameter.sessionId;
-        console.log('Session ID from request:', sessionId);
-
-        if (!sessionId) {
-            console.log('No session ID, redirecting to login');
-            return serveLoginPage();
-        }
-
-        // Validate session
-        const userCache = CacheService.getUserCache();
-        const sessionData = userCache.get(sessionId);
-        console.log('Session data retrieved:', sessionData);
-
-        if (!sessionData) {
-            console.log('Invalid or expired session');
-            return serveLoginPage();
-        }
-
-        // Parse user data
-        const user = JSON.parse(sessionData);
-        console.log('User data:', JSON.stringify(user));
-
-        // Serve dashboard by default after successful login
-        console.log('Serving dashboard for user:', user.username);
-        const template = HtmlService.createTemplateFromFile('DashboardWeb');
-        template.user = user;
-        template.sessionId = sessionId;
+        console.log('Checking session ID:', sessionId);
         
-        return template
-            .evaluate()
-            .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
+        // If no session ID and no explicit login page request, show login
+        if (!sessionId && (!e.parameter.page || e.parameter.page !== 'login')) {
+            console.log('No session ID provided - showing login page');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        }
+
+        // Get user for session
+        const user = sessionId ? getCurrentUser(sessionId) : null;
+        console.log('User from session:', user ? 'Found' : 'Not found');
+
+        // If no valid user and not login page, show login
+        if (!user && (!e.parameter.page || e.parameter.page !== 'login')) {
+            console.log('No valid user found - redirecting to login');
+            return HtmlService.createTemplateFromFile('Login')
+                .evaluate()
+                .setTitle('Login - 1PWR Procurement')
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+        }
+
+        // Handle different page requests
+        let template;
+        if (e.parameter.page === 'submitted') {
+            console.log('Handling submitted view request');
+            return serveSubmittedView(e);
+        }
+
+        if (e.parameter.page === 'prview') {
+            console.log('Handling PR view request');
+            console.log('PR Number:', e.parameter.pr);
+            const result = handlePRView(e.parameter.pr);
+            console.log('PR view handler completed');
+            return result;
+        }
+
+        if (e.parameter.page === 'form') {
+            console.log('Handling form page request');
+            try {
+                template = HtmlService.createTemplateFromFile('index');
+                // Add user context to template
+                template.user = user;
+                console.log('Form template created successfully');
+                const evaluated = template
+                    .evaluate()
+                    .setTitle('Submit Purchase Request')
+                    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+                    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+                console.log('Form template evaluated successfully');
+                return evaluated;
+            } catch (formError) {
+                console.log('ERROR: Error creating form:', formError.toString());
+                throw formError;
+            }
+        }
+
+        // Default to dashboard
+        console.log('Loading dashboard for user');
+        try {
+            console.log('Creating dashboard template');
+            template = HtmlService.createTemplateFromFile('DashboardWeb');
+            // Add user context to template
+            template.user = user;
+            template.sessionId = sessionId;
+
+            const deploymentUrl = ScriptApp.getService().getUrl();
+            console.log('Deployment URL:', deploymentUrl);
+            template.deploymentUrl = deploymentUrl;
+
+            console.log('Evaluating dashboard template');
+            const evaluated = template
+                .evaluate()
+                .setTitle('Dashboard')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+            console.log('Dashboard template evaluated successfully');
+            return evaluated;
+        } catch (dashError) {
+            console.log('ERROR: Error creating dashboard:', dashError.toString());
+            console.log('Error stack:', dashError.stack);
+            throw dashError;
+        }
 
     } catch (error) {
         console.error('Error in doGet:', error);
         return createErrorPage(error.message);
+    } finally {
+        console.log('==================== END doGet ====================');
     }
 }
 
-function serveLoginPage() {
-    console.log('Serving login page');
-    return HtmlService.createTemplateFromFile('Login')
-        .evaluate()
-        .setTitle('Login - 1PWR Procurement')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
-}
-
-function serveDashboard(e, user) {
-    console.log('Loading dashboard for user:', user.username);
-    try {
-        const template = HtmlService.createTemplateFromFile('DashboardWeb');
-        template.user = user;
-        template.sessionId = e.parameter.sessionId;
-        
-        return template
-            .evaluate()
-            .setTitle('Dashboard - 1PWR Procurement')
-            .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DEFAULT);
-    } catch (error) {
-        console.error('Error serving dashboard:', error);
-        throw error;
-    }
-}
-
-function serveFormPage(e, user) {
-    const template = HtmlService.createTemplateFromFile('index');
-    template.user = user;
-    return template
-        .evaluate()
+/**
+ * Handles routing for authenticated users
+ */
+function handleAuthenticatedRoute(e, user) {
+  switch (e.parameter.page) {
+    case 'submitted':
+      return serveSubmittedView(e);
+      
+    case 'prview':
+      if (!e.parameter.pr) {
+        return createErrorPage('PR number required');
+      }
+      return handlePRView(e.parameter.pr);
+      
+    case 'form':
+      const template = HtmlService.createTemplateFromFile('index');
+      template.user = user;
+      return template.evaluate()
         .setTitle('Submit Purchase Request')
-        .setSandboxMode(HtmlService.SandboxMode.IFRAME)
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+      
+    default:
+      // Serve dashboard
+      const dashTemplate = HtmlService.createTemplateFromFile('DashboardWeb');
+      dashTemplate.user = user;
+      dashTemplate.deploymentUrl = ScriptApp.getService().getUrl();
+      return dashTemplate.evaluate()
+        .setTitle('Dashboard')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  }
 }
 
 /**
@@ -825,13 +834,93 @@ function formatPRDataForDisplay(rowData) {
  *******************************************************************************************/
 function getActiveRequestors() {
   try {
-    Logger.log('Code.gs: Starting getActiveRequestors');
-    const users = SharedUtils.getActiveRequestors();
-    Logger.log('Code.gs: Got users:', users);
-    return users;
+    Logger.log('getActiveRequestors: Function started.');
+
+    // Accessing CONFIG object
+    if (typeof CONFIG === 'undefined') {
+      Logger.log('ERROR: CONFIG object is not defined.');
+      return [];
+    }
+
+    const spreadsheetId = CONFIG.SPREADSHEET_ID;
+    const sheetName = CONFIG.REQUESTOR_SHEET_NAME;
+
+    Logger.log(`getActiveRequestors: Using Spreadsheet ID: ${spreadsheetId}`);
+    Logger.log(`getActiveRequestors: Using Sheet Name: ${sheetName}`);
+
+    // Open the spreadsheet
+    const ss = SpreadsheetApp.openById(spreadsheetId);
+    if (!ss) {
+      Logger.log('ERROR: Unable to open spreadsheet. Check the Spreadsheet ID.');
+      return [];
+    }
+
+    // Get the sheet
+    const sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      Logger.log(`WARNING: Sheet "${sheetName}" not found.`);
+      return [];
+    } else {
+      Logger.log(`getActiveRequestors: Sheet "${sheetName}" found.`);
+    }
+
+    // Get data range and values
+    const dataRange = sheet.getDataRange();
+    const dataValues = dataRange.getValues();
+    Logger.log(`getActiveRequestors: Retrieved ${dataValues.length} rows from the sheet.`);
+
+    if (dataValues.length < 2) {
+      Logger.log('WARNING: No data found in the sheet beyond headers.');
+      return [];
+    }
+
+    // Process headers: trim and convert to lowercase
+    const headers = dataValues[0].map(header => header.toString().trim().toLowerCase());
+    Logger.log(`getActiveRequestors: Headers found: ${headers.join(', ')}`);
+
+    const nameIndex = headers.indexOf('name');
+    const departmentIndex = headers.indexOf('department');
+    const emailIndex = headers.indexOf('email');
+    const activeIndex = headers.indexOf('active (y/n)');
+
+    Logger.log(`getActiveRequestors: Column Indices - Name: ${nameIndex}, Department: ${departmentIndex}, Email: ${emailIndex}, Active: ${activeIndex}`);
+
+    // Check for required columns
+    if (nameIndex === -1 || departmentIndex === -1 || emailIndex === -1 || activeIndex === -1) {
+      Logger.log('WARNING: One or more required columns (Name, Department, Email, Active (Y/N)) not found in the sheet.');
+      return [];
+    }
+
+    const requestors = [];
+    let activeCount = 0;
+
+    for (let i = 1; i < dataValues.length; i++) {
+      const row = dataValues[i];
+      const name = row[nameIndex];
+      const department = row[departmentIndex];
+      const email = row[emailIndex];
+      const isActive = row[activeIndex];
+
+      Logger.log(`getActiveRequestors: Processing row ${i + 1}: Name="${name}", Department="${department}", Email="${email}", Active="${isActive}"`);
+
+      if (isActive && isActive.toString().trim().toUpperCase() === 'Y') {
+        requestors.push({
+          name: name,
+          department: department,
+          email: email
+        });
+        activeCount++;
+        Logger.log(`getActiveRequestors: Added active requestor from row ${i + 1}.`);
+      }
+    }
+
+    Logger.log(`getActiveRequestors: Total active requestors found: ${activeCount}`);
+    Logger.log('getActiveRequestors: Function completed successfully.');
+
+    return requestors;
   } catch (error) {
-    Logger.log('Code.gs: Error in getActiveRequestors:', error.message);
-    throw error;
+    Logger.log(`ERROR in getActiveRequestors: ${error}`);
+    return [];
   }
 }
 
@@ -1133,6 +1222,7 @@ function getActiveApprovers() {
         return [];
     }
 }
+
 
 
 
@@ -2149,10 +2239,9 @@ function verifyPRTracker() {
     const headers = sheet.getRange(1, 1, 1, 3).getValues()[0];
     const expectedHeaders = ['PR Number', 'Generated Date', 'Generated By'];
     
-    // Fix the syntax error in the comparison
     const headersCorrect = headers.every((header, index) => 
       header === expectedHeaders[index]
-    ); 
+    );
     
     if (!headersCorrect) {
       throw new Error('Headers do not match expected format');
@@ -2999,394 +3088,6 @@ function processAjaxRequest(action, user, params) {
     // Add other AJAX actions as needed
     default:
       throw new Error('Unknown action: ' + action);
-  }
-}
-
-/**
- * Records device information for session tracking
- * @param {string} sessionId - Session ID
- * @param {Object} deviceInfo - Device information
- */
-function recordSessionDevice(sessionId, deviceInfo) {
-    try {
-        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-        const sheet = ss.getSheetByName(SESSION_CONFIG.SHEET_NAME);
-        
-        if (!sheet) return;
-
-        const data = sheet.getDataRange().getValues();
-        const sessionRow = data.findIndex(row => 
-            row[SESSION_CONFIG.COLUMNS.SESSION_ID] === sessionId
-        );
-
-        if (sessionRow > -1) {
-            // Update device info in the last column
-            sheet.getRange(sessionRow + 1, 8).setValue(JSON.stringify(deviceInfo));
-        }
-    } catch (error) {
-        console.error('Error recording device info:', error);
-    }
-}
-
-/**
- * Handles secure navigation between pages
- * @param {string} url - URL to navigate to
- * @returns {boolean} Success status
- */
-function navigateToUrl(url) {
-    try {
-        // Log navigation attempt
-        console.log('Navigation requested to:', url);
-        
-        // Return true to trigger client-side navigation
-        return true;
-    } catch (error) {
-        console.error('Navigation error:', error);
-        return false;
-    }
-}
-
-function verifyUser(username, password) {
-    console.log('Verifying user:', username);
-    try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        const sheet = ss.getSheetByName('Requestor List');
-        
-        if (!sheet) {
-            throw new Error('User list not found');
-        }
-
-        const data = sheet.getDataRange().getValues();
-        const headers = data[0].map(header => header.toString().toLowerCase());
-        const nameCol = headers.indexOf('name');
-        const emailCol = headers.indexOf('email');
-        const passwordCol = headers.indexOf('password');
-        const activeCol = headers.indexOf('active (y/n)');
-
-        // Find user
-        for (let i = 1; i < data.length; i++) {
-            if (data[i][nameCol] === username && 
-                data[i][passwordCol] === password && 
-                data[i][activeCol].toString().toUpperCase() === 'Y') {
-                
-                // Create session
-                const sessionId = Utilities.getUuid();
-                const userEmail = data[i][emailCol];
-                
-                // Store session in cache
-                const userCache = CacheService.getUserCache();
-                const sessionData = JSON.stringify({
-                    username: username,
-                    email: userEmail,
-                    timestamp: new Date().toISOString()
-                });
-                userCache.put(sessionId, sessionData, 3600); // 1 hour expiry
-                
-                // Log successful login
-                console.log('Login successful for user:', username);
-                
-                return {
-                    success: true,
-                    sessionId: sessionId
-                };
-            }
-        }
-        
-        return {
-            success: false,
-            message: 'Invalid username or password'
-        };
-        
-    } catch (error) {
-        console.error('Login error:', error);
-        return {
-            success: false,
-            message: error.toString()
-        };
-    }
-}
-
-function getDashboardData(orgFilter = 'all') {
-    console.log('Getting dashboard data for org:', orgFilter);
-    try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        const sheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
-        
-        if (!sheet) {
-            throw new Error('Master Log sheet not found');
-        }
-
-        const data = sheet.getDataRange().getValues();
-        const headers = data[0];
-        
-        // Filter and process PRs
-        const prs = data.slice(1)
-            .filter(row => orgFilter === 'all' || row[COL.ORGANIZATION] === orgFilter)
-            .map(row => ({
-                number: row[COL.PR_NUMBER],
-                description: row[COL.DESCRIPTION],
-                requestor: row[COL.REQUESTOR_NAME],
-                status: row[COL.PR_STATUS],
-                daysOpen: calculateDaysOpen(row[COL.TIMESTAMP]),
-                isUrgent: row[COL.URGENCY] === 'Y'
-            }));
-
-        // Group PRs by status
-        const submitted = prs.filter(pr => pr.status === 'Submitted');
-        const inProgress = prs.filter(pr => ['In Queue', 'Ordered'].includes(pr.status));
-        const completed = prs.filter(pr => pr.status === 'Completed');
-
-        // Calculate metrics
-        const metrics = {
-            total: prs.length,
-            urgent: prs.filter(pr => pr.isUrgent).length,
-            avgDays: Math.round(prs.reduce((sum, pr) => sum + pr.daysOpen, 0) / prs.length || 0),
-            completionRate: Math.round((completed.length / prs.length) * 100) || 0
-        };
-
-        return {
-            submitted: submitted,
-            inProgress: inProgress,
-            completed: completed,
-            metrics: metrics
-        };
-
-    } catch (error) {
-        console.error('Error getting dashboard data:', error);
-        throw error;
-    }
-}
-
-function logout() {
-    try {
-        const userCache = CacheService.getUserCache();
-        const sessionId = getSessionId();
-        if (sessionId) {
-            userCache.remove(sessionId);
-        }
-        return true;
-    } catch (error) {
-        console.error('Error during logout:', error);
-        return false;
-    }
-}
-
-function getDashboardHtml(sessionId) {
-    console.log('Getting dashboard HTML for session:', sessionId);
-    try {
-        // Validate session
-        const userCache = CacheService.getUserCache();
-        const sessionData = userCache.get(sessionId);
-        
-        if (!sessionData) {
-            console.log('Invalid or expired session');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-                .getContent();
-        }
-
-        // Parse user data
-        const user = JSON.parse(sessionData);
-        console.log('User data:', user);
-
-        // Create dashboard template with user data
-        const template = HtmlService.createTemplateFromFile('DashboardWeb');
-        template.user = user;
-        template.sessionId = sessionId;
-
-        // Get initial dashboard data
-        const dashboardData = getDashboardData();
-        template.dashboardData = dashboardData;
-
-        return template
-            .evaluate()
-            .setTitle('Dashboard - 1PWR Procurement')
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-            .getContent();
-
-    } catch (error) {
-        console.error('Error in getDashboardHtml:', error);
-        return createErrorPage('Failed to load dashboard: ' + error.message)
-            .setTitle('Error')
-            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-            .getContent();
-    }
-}
-
-/**
- * Handles navigation to the dashboard
- * @param {string} sessionId - The session ID from successful login
- * @return {string} The URL to redirect to
- */
-function navigateToDashboard(sessionId) {
-  // Verify session is valid using existing SharedUtils function
-  const user = getCurrentUser(sessionId);
-  if (!user) {
-    throw new Error('Invalid session');
-  }
-  
-  // Return the URL for the dashboard page
-  // Use the current script URL which will handle the routing based on the page parameter
-  return ScriptApp.getService().getUrl();
-}
-
-/**
- * Gets the initial dashboard data
- * @return {Object} Dashboard data including user info and metrics
- */
-function getDashboardData() {
-  // Get current user from session
-  const user = getCurrentUser();
-  if (!user) {
-    throw new Error('Not authenticated');
-  }
-
-  // Get dashboard metrics and data
-  const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
-  const data = sheet.getDataRange().getValues();
-  
-  // Process data and calculate metrics
-  const metrics = calculateMetrics(data);
-  const lists = categorizePRs(data);
-  
-  return {
-    user: {
-      username: user.name,
-      department: user.department
-    },
-    dashboard: {
-      metrics: metrics,
-      submitted: lists.submitted,
-      inProgress: lists.inProgress,
-      completed: lists.completed
-    }
-  };
-}
-
-/**
- * Calculate dashboard metrics from data
- * @param {Array} data - Raw sheet data
- * @return {Object} Calculated metrics
- */
-function calculateMetrics(data) {
-  let total = 0;
-  let urgent = 0;
-  let completed = 0;
-  let totalDays = 0;
-  
-  // Skip header row
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    if (row[COL.PR_NUMBER]) {  // Only count rows with PR numbers
-      total++;
-      if (row[COL.URGENCY] === 'Urgent') urgent++;
-      if (row[COL.COMPLETION] === '100%') completed++;
-      totalDays += parseInt(row[COL.DAYS_OPEN] || 0);
-    }
-  }
-  
-  return {
-    total: total,
-    urgent: urgent,
-    avgDays: total ? Math.round(totalDays / total) : 0,
-    completionRate: total ? Math.round((completed / total) * 100) : 0
-  };
-}
-
-/**
- * Categorize PRs into lists
- * @param {Array} data - Raw sheet data
- * @return {Object} Categorized PR lists
- */
-function categorizePRs(data) {
-  const submitted = [];
-  const inProgress = [];
-  const completed = [];
-  
-  // Skip header row
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    if (!row[COL.PR_NUMBER]) continue;  // Skip rows without PR numbers
-    
-    const pr = {
-      number: row[COL.PR_NUMBER],
-      description: row[COL.DESCRIPTION],
-      daysOpen: parseInt(row[COL.DAYS_OPEN] || 0)
-    };
-    
-    // Categorize based on status
-    switch(row[COL.PR_STATUS]) {
-      case 'Submitted':
-        submitted.push(pr);
-        break;
-      case 'In Progress':
-      case 'In Queue':
-      case 'Ordered':
-        inProgress.push(pr);
-        break;
-      case 'Completed':
-        completed.push(pr);
-        break;
-    }
-  }
-  
-  return { submitted, inProgress, completed };
-}
-
-/**
- * Stores a new session in the cache
- * @param {string} sessionId - The session ID to store
- * @param {Object} user - The user object to store in the session
- */
-function storeSession(sessionId, user) {
-  if (!sessionId || !user) {
-    throw new Error('Session ID and user are required');
-  }
-  
-  const cache = CacheService.getUserCache();
-  const sessionData = {
-    sessionId: sessionId,
-    user: user,
-    timestamp: new Date().getTime()
-  };
-  
-  // Store session for 24 hours
-  cache.put(sessionId, JSON.stringify(sessionData), 24 * 60 * 60);
-}
-
-/**
- * Gets the current deployment ID
- * @return {string} The deployment ID
- */
-function getDeploymentId() {
-  // Get the current deployment ID from Properties Service
-  const scriptProperties = PropertiesService.getScriptProperties();
-  const deploymentId = scriptProperties.getProperty('DEPLOYMENT_ID');
-  
-  if (!deploymentId) {
-    throw new Error('Deployment ID not set. Please set it in script properties.');
-  }
-  
-  return deploymentId;
-}
-
-/**
- * Exposes getActiveRequestors to the web app
- * This function is called from the client-side to populate the username dropdown
- * @returns {Array<Object>} Array of active requestor objects
- */
-function getActiveRequestors() {
-  try {
-    Logger.log('Code.gs: Starting getActiveRequestors');
-    const users = SharedUtils.getActiveRequestors();
-    Logger.log('Code.gs: Got users:', users);
-    return users;
-  } catch (error) {
-    Logger.log('Code.gs: Error in getActiveRequestors:', error.message);
-    throw error;
   }
 }
 

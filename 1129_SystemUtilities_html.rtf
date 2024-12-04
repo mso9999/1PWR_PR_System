@@ -1,0 +1,359 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red46\green49\blue51;\red42\green42\blue42;\red246\green247\blue249;
+\red20\green67\blue174;\red24\green25\blue27;\red162\green0\blue16;\red77\green80\blue85;\red18\green115\blue126;
+\red21\green98\blue39;\red186\green6\blue115;\red97\green3\blue173;}
+{\*\expandedcolortbl;;\cssrgb\c23529\c25098\c26275;\cssrgb\c21961\c21961\c21961;\cssrgb\c97255\c97647\c98039;
+\cssrgb\c9412\c35294\c73725;\cssrgb\c12549\c12941\c14118;\cssrgb\c70196\c7843\c7059;\cssrgb\c37255\c38824\c40784;\cssrgb\c3529\c52157\c56863;
+\cssrgb\c7451\c45098\c20000;\cssrgb\c78824\c15294\c52549;\cssrgb\c46275\c15294\c73333;}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 \cb4 \strokec3 <\cf5 \strokec5 script\cf3 \strokec3 >\cf2 \cb1 \strokec2 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 showError\cf2 \strokec2 (\cf6 \strokec6 message\cf2 \strokec2 , \cf6 \strokec6 type\cf2 \strokec2  = \cf7 \strokec7 'error'\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf8 \strokec8 // Remove any existing error messages\cf2 \cb1 \strokec2 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 existingErrors\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 querySelectorAll\cf2 \strokec2 (\cf7 \strokec7 '.system-message'\cf2 \strokec2 );\cb1 \
+\cb4   \cf6 \strokec6 existingErrors\cf2 \strokec2 .\cf6 \strokec6 forEach\cf2 \strokec2 (\cf6 \strokec6 error\cf2 \strokec2  => \cf6 \strokec6 error\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 ());\cb1 \
+\
+\cb4   \cf8 \strokec8 // Create new error message\cf2 \cb1 \strokec2 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 errorDiv\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 createElement\cf2 \strokec2 (\cf7 \strokec7 'div'\cf2 \strokec2 );\cb1 \
+\cb4   \cf6 \strokec6 errorDiv\cf2 \strokec2 .\cf6 \strokec6 className\cf2 \strokec2  = \cf7 \strokec7 `system-message \cf2 \strokec2 $\{\cf6 \strokec6 type\cf2 \strokec2 \}\cf7 \strokec7  fixed top-4 right-4 max-w-sm p-4 rounded-lg shadow-lg\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb4 \strokec7     \cf2 \strokec2 $\{\cf6 \strokec6 type\cf2 \strokec2  === \cf7 \strokec7 'error'\cf2 \strokec2  ? \cf7 \strokec7 'bg-red-100 text-red-700 border-red-400'\cf2 \strokec2  : \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4       \cf6 \strokec6 type\cf2 \strokec2  === \cf7 \strokec7 'warning'\cf2 \strokec2  ? \cf7 \strokec7 'bg-yellow-100 text-yellow-700 border-yellow-400'\cf2 \strokec2  :\cb1 \
+\cb4       \cf7 \strokec7 'bg-blue-100 text-blue-700 border-blue-400'\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf6 \strokec6 errorDiv\cf2 \strokec2 .\cf6 \strokec6 innerHTML\cf2 \strokec2  = \cf7 \strokec7 `\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb4 \strokec7     <div class="flex items-center">\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7       <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9 8v4h2V8H9zm0 6h2v-1H9v1z"/>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7       </svg>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7       <span>\cf2 \strokec2 $\{\cf6 \strokec6 message\cf2 \strokec2 \}\cf7 \strokec7 </span>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7     </div>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7     <button onclick="this.parentElement.remove()" class="absolute top-1 right-1 p-1">\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7       <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7       </svg>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7     </button>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7   `\cf2 \strokec2 ;\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 body\cf2 \strokec2 .\cf6 \strokec6 appendChild\cf2 \strokec2 (\cf6 \strokec6 errorDiv\cf2 \strokec2 );\cb1 \
+\
+\cb4   \cf8 \strokec8 // Auto-remove after 5 seconds\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 setTimeout\cf2 \strokec2 (() => \{\cb1 \
+\cb4     \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 errorDiv\cf2 \strokec2 .\cf6 \strokec6 parentElement\cf2 \strokec2 ) \{\cb1 \
+\cb4       \cf6 \strokec6 errorDiv\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 ();\cb1 \
+\cb4     \}\cb1 \
+\cb4   \}, \cf9 \strokec9 5000\cf2 \strokec2 );\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Shows error message for specific form field\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} fieldId - ID of form field\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} message - Error message\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 showFieldError\cf2 \strokec2 (\cf6 \strokec6 fieldId\cf2 \strokec2 , \cf6 \strokec6 message\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 field\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 getElementById\cf2 \strokec2 (\cf6 \strokec6 fieldId\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 field\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf8 \strokec8 // Add error styling to field\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 add\cf2 \strokec2 (\cf7 \strokec7 'invalid-input'\cf2 \strokec2 );\cb1 \
+\cb4   \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 setAttribute\cf2 \strokec2 (\cf7 \strokec7 'aria-invalid'\cf2 \strokec2 , \cf7 \strokec7 'true'\cf2 \strokec2 );\cb1 \
+\
+\cb4   \cf8 \strokec8 // Show error message\cf2 \cb1 \strokec2 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 errorSpan\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 getElementById\cf2 \strokec2 (\cf7 \strokec7 `\cf2 \strokec2 $\{\cf6 \strokec6 fieldId\cf2 \strokec2 \}\cf7 \strokec7 Error`\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 errorSpan\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf6 \strokec6 errorSpan\cf2 \strokec2 .\cf6 \strokec6 textContent\cf2 \strokec2  = \cf6 \strokec6 message\cf2 \strokec2 ;\cb1 \
+\cb4     \cf6 \strokec6 errorSpan\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 (\cf7 \strokec7 'hidden'\cf2 \strokec2 );\cb1 \
+\cb4   \}\cb1 \
+\
+\cb4   \cf8 \strokec8 // Add shake animation\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 add\cf2 \strokec2 (\cf7 \strokec7 'shake'\cf2 \strokec2 );\cb1 \
+\cb4   \cf6 \strokec6 setTimeout\cf2 \strokec2 (() => \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 (\cf7 \strokec7 'shake'\cf2 \strokec2 ), \cf9 \strokec9 500\cf2 \strokec2 );\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Clears all error messages and styling\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 clearErrors\cf2 \strokec2 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf8 \strokec8 // Clear field errors\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 querySelectorAll\cf2 \strokec2 (\cf7 \strokec7 '.invalid-input'\cf2 \strokec2 ).\cf6 \strokec6 forEach\cf2 \strokec2 (\cf6 \strokec6 field\cf2 \strokec2  => \{\cb1 \
+\cb4     \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 (\cf7 \strokec7 'invalid-input'\cf2 \strokec2 );\cb1 \
+\cb4     \cf6 \strokec6 field\cf2 \strokec2 .\cf6 \strokec6 removeAttribute\cf2 \strokec2 (\cf7 \strokec7 'aria-invalid'\cf2 \strokec2 );\cb1 \
+\cb4   \});\cb1 \
+\
+\cb4   \cf8 \strokec8 // Hide error messages\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 querySelectorAll\cf2 \strokec2 (\cf7 \strokec7 '.error-message'\cf2 \strokec2 ).\cf6 \strokec6 forEach\cf2 \strokec2 (\cf6 \strokec6 message\cf2 \strokec2  => \{\cb1 \
+\cb4     \cf6 \strokec6 message\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 add\cf2 \strokec2 (\cf7 \strokec7 'hidden'\cf2 \strokec2 );\cb1 \
+\cb4     \cf6 \strokec6 message\cf2 \strokec2 .\cf6 \strokec6 textContent\cf2 \strokec2  = \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\cb4   \});\cb1 \
+\
+\cb4   \cf8 \strokec8 // Remove system messages\cf2 \cb1 \strokec2 \
+\cb4   \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 querySelectorAll\cf2 \strokec2 (\cf7 \strokec7 '.system-message'\cf2 \strokec2 ).\cf6 \strokec6 forEach\cf2 \strokec2 (\cf6 \strokec6 message\cf2 \strokec2  => \{\cb1 \
+\cb4     \cf6 \strokec6 message\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 ();\cb1 \
+\cb4   \});\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Formats date for display\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Date|string\} date - Date to format\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} [format='short'] - Format style (short, long, iso)\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string\} Formatted date string\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 formatDate\cf2 \strokec2 (\cf6 \strokec6 date\cf2 \strokec2 , \cf6 \strokec6 format\cf2 \strokec2  = \cf7 \strokec7 'short'\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 date\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 dateObj\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 date\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 isNaN\cf2 \strokec2 (\cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 getTime\cf2 \strokec2 ())) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 options\cf2 \strokec2  = \{\cb1 \
+\cb4     \cf6 \strokec6 short\cf2 \strokec2 : \{ \cf6 \strokec6 year\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2 , \cf6 \strokec6 month\cf2 \strokec2 : \cf7 \strokec7 'short'\cf2 \strokec2 , \cf6 \strokec6 day\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2  \},\cb1 \
+\cb4     \cf6 \strokec6 long\cf2 \strokec2 : \{ \cf6 \strokec6 year\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2 , \cf6 \strokec6 month\cf2 \strokec2 : \cf7 \strokec7 'long'\cf2 \strokec2 , \cf6 \strokec6 day\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2  \},\cb1 \
+\cb4     \cf6 \strokec6 iso\cf2 \strokec2 : \{ \cf6 \strokec6 year\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2 , \cf6 \strokec6 month\cf2 \strokec2 : \cf7 \strokec7 '2-digit'\cf2 \strokec2 , \cf6 \strokec6 day\cf2 \strokec2 : \cf7 \strokec7 '2-digit'\cf2 \strokec2  \}\cb1 \
+\cb4   \};\cb1 \
+\
+\cb4   \cf5 \strokec5 try\cf2 \strokec2  \{\cb1 \
+\cb4     \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 format\cf2 \strokec2  === \cf7 \strokec7 'iso'\cf2 \strokec2 ) \{\cb1 \
+\cb4       \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 toISOString\cf2 \strokec2 ().\cf6 \strokec6 split\cf2 \strokec2 (\cf7 \strokec7 'T'\cf2 \strokec2 )[\cf9 \strokec9 0\cf2 \strokec2 ];\cb1 \
+\cb4     \}\cb1 \
+\cb4     \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 toLocaleDateString\cf2 \strokec2 (\cf5 \strokec5 undefined\cf2 \strokec2 , \cf6 \strokec6 options\cf2 \strokec2 [\cf6 \strokec6 format\cf2 \strokec2 ] || \cf6 \strokec6 options\cf2 \strokec2 .\cf6 \strokec6 short\cf2 \strokec2 );\cb1 \
+\cb4   \} \cf5 \strokec5 catch\cf2 \strokec2  (\cf6 \strokec6 error\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf6 \strokec6 console\cf2 \strokec2 .\cf6 \strokec6 error\cf2 \strokec2 (\cf7 \strokec7 'Date formatting error:'\cf2 \strokec2 , \cf6 \strokec6 error\cf2 \strokec2 );\cb1 \
+\cb4     \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 date\cf2 \strokec2 .\cf6 \strokec6 toString\cf2 \strokec2 ();\cb1 \
+\cb4   \}\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Formats date and time for display\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Date|string\} datetime - Date/time to format\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{boolean\} [includeSeconds=false] - Whether to include seconds\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string\} Formatted date/time string\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 formatDateTime\cf2 \strokec2 (\cf6 \strokec6 datetime\cf2 \strokec2 , \cf6 \strokec6 includeSeconds\cf2 \strokec2  = \cf5 \strokec5 false\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 datetime\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 dateObj\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 datetime\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 isNaN\cf2 \strokec2 (\cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 getTime\cf2 \strokec2 ())) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf5 \strokec5 try\cf2 \strokec2  \{\cb1 \
+\cb4     \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 dateOptions\cf2 \strokec2  = \{ \cf6 \strokec6 year\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2 , \cf6 \strokec6 month\cf2 \strokec2 : \cf7 \strokec7 'short'\cf2 \strokec2 , \cf6 \strokec6 day\cf2 \strokec2 : \cf7 \strokec7 'numeric'\cf2 \strokec2  \};\cb1 \
+\cb4     \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 timeOptions\cf2 \strokec2  = \{\cb1 \
+\cb4       \cf6 \strokec6 hour\cf2 \strokec2 : \cf7 \strokec7 '2-digit'\cf2 \strokec2 ,\cb1 \
+\cb4       \cf6 \strokec6 minute\cf2 \strokec2 : \cf7 \strokec7 '2-digit'\cf2 \strokec2 ,\cb1 \
+\cb4       ...(\cf6 \strokec6 includeSeconds\cf2 \strokec2  && \{ \cf6 \strokec6 second\cf2 \strokec2 : \cf7 \strokec7 '2-digit'\cf2 \strokec2  \}),\cb1 \
+\cb4       \cf6 \strokec6 hour12\cf2 \strokec2 : \cf5 \strokec5 true\cf2 \cb1 \strokec2 \
+\cb4     \};\cb1 \
+\
+\cb4     \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 datePart\cf2 \strokec2  = \cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 toLocaleDateString\cf2 \strokec2 (\cf5 \strokec5 undefined\cf2 \strokec2 , \cf6 \strokec6 dateOptions\cf2 \strokec2 );\cb1 \
+\cb4     \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 timePart\cf2 \strokec2  = \cf6 \strokec6 dateObj\cf2 \strokec2 .\cf6 \strokec6 toLocaleTimeString\cf2 \strokec2 (\cf5 \strokec5 undefined\cf2 \strokec2 , \cf6 \strokec6 timeOptions\cf2 \strokec2 );\cb1 \
+\cb4     \cb1 \
+\cb4     \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 `\cf2 \strokec2 $\{\cf6 \strokec6 datePart\cf2 \strokec2 \}\cf7 \strokec7  at \cf2 \strokec2 $\{\cf6 \strokec6 timePart\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2 ;\cb1 \
+\cb4   \} \cf5 \strokec5 catch\cf2 \strokec2  (\cf6 \strokec6 error\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf6 \strokec6 console\cf2 \strokec2 .\cf6 \strokec6 error\cf2 \strokec2 (\cf7 \strokec7 'DateTime formatting error:'\cf2 \strokec2 , \cf6 \strokec6 error\cf2 \strokec2 );\cb1 \
+\cb4     \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 datetime\cf2 \strokec2 .\cf6 \strokec6 toString\cf2 \strokec2 ();\cb1 \
+\cb4   \}\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Shows loading state for element\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} elementId - ID of element to show loading state for\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 showLoading\cf2 \strokec2 (\cf6 \strokec6 elementId\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 element\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 getElementById\cf2 \strokec2 (\cf6 \strokec6 elementId\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 element\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf6 \strokec6 element\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 add\cf2 \strokec2 (\cf7 \strokec7 'loading'\cf2 \strokec2 );\cb1 \
+\cb4   \cb1 \
+\cb4   \cf8 \strokec8 // Add loading overlay\cf2 \cb1 \strokec2 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 overlay\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 createElement\cf2 \strokec2 (\cf7 \strokec7 'div'\cf2 \strokec2 );\cb1 \
+\cb4   \cf6 \strokec6 overlay\cf2 \strokec2 .\cf6 \strokec6 className\cf2 \strokec2  = \cf7 \strokec7 'loading-overlay absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center'\cf2 \strokec2 ;\cb1 \
+\cb4   \cf6 \strokec6 overlay\cf2 \strokec2 .\cf6 \strokec6 innerHTML\cf2 \strokec2  = \cf7 \strokec7 `\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb4 \strokec7     <div class="loading-spinner"></div>\cf2 \cb1 \strokec2 \
+\cf7 \cb4 \strokec7   `\cf2 \strokec2 ;\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cb1 \
+\cb4   \cf6 \strokec6 element\cf2 \strokec2 .\cf6 \strokec6 style\cf2 \strokec2 .\cf6 \strokec6 position\cf2 \strokec2  = \cf7 \strokec7 'relative'\cf2 \strokec2 ;\cb1 \
+\cb4   \cf6 \strokec6 element\cf2 \strokec2 .\cf6 \strokec6 appendChild\cf2 \strokec2 (\cf6 \strokec6 overlay\cf2 \strokec2 );\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Hides loading state for element\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} elementId - ID of element to hide loading state for\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 hideLoading\cf2 \strokec2 (\cf6 \strokec6 elementId\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 element\cf2 \strokec2  = \cf6 \strokec6 document\cf2 \strokec2 .\cf6 \strokec6 getElementById\cf2 \strokec2 (\cf6 \strokec6 elementId\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 element\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2 ;\cb1 \
+\
+\cb4   \cf6 \strokec6 element\cf2 \strokec2 .\cf6 \strokec6 classList\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 (\cf7 \strokec7 'loading'\cf2 \strokec2 );\cb1 \
+\cb4   \cb1 \
+\cb4   \cf8 \strokec8 // Remove loading overlay\cf2 \cb1 \strokec2 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 overlay\cf2 \strokec2  = \cf6 \strokec6 element\cf2 \strokec2 .\cf6 \strokec6 querySelector\cf2 \strokec2 (\cf7 \strokec7 '.loading-overlay'\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 overlay\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf6 \strokec6 overlay\cf2 \strokec2 .\cf6 \strokec6 remove\cf2 \strokec2 ();\cb1 \
+\cb4   \}\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Calculates business days between two dates\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Date|string\} startDate - Start date\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Date|string\} endDate - End date\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{number\} Number of business days\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 calculateBusinessDays\cf2 \strokec2 (\cf6 \strokec6 startDate\cf2 \strokec2 , \cf6 \strokec6 endDate\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 start\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 startDate\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 end\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 endDate\cf2 \strokec2 );\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 let\cf2 \strokec2  \cf6 \strokec6 count\cf2 \strokec2  = \cf9 \strokec9 0\cf2 \strokec2 ;\cb1 \
+\cb4   \cf5 \strokec5 let\cf2 \strokec2  \cf6 \strokec6 current\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 start\cf2 \strokec2 );\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 while\cf2 \strokec2  (\cf6 \strokec6 current\cf2 \strokec2  <= \cf6 \strokec6 end\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf8 \strokec8 // Skip weekends (0 = Sunday, 6 = Saturday)\cf2 \cb1 \strokec2 \
+\cb4     \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 current\cf2 \strokec2 .\cf6 \strokec6 getDay\cf2 \strokec2 () !== \cf9 \strokec9 0\cf2 \strokec2  && \cf6 \strokec6 current\cf2 \strokec2 .\cf6 \strokec6 getDay\cf2 \strokec2 () !== \cf9 \strokec9 6\cf2 \strokec2 ) \{\cb1 \
+\cb4       \cf6 \strokec6 count\cf2 \strokec2 ++;\cb1 \
+\cb4     \}\cb1 \
+\cb4     \cf6 \strokec6 current\cf2 \strokec2 .\cf6 \strokec6 setDate\cf2 \strokec2 (\cf6 \strokec6 current\cf2 \strokec2 .\cf6 \strokec6 getDate\cf2 \strokec2 () + \cf9 \strokec9 1\cf2 \strokec2 );\cb1 \
+\cb4   \}\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 count\cf2 \strokec2 ;\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Gets status class for styling\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Object\} poData - PO data object\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string\} CSS class for status\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 getStatusClass\cf2 \strokec2 (\cf6 \strokec6 poData\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 poData\cf2 \strokec2 .\cf6 \strokec6 daysOverdue\cf2 \strokec2  > \cf9 \strokec9 0\cf2 \strokec2 ) \{\cb1 \
+\cb4     \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 poData\cf2 \strokec2 .\cf6 \strokec6 daysOverdue\cf2 \strokec2  >= \cf9 \strokec9 30\cf2 \strokec2  ? \cf7 \strokec7 'overdue'\cf2 \strokec2  : \cf7 \strokec7 'warning'\cf2 \strokec2 ;\cb1 \
+\cb4   \}\cb1 \
+\cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 'current'\cf2 \strokec2 ;\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Generates view link for PO\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} poNumber - PO number\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string\} URL to view PO\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 generateViewLink\cf2 \strokec2 (\cf6 \strokec6 poNumber\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 `viewPO.html?po=\cf2 \strokec2 $\{\cf6 \strokec6 encodeURIComponent\cf2 \strokec2 (\cf6 \strokec6 poNumber\cf2 \strokec2 )\}\cf7 \strokec7 `\cf2 \strokec2 ;\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Generates update link for PO\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} poNumber - PO number\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string\} URL to update PO landing date\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 generateUpdateLink\cf2 \strokec2 (\cf6 \strokec6 poNumber\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 `updateLandingDate.html?po=\cf2 \strokec2 $\{\cf6 \strokec6 encodeURIComponent\cf2 \strokec2 (\cf6 \strokec6 poNumber\cf2 \strokec2 )\}\cf7 \strokec7 `\cf2 \strokec2 ;\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Safely gets URL parameter\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} param - Parameter name\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{string|null\} Parameter value\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 getUrlParam\cf2 \strokec2 (\cf6 \strokec6 param\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 urlParams\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 URLSearchParams\cf2 \strokec2 (\cf6 \strokec6 window\cf2 \strokec2 .\cf6 \strokec6 location\cf2 \strokec2 .\cf6 \strokec6 search\cf2 \strokec2 );\cb1 \
+\cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 urlParams\cf2 \strokec2 .\cf5 \strokec5 get\cf2 \strokec2 (\cf6 \strokec6 param\cf2 \strokec2 );\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Validates email address format\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} email - Email address to validate\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @returns \{boolean\} Whether email is valid\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 isValidEmail\cf2 \strokec2 (\cf6 \strokec6 email\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 re\cf2 \strokec2  = \cf12 \cb4 \strokec12 /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/\cf2 \cb4 \strokec2 ;\cb1 \
+\cb4   \cf5 \strokec5 return\cf2 \strokec2  \cf6 \strokec6 re\cf2 \strokec2 .\cf6 \strokec6 test\cf2 \strokec2 (\cf11 \strokec11 String\cf2 \strokec2 (\cf6 \strokec6 email\cf2 \strokec2 ).\cf6 \strokec6 toLowerCase\cf2 \strokec2 ());\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * Handles server errors\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{Error|string\} error - Error object or message\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  * @param \{string\} [context] - Error context\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10  */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb4 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 handleServerError\cf2 \strokec2 (\cf6 \strokec6 error\cf2 \strokec2 , \cf6 \strokec6 context\cf2 \strokec2  = \cf7 \strokec7 ''\cf2 \strokec2 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4   \cf6 \strokec6 console\cf2 \strokec2 .\cf6 \strokec6 error\cf2 \strokec2 (\cf7 \strokec7 `Server error \cf2 \strokec2 $\{\cf6 \strokec6 context\cf2 \strokec2  ? \cf7 \strokec7 `in \cf2 \strokec2 $\{\cf6 \strokec6 context\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2  : \cf7 \strokec7 ''\cf2 \strokec2 \}\cf7 \strokec7 :`\cf2 \strokec2 , \cf6 \strokec6 error\cf2 \strokec2 );\cb1 \
+\cb4   \cb1 \
+\cb4   \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 message\cf2 \strokec2  = \cf6 \strokec6 error\cf2 \strokec2 .\cf6 \strokec6 message\cf2 \strokec2  || \cf6 \strokec6 error\cf2 \strokec2 .\cf6 \strokec6 toString\cf2 \strokec2 ();\cb1 \
+\cb4   \cf6 \strokec6 showError\cf2 \strokec2 (\cf7 \strokec7 `An error occurred\cf2 \strokec2 $\{\cf6 \strokec6 context\cf2 \strokec2  ? \cf7 \strokec7 ` while \cf2 \strokec2 $\{\cf6 \strokec6 context\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2  : \cf7 \strokec7 ''\cf2 \strokec2 \}\cf7 \strokec7 : \cf2 \strokec2 $\{\cf6 \strokec6 message\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2 );\cb1 \
+\cb4 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf10 \cb4 \strokec10 /**\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10      * Formats date in DD-MMM-YY format\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10      * @param \{Date|string\} date - Date to format\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10      * @returns \{string\} Formatted date string\cf2 \cb1 \strokec2 \
+\cf10 \cb4 \strokec10      */\cf2 \cb1 \strokec2 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb4     \cf5 \strokec5 function\cf2 \strokec2  \cf6 \strokec6 formatDateShort\cf2 \strokec2 (\cf6 \strokec6 date\cf2 \strokec2 ) \{\cb1 \
+\cb4         \cf5 \strokec5 if\cf2 \strokec2  (!\cf6 \strokec6 date\cf2 \strokec2 ) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\cb4         \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 d\cf2 \strokec2  = \cf5 \strokec5 new\cf2 \strokec2  \cf11 \strokec11 Date\cf2 \strokec2 (\cf6 \strokec6 date\cf2 \strokec2 );\cb1 \
+\cb4         \cf5 \strokec5 if\cf2 \strokec2  (\cf6 \strokec6 isNaN\cf2 \strokec2 (\cf6 \strokec6 d\cf2 \strokec2 .\cf6 \strokec6 getTime\cf2 \strokec2 ())) \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 ''\cf2 \strokec2 ;\cb1 \
+\cb4         \cb1 \
+\cb4         \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 months\cf2 \strokec2  = [\cf7 \strokec7 'Jan'\cf2 \strokec2 , \cf7 \strokec7 'Feb'\cf2 \strokec2 , \cf7 \strokec7 'Mar'\cf2 \strokec2 , \cf7 \strokec7 'Apr'\cf2 \strokec2 , \cf7 \strokec7 'May'\cf2 \strokec2 , \cf7 \strokec7 'Jun'\cf2 \strokec2 , \cb1 \
+\cb4                        \cf7 \strokec7 'Jul'\cf2 \strokec2 , \cf7 \strokec7 'Aug'\cf2 \strokec2 , \cf7 \strokec7 'Sep'\cf2 \strokec2 , \cf7 \strokec7 'Oct'\cf2 \strokec2 , \cf7 \strokec7 'Nov'\cf2 \strokec2 , \cf7 \strokec7 'Dec'\cf2 \strokec2 ];\cb1 \
+\cb4         \cb1 \
+\cb4         \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 day\cf2 \strokec2  = \cf6 \strokec6 d\cf2 \strokec2 .\cf6 \strokec6 getDate\cf2 \strokec2 ().\cf6 \strokec6 toString\cf2 \strokec2 ().\cf6 \strokec6 padStart\cf2 \strokec2 (\cf9 \strokec9 2\cf2 \strokec2 , \cf7 \strokec7 '0'\cf2 \strokec2 );\cb1 \
+\cb4         \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 month\cf2 \strokec2  = \cf6 \strokec6 months\cf2 \strokec2 [\cf6 \strokec6 d\cf2 \strokec2 .\cf6 \strokec6 getMonth\cf2 \strokec2 ()];\cb1 \
+\cb4         \cf5 \strokec5 const\cf2 \strokec2  \cf6 \strokec6 year\cf2 \strokec2  = \cf6 \strokec6 d\cf2 \strokec2 .\cf6 \strokec6 getFullYear\cf2 \strokec2 ().\cf6 \strokec6 toString\cf2 \strokec2 ().\cf6 \strokec6 slice\cf2 \strokec2 (-\cf9 \strokec9 2\cf2 \strokec2 );\cb1 \
+\cb4         \cb1 \
+\cb4         \cf5 \strokec5 return\cf2 \strokec2  \cf7 \strokec7 `\cf2 \strokec2 $\{\cf6 \strokec6 day\cf2 \strokec2 \}\cf7 \strokec7 -\cf2 \strokec2 $\{\cf6 \strokec6 month\cf2 \strokec2 \}\cf7 \strokec7 -\cf2 \strokec2 $\{\cf6 \strokec6 year\cf2 \strokec2 \}\cf7 \strokec7 `\cf2 \strokec2 ;\cb1 \
+\cb4     \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf3 \cb4 \strokec3 </\cf5 \strokec5 script\cf3 \strokec3 >\cf2 \cb1 \strokec2 \
+}

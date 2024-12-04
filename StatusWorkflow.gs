@@ -1,37 +1,53 @@
 /**
-* 1PWR Procurement System - Status Workflow Management
-* ==================================================
-*
-* Purpose:
-* -------
-* This script file is responsible for managing the status transitions and business rules for purchase requisitions (PRs) and purchase orders (POs) in the 1PWR procurement system. It handles the validation of status changes, enforcement of required fields, and the execution of associated actions (such as sending notifications, updating reminders, and triggering auto-cancellation).
-*
-* Integration Points:
-* ------------------
-* - Code.gs: Provides access to the overall system configuration, column mappings, and utility functions.
-* - NotificationSystem.gs: Handles the sending of email notifications for status changes and other events.
-* - DashboardWeb.html: Communicates with this script to update the status of PRs and POs displayed in the dashboard.
-* - PRViewWeb.html: Allows users to update the status of individual PRs through this script.
-*
-* Data Framework:
-* --------------
-* The status workflow management relies on the "Master Log" sheet in the 1PWR procurement tracking spreadsheet. It uses the column mappings defined in the Code.gs file to access the necessary data, such as current status, required fields, and related information.
-*
-* Core Functionality:
-* -----------------
-* 1. Status Transitions: Defines the valid status transitions for both PRs and POs, enforcing the allowed transitions based on the current status.
-* 2. Required Field Validation: Ensures that all necessary fields are populated before allowing a status change to be processed.
-* 3. Business Rule Enforcement: Implements additional business rules, such as quotes and adjudication requirements based on the PR amount and vendor status.
-* 4. Status-based Actions: Triggers associated actions when a status change occurs, such as resetting auto-cancellation timers, clearing reminders, and sending notifications.
-* 5. Audit Logging: Records all status changes in the "Audit Log" sheet for historical tracking and reporting.
-*
-* Dependencies:
-* ------------
-* - Configuration constants defined in Code.gs
-* - Notification system implemented in NotificationSystem.gs
-* - Google Apps Script environment for sheet access and data manipulation
-*
-*/
+ * StatusWorkflow.gs
+ * ================
+ * Part of 1PWR Procurement System
+ * Version: 1.2
+ * Last Updated: 2024-11-19
+ * 
+ * Purpose:
+ * --------
+ * Manages the progression of Purchase Orders (POs) and Purchase Requisitions (PRs) through various statuses according to 
+ * defined business rules. Handles validation, notifications, authorization checks, and automated actions.
+ * 
+ * Integration Points:
+ * ------------------
+ * - Code.gs: Uses CONFIG and COL constants for sheet structure
+ * - NotificationSystem.gs: Sends status-related notifications
+ * - DashboardWeb.html: Provides UI for status changes
+ * - LandingDateUpdate.gs: Handles landing date modifications
+ * 
+ * Sheet Dependencies:
+ * ------------------
+ * Master Log Tab Columns:
+ * - A: PO Number (COL.PO_NUMBER)
+ * - U: Status (COL.STATUS)
+ * - BA: Procurement Notes (COL.PROCUREMENT_NOTES)
+ * Additional columns defined in COL constant from Code.gs
+ * 
+ * Additional Required Sheets:
+ * - Audit Log: Records all status changes
+ * - Notification Log: Tracks sent notifications
+ * 
+ * Business Rules:
+ * --------------
+ * Status Flow:
+ * Submitted → In Queue → Ordered → Completed
+ *          → Rejected
+ *          → Revise and Resubmit → Resubmitted → Submitted
+ *          → Canceled (possible from any status)
+ * 
+ * Required Fields by Status:
+ * - Ordered: Link to PoP, Payment Date, Expected Landing Date
+ * - Completed: Landed Date
+ * - Rejected/R&R: Procurement Notes
+ * 
+ * Change History:
+ * --------------
+ * 2024-11-06: Initial implementation
+ * 2024-11-19: Integrated authorization checks and additional validation methods
+ */
+
 /**
  * Configuration Constants
  * ======================
@@ -1210,3 +1226,4 @@ function generateLandingDateUpdateLink(poNumber) {
   const baseUrl = ScriptApp.getService().getUrl();
   return `${baseUrl}?action=updateLandingDate&doc=${encodeURIComponent(poNumber)}`;
 }
+
