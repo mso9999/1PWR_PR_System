@@ -16,6 +16,8 @@
  * - Previous isAuthorizedShared() calls should now use isAuthorized()
  */
 
+// Reference to global CONFIG object from Code.gs
+const SPREADSHEET_ID = '1LG-qn2ELxE-gHWbOPPz1ARL-QUSTbGOdrTLTBT3x9BE';
 
 /**
  * Session management configuration
@@ -73,8 +75,8 @@ function isAuthorized(user, requiredRole) {
   if (!user || !requiredRole) return false;
 
   try {
-    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('Requestor List');
     if (!sheet) return false;
 
     const data = sheet.getDataRange().getValues();
@@ -766,7 +768,7 @@ function verifyUser(username, password) {
     try {
         // Get Requestor List sheet
         const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-        const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
+        const sheet = ss.getSheetByName('Requestor List');
         if (!sheet) {
             Logger.log('ERROR: User list sheet not found');
             throw new Error('User list not found');
@@ -1439,10 +1441,10 @@ function getActiveRequestors() {
     Logger.log('Starting getActiveRequestors');
     
     // Open the spreadsheet and get the Requestor List sheet
-    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     Logger.log('Opened spreadsheet');
     
-    const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
+    const sheet = ss.getSheetByName('Requestor List');
     if (!sheet) {
       Logger.log('ERROR: Requestor List sheet not found');
       throw new Error('Requestor List sheet not found');
