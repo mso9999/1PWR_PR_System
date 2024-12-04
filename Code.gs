@@ -391,33 +391,16 @@ function doGet(e) {
     const sessionId = e.parameter.sessionId;
     const user = getCurrentUserFromAuth(sessionId);
     
+    // Create template and add nonce
     const template = HtmlService.createTemplateFromFile('Login');
+    template.nonce = Utilities.getUuid();
+    
     const output = template
       .evaluate()
       .setTitle('Login - 1PWR Procurement')
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      // Set sandbox mode with restricted permissions
       .setSandboxMode(HtmlService.SandboxMode.EMULATED);
-    
-    // Add security headers with strict CSP
-    const headers = {
-      'Content-Security-Policy': 
-        "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
-        "style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
-        "frame-ancestors 'self' https://script.google.com; " +
-        "form-action 'self' https://script.google.com; " +
-        "base-uri 'self'; " +
-        "connect-src 'self' https://script.google.com https://*.googleusercontent.com",
-      'X-Frame-Options': 'SAMEORIGIN',
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin'
-    };
-    
-    Object.keys(headers).forEach(key => {
-      output.addMetaTag(key, headers[key]);
-    });
     
     return output;
   } catch (error) {

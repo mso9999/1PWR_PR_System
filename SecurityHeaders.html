@@ -1,6 +1,6 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.4.1 (Comprehensive MutationObserver patch)
+ * Version: 1.4.3
  * Last Updated: 2023-12-04
  *
  * Description:
@@ -18,15 +18,15 @@
  *   - Frame Options
  *   - Referrer Policy
  *
- * Changes in 1.4.1:
- *   - Comprehensive MutationObserver patch
+ * Changes in 1.4.3:
+ *   - Proper nonce template syntax
  ******************************************************************************************-->
 
-<!-- Security Headers Template v1.4.1 -->
+<!-- Security Headers Template v1.4.3 -->
 <?!= include('script'); ?>
 <?!= include('style'); ?>
 
-<script>
+<script nonce="<?!= nonce ?>">
 // Patch MutationObserver to handle null/undefined targets safely
 (function patchMutationObserver() {
   if (typeof MutationObserver !== 'undefined') {
@@ -54,6 +54,7 @@
     };
     
     window.MutationObserver.prototype = OriginalMutationObserver.prototype;
+  }
 })();
 
 // Safe navigation handling
@@ -103,12 +104,10 @@ document.addEventListener('submit', function(e) {
 <!-- Content Security Policy -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com;
+  script-src 'self' 'unsafe-inline' 'nonce-<?!= nonce ?>' https://script.google.com https://*.googleusercontent.com;
   style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com;
   frame-ancestors 'self' https://script.google.com;
   form-action 'self' https://script.google.com;
   base-uri 'self';
   connect-src 'self' https://script.google.com https://*.googleusercontent.com;
 ">
-
-<?!= generateNonce() ?>

@@ -1,152 +1,151 @@
 <!--*****************************************************************************************
  * File: Login.html
- * Version: 1.2 (Fixed login sequence and session management)
+ * Version: 1.3 (Updated with proper nonce template syntax and improved error handling)
  * Last Updated: 2023-12-04
  *
- * Changes in 1.2:
- *   - Fixed session management
- *   - Added proper error handling
- *   - Enhanced security measures
+ * Changes in 1.3:
+ *   - Updated with proper nonce template syntax
+ *   - Improved error handling
  ******************************************************************************************-->
 
 <!DOCTYPE html>
 <html>
 <head>
-    <?!= include('SecurityHeaders'); ?>
-    <?!= include('style'); ?>
-    <title>1PWR Purchase Request System - Login</title>
+  <?!= include('SecurityHeaders'); ?>
+  <?!= include('style'); ?>
+  <title>1PWR Purchase Request System - Login</title>
 </head>
 <body class="bg-gray-100">
-    <div class="min-h-screen flex items-center justify-center">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-            <div class="flex justify-center mb-8">
-                <h2 class="text-2xl font-bold">1PWR Purchase Request System</h2>
-            </div>
-            
-            <form id="loginForm" onsubmit="return handleLogin(event)">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-                        Username
-                    </label>
-                    <select id="username" name="username" required
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <option value="">Select a user</option>
-                    </select>
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-                        Password
-                    </label>
-                    <div class="relative">
-                        <input id="password" name="password" type="password" required
-                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
-                        <button type="button" onclick="togglePassword()"
-                            class="absolute inset-y-0 right-0 pr-3 flex items-center">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between">
-                    <button type="submit"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        Sign In
-                    </button>
-                    <button type="button" onclick="showResetPassword()"
-                        class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                        Reset Password
-                    </button>
-                </div>
-            </form>
-
-            <div id="errorMessage" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            </div>
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+      <div class="flex justify-center mb-8">
+        <h2 class="text-2xl font-bold">1PWR Purchase Request System</h2>
+      </div>
+      
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+            Username
+          </label>
+          <select id="username" name="username" required
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <option value="">Select a user</option>
+          </select>
         </div>
+        
+        <div class="mb-6">
+          <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
+            Password
+          </label>
+          <div class="relative">
+            <input id="password" name="password" type="password" required
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+            <button type="button" onclick="togglePassword()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <button type="submit"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Sign In
+          </button>
+          <button type="button" onclick="showResetPassword()"
+            class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+            Reset Password
+          </button>
+        </div>
+      </form>
+
+      <div id="errorMessage" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+      </div>
     </div>
+  </div>
 
-    <?!= include('SessionUtilities'); ?>
-    
-    <script nonce="<?= nonce ?>">
-        // Initialize form and session management
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing session management');
-            setupFormHandlers();
-            loadUserOptions();
-            initializeSession();
-        });
+  <?!= include('SessionUtilities'); ?>
+  
+  <script nonce="<?!= nonce ?>">
+    // Initialize form and session management
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing session management');
+      setupFormHandlers();
+      loadUserOptions();
+      initializeSession();
+    });
 
-        function initializeSession() {
-            console.log('Initializing session management, current URL:', window.location.href);
-            const sessionId = getStoredSessionId();
-            console.log('Session ID check result:', sessionId ? 'Found' : 'Not found');
-            
-            if (!sessionId) {
-                console.log('No session ID found, redirecting to login');
-                clearStoredSession();
-            }
-        }
+    function initializeSession() {
+      console.log('Initializing session management, current URL:', window.location.href);
+      const sessionId = getStoredSessionId();
+      console.log('Session ID check result:', sessionId ? 'Found' : 'Not found');
+      
+      if (!sessionId) {
+        console.log('No session ID found, redirecting to login');
+        clearStoredSession();
+      }
+    }
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    function handleLogin(event) {
+      event.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-            if (!username || !password) {
-                showError('Please enter both username and password');
-                return false;
-            }
+      if (!username || !password) {
+        showError('Please enter both username and password');
+        return false;
+      }
 
-            google.script.run
-                .withSuccessHandler(function(result) {
-                    if (result.success) {
-                        window.location.href = result.redirectUrl + '?sessionId=' + result.sessionId;
-                    } else {
-                        showError(result.message || 'Login failed');
-                    }
-                })
-                .withFailureHandler(function(error) {
-                    console.error('Login error:', error);
-                    showError('An error occurred during login');
-                })
-                .authenticateUser(username, password);
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            window.location.href = result.redirectUrl + '?sessionId=' + result.sessionId;
+          } else {
+            showError(result.message || 'Login failed');
+          }
+        })
+        .withFailureHandler(function(error) {
+          console.error('Login error:', error);
+          showError('An error occurred during login');
+        })
+        .authenticateUser(username, password);
 
-            return false;
-        }
+      return false;
+    }
 
-        function loadUserOptions() {
-            google.script.run
-                .withSuccessHandler(function(users) {
-                    const select = document.getElementById('username');
-                    select.innerHTML = '<option value="">Select a user</option>';
-                    users.forEach(function(user) {
-                        const option = document.createElement('option');
-                        option.value = user.email;
-                        option.textContent = user.name;
-                        select.appendChild(option);
-                    });
-                })
-                .withFailureHandler(function(error) {
-                    console.error('Error loading users:', error);
-                    showError('Failed to load user list');
-                })
-                .getActiveRequestors();
-        }
+    function loadUserOptions() {
+      google.script.run
+        .withSuccessHandler(function(users) {
+          const select = document.getElementById('username');
+          select.innerHTML = '<option value="">Select a user</option>';
+          users.forEach(function(user) {
+            const option = document.createElement('option');
+            option.value = user.email;
+            option.textContent = user.name;
+            select.appendChild(option);
+          });
+        })
+        .withFailureHandler(function(error) {
+          console.error('Error loading users:', error);
+          showError('Failed to load user list');
+        })
+        .getActiveRequestors();
+    }
 
-        function showError(message) {
-            const errorDiv = document.getElementById('errorMessage');
-            errorDiv.textContent = message;
-            errorDiv.classList.remove('hidden');
-            setTimeout(() => {
-                errorDiv.classList.add('hidden');
-            }, 5000);
-        }
+    function showError(message) {
+      const errorDiv = document.getElementById('errorMessage');
+      errorDiv.textContent = message;
+      errorDiv.classList.remove('hidden');
+      setTimeout(() => {
+        errorDiv.classList.add('hidden');
+      }, 5000);
+    }
 
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const type = passwordInput.type === 'password' ? 'text' : 'password';
-            passwordInput.type = type;
-        }
-    </script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.type === 'password' ? 'text' : 'password';
+      passwordInput.type = type;
+    }
+  </script>
 </body>
 </html>
