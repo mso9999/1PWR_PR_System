@@ -381,23 +381,36 @@ function doGet(e) {
     Logger.log('==================== START doGet ====================');
     Logger.log('Request parameters:', e.parameter);
     
-    // Check if specific page is requested
-    const page = e.parameter.page;
-    
-    if (!page) {
+    // If no parameters, serve login page
+    if (!e.parameter.page) {
       Logger.log('No parameters, serving login page');
-      return HtmlService.createHtmlOutputFromFile('Login')
-        .setTitle('1PWR Procurement System')
-        .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/favicon.png');
+      return HtmlService.createTemplateFromFile('Login')
+        .evaluate()
+        .setTitle('1PWR Procurement System - Login')
+        .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
     }
     
-    Logger.log('Page requested:', page);
-    
-    // Add other page routing logic here
-    
+    // Handle other pages based on parameter
+    switch(e.parameter.page.toLowerCase()) {
+      case 'dashboard':
+        Logger.log('Serving dashboard');
+        return HtmlService.createTemplateFromFile('DashboardWeb')
+          .evaluate()
+          .setTitle('1PWR Procurement System - Dashboard')
+          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+      default:
+        Logger.log('Invalid page parameter, redirecting to login');
+        return HtmlService.createTemplateFromFile('Login')
+          .evaluate()
+          .setTitle('1PWR Procurement System - Login')
+          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    }
   } catch (error) {
-    Logger.log('Error in doGet:', error);
-    return HtmlService.createHtmlOutput('An error occurred: ' + error.message);
+    Logger.log('Error in doGet:', error.message);
+    throw error;
   }
 }
 
