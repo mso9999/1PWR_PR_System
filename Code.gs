@@ -3389,5 +3389,14 @@ function getDeploymentId() {
   return deploymentId;
 }
 
+/**
+ * Exposes getActiveRequestors to the web app
+ * This function is called from the client-side to populate the username dropdown
+ * @returns {Array<Object>} Array of active requestor objects
+ */
+function getActiveRequestors() {
+  return SharedUtils.getActiveRequestors();
+}
+
 
 
