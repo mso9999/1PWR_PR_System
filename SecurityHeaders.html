@@ -1,28 +1,18 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.4.3
+ * Version: 1.5.0
  * Last Updated: 2023-12-04
  *
  * Description:
- *   Defines security-related HTML headers and meta tags for the application.
- *   Implements Content Security Policy (CSP) and other security best practices
- *   to protect against common web vulnerabilities.
+ *   Provides security-related JavaScript functionality for the application.
+ *   Implements MutationObserver patch and safe navigation handling.
  *
- * Relationship with Other Files:
- *   - Included in all HTML templates
- *   - Works with server-side security measures
- *
- * Security Framework:
- *   - Content Security Policy
- *   - XSS Protection
- *   - Frame Options
- *   - Referrer Policy
- *
- * Changes in 1.4.3:
- *   - Proper nonce template syntax
+ * Changes in 1.5.0:
+ *   - Removed meta tags (moved to HTTP headers)
+ *   - Enhanced MutationObserver security
+ *   - Improved navigation handling
  ******************************************************************************************-->
 
-<!-- Security Headers Template v1.4.3 -->
 <?!= include('script'); ?>
 <?!= include('style'); ?>
 
@@ -92,22 +82,3 @@ document.addEventListener('submit', function(e) {
   safeNavigate(form.action);
 });
 </script>
-
-<!-- Security Headers -->
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="X-XSS-Protection" content="1; mode=block">
-
-<!-- Content Security Policy -->
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'nonce-<?!= nonce ?>' https://script.google.com https://*.googleusercontent.com;
-  style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com;
-  frame-ancestors 'self' https://script.google.com;
-  form-action 'self' https://script.google.com;
-  base-uri 'self';
-  connect-src 'self' https://script.google.com https://*.googleusercontent.com;
-">

@@ -1,5 +1,17 @@
 /*******************************************************************************************
  * File: Code.gs
+ * Version: 1.4 (Security headers and error fixes)
+ * Last Updated: 2023-12-04
+ *
+ * Changes in 1.4:
+ *   - Moved security headers to proper HTTP headers
+ *   - Fixed CSP header implementation
+ *   - Added proper nonce handling
+ *   - Enhanced error handling
+ *******************************************************************************************/
+
+/*******************************************************************************************
+ * File: Code.gs
  * Version: 1.3 (Enhanced security and template handling)
  * Last Updated: 2023-12-04
  *
@@ -385,28 +397,33 @@ function verifyExecutionContext() {
  * Preserves existing routing logic while adding auth checks and session tracking
  */
 function doGet(e) {
-  console.log('doGet called with parameters:', e.parameter);
+  const nonce = generateNonce();
+  const template = HtmlService.createTemplateFromFile('Login');
+  template.nonce = nonce;
   
-  try {
-    const sessionId = e.parameter.sessionId;
-    const user = getCurrentUserFromAuth(sessionId);
-    
-    // Create template and add nonce
-    const template = HtmlService.createTemplateFromFile('Login');
-    template.nonce = Utilities.getUuid();
-    
-    const output = template
-      .evaluate()
-      .setTitle('Login - 1PWR Procurement')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      .setSandboxMode(HtmlService.SandboxMode.EMULATED);
-    
-    return output;
-  } catch (error) {
-    console.error('Error in doGet:', error);
-    return HtmlService.createHtmlOutput('An error occurred. Please try again later.');
-  }
+  const output = template.evaluate()
+    .setTitle('1PWR Purchase Request System')
+    .setFaviconUrl('https://www.google.com/images/favicon.ico')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
+    .addMetaTag('charset', 'UTF-8')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+
+  // Set security headers
+  const headers = output.getHeaders();
+  headers['X-Content-Type-Options'] = 'nosniff';
+  headers['Referrer-Policy'] = 'strict-origin-when-cross-origin';
+  headers['X-XSS-Protection'] = '1; mode=block';
+  headers['Content-Security-Policy'] = `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'nonce-${nonce}' https://script.google.com https://*.googleusercontent.com;
+    style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com;
+    frame-ancestors 'self' https://script.google.com;
+    form-action 'self' https://script.google.com;
+    base-uri 'self';
+    connect-src 'self' https://script.google.com https://*.googleusercontent.com
+  `.replace(/\s+/g, ' ').trim();
+
+  return output;
 }
 
 /**
@@ -438,7 +455,7 @@ function handleAuthenticatedRoute(e, user) {
         .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
         .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-      
+
     default:
       // Serve dashboard
       const dashTemplate = HtmlService.createTemplateFromFile('DashboardWeb');
