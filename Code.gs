@@ -409,7 +409,7 @@ function doGet(e) {
     console.log('Checking session ID:', sessionId);
 
     // Get user from session
-    const user = sessionId ? getCurrentUser(sessionId) : null;
+    const user = sessionId ? getCurrentUserFromAuth(sessionId) : null;
     console.log('User from session:', user ? user.email : 'Not found');
 
     let template;
@@ -536,7 +536,7 @@ function serveSubmittedView(e) {
   try {
     // Validate session first
     const sessionId = e.parameter.sessionId;
-    const user = sessionId ? getCurrentUser(sessionId) : null;
+    const user = sessionId ? getCurrentUserFromAuth(sessionId) : null;
     
     if (!user) {
       console.log('Invalid session in serveSubmittedView');
@@ -1081,7 +1081,7 @@ function getApprovedVendors() {
  * Description:
  *   Retrieves the list of active approvers from the "Approver List" sheet.
  * Returns:
- *   - An array of approver objects containing names and departments.
+ *   - An array of approver objects containing names, departments, and emails.
  */
 /**
  * Function: getActiveApprovers()
@@ -1489,7 +1489,7 @@ function processForm(formData) {
   
   try {
     // Validate session
-    const user = getCurrentUser(formData.sessionId);
+    const user = getCurrentUserFromAuth(formData.sessionId);
     if (!user) {
       return {
         success: false,
@@ -1617,7 +1617,7 @@ function getFormInitialData(sessionId) {
   console.log('Getting initial form data');
   
   try {
-    const user = getCurrentUser(sessionId);
+    const user = getCurrentUserFromAuth(sessionId);
     if (!user) {
       return { sessionExpired: true };
     }
@@ -2982,7 +2982,7 @@ function doPost(e) {
             console.log('Session ID found in POST request');
             
             // Get user from session
-            const user = getCurrentUser(e.parameter.sessionId);
+            const user = getCurrentUserFromAuth(e.parameter.sessionId);
             if (!user) {
                 console.log('No valid user found for session');
                 return HtmlService.createTemplateFromFile('Login')

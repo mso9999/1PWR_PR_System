@@ -1480,15 +1480,15 @@ function loadUserOptions() {
 }
 
 /**
- * @deprecated Use getCurrentUser from auth.gs instead
+ * @deprecated Use getCurrentUserFromAuth from auth.gs instead
  */
 function getCurrentUser(sessionId) {
-  return auth.getCurrentUser(sessionId);
+  return getCurrentUserFromAuth(sessionId);
 }
 
 /**
- * @deprecated Use getWebAppUrl from auth.gs instead
+ * @deprecated Use getWebAppUrlFromAuth from auth.gs instead
  */
 function getWebAppUrl(page) {
-  return auth.getWebAppUrl(page);
+  return getWebAppUrlFromAuth(page);
 }
