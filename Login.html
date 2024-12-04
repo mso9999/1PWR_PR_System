@@ -1,11 +1,11 @@
 <!--*****************************************************************************************
  * File: Login.html
- * Version: 1.4 (Updated to fix setupFormHandlers error and improve form handling)
+ * Version: 1.5 (Updated with proper session management functions)
  * Last Updated: 2023-12-04
  *
- * Changes in 1.4:
- *   - Fixed setupFormHandlers error
- *   - Improved form handling
+ * Changes in 1.5:
+ *   - Added proper session management functions
+ *   - Improved session handling in initializeSession and handleLogin
  ******************************************************************************************-->
 
 <!DOCTYPE html>
@@ -34,6 +34,34 @@
   </div>
 
   <script nonce="<?!= nonce ?>">
+    // Session management utilities
+    const SESSION_KEY = '1pwr_session';
+    
+    function getStoredSessionId() {
+      try {
+        return sessionStorage.getItem(SESSION_KEY);
+      } catch (error) {
+        console.error('Error accessing session storage:', error);
+        return null;
+      }
+    }
+    
+    function setStoredSessionId(sessionId) {
+      try {
+        sessionStorage.setItem(SESSION_KEY, sessionId);
+      } catch (error) {
+        console.error('Error storing session ID:', error);
+      }
+    }
+    
+    function clearStoredSession() {
+      try {
+        sessionStorage.removeItem(SESSION_KEY);
+      } catch (error) {
+        console.error('Error clearing session:', error);
+      }
+    }
+
     // Initialize form and session management
     document.addEventListener('DOMContentLoaded', function() {
       console.log('DOM loaded, initializing session management');
@@ -47,7 +75,7 @@
       console.log('Session ID check result:', sessionId ? 'Found' : 'Not found');
       
       if (!sessionId) {
-        console.log('No session ID found, redirecting to login');
+        console.log('No session ID found, clearing session');
         clearStoredSession();
       }
     }
@@ -55,9 +83,16 @@
     function handleLogin(event) {
       event.preventDefault();
       const email = document.getElementById('email').value;
+      
+      if (!email) {
+        alert('Please enter your email address');
+        return;
+      }
+
       google.script.run
         .withSuccessHandler(function(result) {
           if (result.success) {
+            setStoredSessionId(result.sessionId);
             window.location.href = result.redirectUrl;
           } else {
             alert(result.error || 'Login failed. Please try again.');
