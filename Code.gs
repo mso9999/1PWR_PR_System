@@ -1,13 +1,13 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.2 (Enhanced security and session management)
+ * Version: 1.3 (Enhanced security and template handling)
  * Last Updated: 2023-12-04
  *
- * Changes in 1.2:
- *   - Implemented server-side security headers
- *   - Added nonce generation for CSP
- *   - Enhanced session management
- *   - Fixed login sequence
+ * Changes in 1.3:
+ *   - Updated nonce handling in templates
+ *   - Enhanced security headers integration
+ *   - Improved error handling in template processing
+ *   - Fixed session management edge cases
  *******************************************************************************************/
 
 /*******************************************************************************************
