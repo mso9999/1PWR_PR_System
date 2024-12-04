@@ -1,3 +1,26 @@
+/*******************************************************************************************
+ * File: NotificationSystem.gs
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Handles all system notifications including email alerts, status updates, and
+ *   system messages. Manages the communication flow between different stakeholders
+ *   in the PR process.
+ *
+ * Relationship with Other Files:
+ *   - Code.gs: Triggers notifications for form submissions
+ *   - StatusSync.gs: Triggers notifications for status changes
+ *   - Dashboard.gs: Sends dashboard alerts and summaries
+ *   - SharedUtils.gs: Uses shared utility functions
+ *
+ * Google Sheet Data Framework:
+ *   - Reads user contact info from Requestor and Approver Lists
+ *   - Tracks notification history
+ *   - Manages email templates and message formatting
+ *   - Handles notification preferences and settings
+ ********************************************************************************************/
+
 /**
  * NotificationSystem.gs
  * 1PWR Procurement System - Email Notification and Reminder System

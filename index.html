@@ -1,26 +1,24 @@
-<!--
-/*******************************************************************************************
+<!--*****************************************************************************************
  * File: index.html
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
  * Description:
- *   This is the main HTML file for the custom purchase request web app. It defines the
- *   structure of the web app, including the left and right sides of the interface, and
- *   includes client-side scripts and styles. The left side contains the section menu and
- *   input fields, while the right side displays the submission preview and PR number.
+ *   Main entry point for the PR System web application. Provides the core structure
+ *   for the PR submission form and handles user authentication and session management.
  *
  * Relationship with Other Files:
- *   - script.html: Included in this file to provide client-side JavaScript functions.
- *   - style.html: Included in this file to provide CSS styles for the web app.
- *   - Code.gs: Contains server-side scripts that process form submissions and provide data
- *     for dropdowns and other dynamic elements.
+ *   - script.html: Contains the JavaScript for form functionality
+ *   - style.html: Defines the visual styling
+ *   - Code.gs: Server-side controller for form submissions
+ *   - SecurityHeaders.html: Security-related meta tags and headers
  *
- * Data Framework:
- *   - The web app interacts with several sheets in the "1PWR PR MASTER TRACKING" spreadsheet
- *     to populate dropdowns and store form responses.
- *
- * Author: [Your Name]
- * Date: [Date]
- *******************************************************************************************/
--->
+ * Google Sheet Data Framework:
+ *   - Displays data from:
+ *     * Requestor List: For user authentication
+ *     * Master Log: For PR history
+ *     * Various lookup sheets for form dropdowns
+ ******************************************************************************************-->
 
 <!DOCTYPE html>
 <html>
@@ -266,5 +264,3 @@ function returnToDashboard() {
 </script>
 </body>
 </html>
-
-

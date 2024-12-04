@@ -1,3 +1,30 @@
+/*******************************************************************************************
+ * File: SharedUtils.gs
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Provides a centralized collection of utility functions used across the PR system.
+ *   Contains helper functions for data formatting, validation, calculations, and
+ *   common operations used by multiple components of the system.
+ *
+ * Relationship with Other Files:
+ *   - Used by all .gs files in the system
+ *   - Provides core functionality for:
+ *     * Code.gs: Main controller utilities
+ *     * Dashboard.gs: Dashboard calculations
+ *     * StatusSync.gs: Status management helpers
+ *     * NotificationSystem.gs: Email formatting
+ *
+ * Google Sheet Data Framework:
+ *   - Provides utilities for:
+ *     * Date formatting and calculations
+ *     * Currency conversions
+ *     * Data validation
+ *     * Sheet range operations
+ *     * Error handling and logging
+ ********************************************************************************************/
+
 /**
  * SharedUtils.gs (Refactored)
  * Part 1 of 3: Core Configuration and Session Management
@@ -1451,5 +1478,3 @@ function loadUserOptions() {
     })
     .getActiveRequestors();
 }
-
-

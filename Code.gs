@@ -1,29 +1,31 @@
 /*******************************************************************************************
  * File: Code.gs
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
  * Description:
- *   This server-side script file contains all the Google Apps Script functions that handle
- *   data processing, retrieval, and storage for the custom purchase request web app. It
- *   interacts with the Google Sheets backend to fetch data for dropdowns, generate PR numbers,
- *   process form submissions, and perform validations.
+ *   Core server-side script file for the 1PWR Purchase Request System. This file serves
+ *   as the main controller for the web application, handling data processing, form
+ *   submissions, and interactions with the Google Sheets backend database.
  *
  * Relationship with Other Files:
- *   - index.html: The client-side HTML structure that interacts with these server-side functions
- *     through the google.script.run API.
- *   - script.html: Contains client-side JavaScript that calls these server-side functions to
- *     populate dropdowns and submit form data.
- *   - style.html: Defines the CSS styles for the web app interface.
+ *   - Dashboard.gs: Handles dashboard-specific functionality and data processing
+ *   - StatusSync.gs: Manages PR status updates and synchronization
+ *   - SharedUtils.gs: Contains shared utility functions used across the system
+ *   - index.html: Main entry point for the web interface
+ *   - script.html: Client-side JavaScript for form handling and UI interactions
+ *   - style.html: CSS styles for the web interface
  *
- * Data Framework:
- *   - The script interacts with several sheets in a Google Spreadsheet, identified by the
- *     SPREADSHEET_ID constant.
- *   - Sheets include "Requestor List", "Org List", "Expense Type", "Vendor List", "Approver List",
- *     "Site List", "Vehicle List", and others.
- *   - Data is fetched, processed, and returned to the client-side scripts for dynamic content
- *     rendering.
- *
- * Author: [Your Name]
- * Date: [Date]
- *******************************************************************************************/
+ * Google Sheet Data Framework:
+ *   - Master Log Sheet: Primary data store for all PR records
+ *   - Requestor List: Maintains user permissions and roles
+ *   - Site List: Available site locations
+ *   - Expense Type: Valid expense categories
+ *   - Vendor List: Approved vendors
+ *   - Approver List: Authorized approvers by department
+ *   - Vehicle List: Company vehicle registry
+ *   - PR Number Tracker: Manages PR number generation and tracking
+ ********************************************************************************************/
 
 // Replace with your actual Spreadsheet ID
 const SPREADSHEET_ID = '1LG-qn2ELxE-gHWbOPPz1ARL-QUSTbGOdrTLTBT3x9BE';
@@ -1340,52 +1342,46 @@ function getPRNumber() {
     const currentYearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
 
     // Get PR number column data
-    try {
-      const dataRange = sheet.getRange('A:A'); // Assuming PR numbers are in column A
-      const prNumbers = dataRange.getValues();
+    const dataRange = sheet.getRange('A:A'); // Assuming PR numbers are in column A
+    const prNumbers = dataRange.getValues();
 
-      // Find highest number for current month
-      let maxNumber = 0;
-      const prPattern = new RegExp(`PR-${currentYearMonth}-(\\d{3})`);
+    // Find highest number for current month
+    let maxNumber = 0;
+    const prPattern = new RegExp(`PR-${currentYearMonth}-(\\d{3})`);
 
-      prNumbers.forEach((row, index) => {
-        if (row[0]) {  // Only process non-empty cells
-          const prNum = row[0].toString();
-          const match = prNum.match(prPattern);
-          if (match) {
-            const num = parseInt(match[1], 10);
-            maxNumber = Math.max(maxNumber, num);
-            console.log(`Found PR number: ${prNum}, extracted number: ${num}`);
-          }
+    prNumbers.forEach((row, index) => {
+      if (row[0]) {  // Only process non-empty cells
+        const prNum = row[0].toString();
+        const match = prNum.match(prPattern);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          maxNumber = Math.max(maxNumber, num);
+          console.log(`Found PR number: ${prNum}, extracted number: ${num}`);
         }
-      });
-
-      console.log(`Highest number found for ${currentYearMonth}: ${maxNumber}`);
-
-      // Increment and validate
-      const nextNumber = maxNumber + 1;
-      if (nextNumber > 999) {
-        console.error(`PR number limit reached for ${currentYearMonth}`);
-        return 'PR-LIMIT';
       }
+    });
 
-      // Format new PR number
-      const paddedNumber = nextNumber.toString().padStart(3, '0');
-      const newPRNumber = `PR-${currentYearMonth}-${paddedNumber}`;
-      
-      // Log the new number in the tracker sheet
-      const lastRow = sheet.getLastRow();
-      sheet.getRange(lastRow + 1, 1).setValue(newPRNumber);
-      sheet.getRange(lastRow + 1, 2).setValue(new Date()); // Timestamp in column B
-      sheet.getRange(lastRow + 1, 3).setValue(Session.getActiveUser().getEmail()); // User in column C
-      
-      console.log(`Generated new PR number: ${newPRNumber}`);
-      return newPRNumber;
+    console.log(`Highest number found for ${currentYearMonth}: ${maxNumber}`);
 
-    } catch (rangeError) {
-      console.error('Error accessing data range:', rangeError);
-      return 'PR-ERROR-RANGE';
+    // Increment and validate
+    const nextNumber = maxNumber + 1;
+    if (nextNumber > 999) {
+      console.error(`PR number limit reached for ${currentYearMonth}`);
+      return 'PR-LIMIT';
     }
+
+    // Format new PR number
+    const paddedNumber = nextNumber.toString().padStart(3, '0');
+    const newPRNumber = `PR-${currentYearMonth}-${paddedNumber}`;
+    
+    // Log the new number in the tracker sheet
+    const lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow + 1, 1).setValue(newPRNumber);
+    sheet.getRange(lastRow + 1, 2).setValue(new Date()); // Timestamp in column B
+    sheet.getRange(lastRow + 1, 3).setValue(Session.getActiveUser().getEmail()); // User in column C
+    
+    console.log(`Generated new PR number: ${newPRNumber}`);
+    return newPRNumber;
 
   } catch (error) {
     console.error('Error in getPRNumber:', error);
@@ -2747,7 +2743,7 @@ function getPRNumber() {
         const currentYearMonth = `${currentYear}${currentMonth.toString().padStart(2, '0')}`;
 
         // Get PR number column data
-        const dataRange = sheet.getRange('A:A');
+        const dataRange = sheet.getRange('A:A'); // Assuming PR numbers are in column A
         const prNumbers = dataRange.getValues();
         
         // Find highest number for current month
@@ -3090,6 +3086,3 @@ function processAjaxRequest(action, user, params) {
       throw new Error('Unknown action: ' + action);
   }
 }
-
-
-

@@ -1,3 +1,25 @@
+<!--*****************************************************************************************
+ * File: Login.html
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Provides the login interface for the PR System. Handles user authentication,
+ *   session initialization, and redirects to appropriate views based on user
+ *   roles and permissions.
+ *
+ * Relationship with Other Files:
+ *   - Code.gs: Authentication backend
+ *   - SessionUtilities.html: Session management
+ *   - SecurityHeaders.html: Security measures
+ *   - style.html: Core styling
+ *
+ * Google Sheet Data Framework:
+ *   - Validates against:
+ *     * Requestor List: User credentials
+ *     * User roles and permissions
+ ******************************************************************************************-->
+
 <!--
 /*******************************************************************************
 * File: Login.html
@@ -585,7 +607,7 @@ window.addEventListener('beforeunload', function(e) {
     if (!e.currentTarget.performance.navigation.type) {
         clearStoredSession();
     }
-});
+}
 
 
 

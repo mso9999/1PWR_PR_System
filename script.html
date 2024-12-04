@@ -1,3 +1,26 @@
+<!--*****************************************************************************************
+ * File: script.html
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Contains all client-side JavaScript functionality for the PR System. Handles
+ *   form validation, dynamic UI updates, and communication with server-side
+ *   scripts through google.script.run.
+ *
+ * Relationship with Other Files:
+ *   - index.html: Main HTML structure that includes this script
+ *   - style.html: CSS styles referenced by this script
+ *   - Code.gs: Server-side functions called by this script
+ *   - SharedUtils.gs: Shared utility functions
+ *
+ * Google Sheet Data Framework:
+ *   - Interacts with server-side functions to:
+ *     * Fetch dropdown data from various sheets
+ *     * Submit form data to Master Log
+ *     * Validate data against sheet constraints
+ ******************************************************************************************-->
+
 <!--
 /*******************************************************************************************
  * File: script.html
@@ -1516,7 +1539,3 @@ function validateSection(sectionId) {
 }
 
 </script>
-
-
-
-

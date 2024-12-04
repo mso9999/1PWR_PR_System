@@ -1,4 +1,25 @@
-
+/*******************************************************************************************
+ * File: StatusSync.gs
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Manages the synchronization and updating of PR statuses throughout the system.
+ *   Handles status transitions, notifications, and maintains the integrity of the
+ *   status workflow across all PRs in the system.
+ *
+ * Relationship with Other Files:
+ *   - Code.gs: Main controller that calls status sync functions
+ *   - Dashboard.gs: Receives status updates for dashboard display
+ *   - NotificationSystem.gs: Sends notifications on status changes
+ *   - SharedUtils.gs: Uses shared utility functions
+ *
+ * Google Sheet Data Framework:
+ *   - Updates status column in Master Log Sheet
+ *   - Records status change history
+ *   - Manages status-based notifications
+ *   - Tracks approval workflows
+ ********************************************************************************************/
 
 /**
  * Synchronizes Submitted sheet with Master Log data

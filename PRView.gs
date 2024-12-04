@@ -1,3 +1,25 @@
+/*******************************************************************************************
+ * File: PRView.gs
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Handles the display and management of individual PR views. Provides detailed
+ *   information about specific PRs and their current status, history, and
+ *   associated documents.
+ *
+ * Relationship with Other Files:
+ *   - Code.gs: Main controller that routes to PR views
+ *   - PRViewWeb.html: Frontend template for PR display
+ *   - StatusSync.gs: Updates PR status information
+ *   - SharedUtils.gs: Uses shared utility functions
+ *
+ * Google Sheet Data Framework:
+ *   - Reads PR details from Master Log Sheet
+ *   - Tracks PR history and changes
+ *   - Manages PR attachments and documentation
+ ********************************************************************************************/
+
 /**
  * 241107_PRView.gs
  * ================
@@ -39,8 +61,6 @@
  * Called by doGet() when URL includes pr parameter
  * Example: ?pr=PR-202411-001
  */
-
-
 
 
 /**
