@@ -384,7 +384,9 @@ function doGet(e) {
     // If no parameters, serve login page
     if (!e.parameter.page) {
       Logger.log('No parameters, serving login page');
-      return HtmlService.createTemplateFromFile('Login')
+      const template = HtmlService.createTemplateFromFile('Login');
+      template.includeFile = include;  // Add include function to template
+      return template
         .evaluate()
         .setTitle('1PWR Procurement System - Login')
         .addMetaTag('viewport', 'width=device-width, initial-scale=1')
@@ -395,14 +397,18 @@ function doGet(e) {
     switch(e.parameter.page.toLowerCase()) {
       case 'dashboard':
         Logger.log('Serving dashboard');
-        return HtmlService.createTemplateFromFile('DashboardWeb')
+        const dashTemplate = HtmlService.createTemplateFromFile('DashboardWeb');
+        dashTemplate.includeFile = include;  // Add include function to template
+        return dashTemplate
           .evaluate()
           .setTitle('1PWR Procurement System - Dashboard')
           .addMetaTag('viewport', 'width=device-width, initial-scale=1')
           .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
       default:
         Logger.log('Invalid page parameter, redirecting to login');
-        return HtmlService.createTemplateFromFile('Login')
+        const defaultTemplate = HtmlService.createTemplateFromFile('Login');
+        defaultTemplate.includeFile = include;  // Add include function to template
+        return defaultTemplate
           .evaluate()
           .setTitle('1PWR Procurement System - Login')
           .addMetaTag('viewport', 'width=device-width, initial-scale=1')
