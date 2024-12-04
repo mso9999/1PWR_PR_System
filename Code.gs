@@ -385,7 +385,6 @@ function doGet(e) {
     if (!e.parameter.page) {
       Logger.log('No parameters, serving login page');
       const template = HtmlService.createTemplateFromFile('Login');
-      template.includeFile = include;  // Add include function to template
       return template
         .evaluate()
         .setTitle('1PWR Procurement System - Login')
@@ -398,7 +397,6 @@ function doGet(e) {
       case 'dashboard':
         Logger.log('Serving dashboard');
         const dashTemplate = HtmlService.createTemplateFromFile('DashboardWeb');
-        dashTemplate.includeFile = include;  // Add include function to template
         return dashTemplate
           .evaluate()
           .setTitle('1PWR Procurement System - Dashboard')
@@ -407,7 +405,6 @@ function doGet(e) {
       default:
         Logger.log('Invalid page parameter, redirecting to login');
         const defaultTemplate = HtmlService.createTemplateFromFile('Login');
-        defaultTemplate.includeFile = include;  // Add include function to template
         return defaultTemplate
           .evaluate()
           .setTitle('1PWR Procurement System - Login')

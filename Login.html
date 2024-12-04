@@ -43,9 +43,37 @@
 <html>
 <head>
     <base target="_top">
-    <?!= includeFile('SecurityHeaders'); ?>
+    <?!= include('SecurityHeaders'); ?>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <?!= includeFile('style'); ?>
+    <?!= include('style'); ?>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 2rem;
+        }
+        #errorMessage {
+            display: none;
+            margin-top: 1rem;
+        }
+        .loading {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -81,7 +109,7 @@
         </div>
     </div>
 
-    <?!= includeFile('script'); ?>
+    <?!= include('script'); ?>
     <script>
         // Load active users when the page loads
         window.onload = function() {
@@ -97,8 +125,8 @@
                     if (users && users.length > 0) {
                         users.forEach(function(user) {
                             const option = document.createElement('option');
-                            option.value = user.name;  // Change back to using object property
-                            option.textContent = `${user.name} (${user.department})`; // Change back to using object properties
+                            option.value = user.name;
+                            option.textContent = `${user.name} (${user.department})`;
                             select.appendChild(option);
                         });
                     } else {
@@ -110,7 +138,7 @@
                     select.innerHTML = '<option value="">Error loading users</option>';
                     showError('Failed to load users: ' + error);
                 })
-                .getActiveRequestors();  // This function should return array of user data from sheet
+                .getActiveRequestors();
         };
 
         function setLoading(isLoading) {
