@@ -1,6 +1,6 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.4 (Safer navigation and MutationObserver fix)
+ * Version: 1.4.1 (Comprehensive MutationObserver patch)
  * Last Updated: 2023-12-04
  *
  * Description:
@@ -18,16 +18,44 @@
  *   - Frame Options
  *   - Referrer Policy
  *
- * Changes in 1.4:
- *   - Safer navigation handling
- *   - MutationObserver fix
+ * Changes in 1.4.1:
+ *   - Comprehensive MutationObserver patch
  ******************************************************************************************-->
 
-<!-- Security Headers Template v1.4 -->
+<!-- Security Headers Template v1.4.1 -->
 <?!= include('script'); ?>
 <?!= include('style'); ?>
 
 <script>
+// Patch MutationObserver to handle null/undefined targets safely
+(function patchMutationObserver() {
+  if (typeof MutationObserver !== 'undefined') {
+    const OriginalMutationObserver = window.MutationObserver;
+    
+    window.MutationObserver = function(callback) {
+      const instance = new OriginalMutationObserver(callback);
+      
+      const originalObserve = instance.observe;
+      instance.observe = function(target, options) {
+        if (!target) {
+          console.warn('MutationObserver: Attempted to observe null/undefined target');
+          return;
+        }
+        
+        if (!(target instanceof Node)) {
+          console.warn('MutationObserver: Target is not a valid Node');
+          return;
+        }
+        
+        return originalObserve.call(this, target, options);
+      };
+      
+      return instance;
+    };
+    
+    window.MutationObserver.prototype = OriginalMutationObserver.prototype;
+})();
+
 // Safe navigation handling
 function safeNavigate(url) {
   try {
@@ -62,16 +90,6 @@ document.addEventListener('submit', function(e) {
   const form = e.target;
   safeNavigate(form.action);
 });
-
-// Disable MutationObserver for gas-hub
-if (window.MutationObserver) {
-  const originalObserve = MutationObserver.prototype.observe;
-  MutationObserver.prototype.observe = function(target, options) {
-    if (target && target.nodeType === Node.ELEMENT_NODE) {
-      originalObserve.call(this, target, options);
-    }
-  };
-}
 </script>
 
 <!-- Security Headers -->
