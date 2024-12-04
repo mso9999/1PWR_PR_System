@@ -406,11 +406,7 @@ function doGet(e) {
     .setFaviconUrl('https://www.google.com/images/favicon.ico')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-    .setSandboxMode(HtmlService.SandboxMode.NATIVE)
-    .setFeaturePolicy(
-      "camera 'none'; microphone 'none'; geolocation 'none'; " +
-      "payment 'none'; usb 'none'; bluetooth 'none'"
-    );
+    .setSandboxMode(HtmlService.SandboxMode.NATIVE);
 }
 
 /**
