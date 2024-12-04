@@ -385,63 +385,42 @@ function verifyExecutionContext() {
  * Preserves existing routing logic while adding auth checks and session tracking
  */
 function doGet(e) {
-    console.log('==================== START doGet ====================');
-    console.log('Request received at:', new Date().toISOString());
-    console.log('Event object:', JSON.stringify(e));
-
-    // Set security headers
-    const nonce = Utilities.getUuid();
+  console.log('doGet called with parameters:', e.parameter);
+  
+  try {
+    const sessionId = e.parameter.sessionId;
+    const user = getCurrentUserFromAuth(sessionId);
+    
+    const template = HtmlService.createTemplateFromFile('Login');
+    const output = template
+      .evaluate()
+      .setTitle('Login - 1PWR Procurement')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+    
+    // Add security headers
     const headers = {
-      'Content-Security-Policy': 
-        "default-src 'self' script.google.com *.google.com; " +
-        "style-src 'self' 'unsafe-inline' fonts.googleapis.com; " +
-        "font-src 'self' fonts.gstatic.com; " +
-        "img-src 'self' data: *.google.com; " +
-        `script-src 'self' 'nonce-${nonce}' script.google.com *.googleusercontent.com;`,
+      'Content-Security-Policy': "default-src 'self' https://script.google.com https://*.googleusercontent.com; " +
+        "script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
+        "style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
+        "frame-src 'self' https://script.google.com https://*.googleusercontent.com; " +
+        "frame-ancestors 'self' https://script.google.com https://*.googleusercontent.com; " +
+        "connect-src 'self' https://script.google.com https://*.googleusercontent.com;",
       'X-Frame-Options': 'SAMEORIGIN',
       'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'X-XSS-Protection': '1; mode=block'
+      'Referrer-Policy': 'strict-origin-when-cross-origin'
     };
-
-    // Check session ID from URL parameters
-    const sessionId = e.parameter.sessionId;
-    console.log('Checking session ID:', sessionId);
-
-    // Get user from session
-    const user = sessionId ? getCurrentUserFromAuth(sessionId) : null;
-    console.log('User from session:', user ? user.email : 'Not found');
-
-    let template;
-    if (!user && e.parameter.page !== 'login') {
-      // No valid session, redirect to login
-      return HtmlService.createHtmlOutput(
-        '<script>window.top.location.href = "' + getWebAppUrl('login') + '";</script>'
-      );
-    } else if (!user) {
-      // Serve login page
-      template = HtmlService.createTemplateFromFile('Login');
-      template.nonce = nonce;
-    } else {
-      // Valid session, handle authenticated routes
-      template = handleAuthenticatedRoute(e, user);
-      template.nonce = nonce;
-      template.user = user;
-    }
-
-    // Create HTML output with security headers
-    const htmlOutput = template.evaluate()
-      .setTitle('1PWR Purchase Request System')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-
-    // Set all security headers
+    
     Object.keys(headers).forEach(key => {
-      htmlOutput.addHeader(key, headers[key]);
+      output.addMetaTag(key, headers[key]);
     });
-
-    console.log('==================== END doGet ====================');
-    return htmlOutput;
+    
+    return output;
+  } catch (error) {
+    console.error('Error in doGet:', error);
+    return HtmlService.createHtmlOutput('An error occurred. Please try again later.');
+  }
 }
 
 /**
