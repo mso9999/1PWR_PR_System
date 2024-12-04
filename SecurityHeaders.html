@@ -1,7 +1,7 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.1 (Restored from 11/29/2023)
- * Last Updated: 2023-11-29
+ * Version: 1.2 (Fixed CSP and frame options implementation)
+ * Last Updated: 2023-12-04
  *
  * Description:
  *   Defines security-related HTML headers and meta tags for the application.
@@ -17,11 +17,19 @@
  *   - XSS Protection
  *   - Frame Options
  *   - Referrer Policy
+ *
+ * Changes in 1.2:
+ *   - Moved CSP implementation to server-side headers
+ *   - Removed meta tag frame options (now server-side)
+ *   - Added nonce generation for inline scripts
  ******************************************************************************************-->
 
-<!-- Version: 1.8 -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-XSS-Protection" content="1; mode=block">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
-<meta http-equiv="Content-Security-Policy" content="default-src * data: blob: 'unsafe-inline' 'unsafe-eval';">
-<meta http-equiv="X-Frame-Options" content="ALLOWALL">
+<meta name="robots" content="noindex, nofollow">
+
+<?!= generateNonce() ?>

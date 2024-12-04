@@ -1,5 +1,17 @@
 /*******************************************************************************************
  * File: Code.gs
+ * Version: 1.2 (Enhanced security and session management)
+ * Last Updated: 2023-12-04
+ *
+ * Changes in 1.2:
+ *   - Implemented server-side security headers
+ *   - Added nonce generation for CSP
+ *   - Enhanced session management
+ *   - Fixed login sequence
+ *******************************************************************************************/
+
+/*******************************************************************************************
+ * File: Code.gs
  * Version: 1.1 (Restored from 11/29/2023)
  * Last Updated: 2023-11-29
  *
@@ -377,121 +389,66 @@ function doGet(e) {
     console.log('Request received at:', new Date().toISOString());
     console.log('Event object:', JSON.stringify(e));
 
-    try {
-        // Handle logout action first
-        if (e.parameter.action === 'logout') {
-            const sessionId = e.parameter.sessionId;
-            console.log('Handling logout for session:', sessionId);
-            if (sessionId) {
-                removeSession(sessionId);
-            }
-            const userCache = CacheService.getUserCache();
-            userCache.remove('userSession');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
+    // Set security headers
+    const nonce = Utilities.getUuid();
+    const headers = {
+      'Content-Security-Policy': 
+        "default-src 'self' script.google.com *.google.com; " +
+        "style-src 'self' 'unsafe-inline' fonts.googleapis.com; " +
+        "font-src 'self' fonts.gstatic.com; " +
+        "img-src 'self' data: *.google.com; " +
+        `script-src 'self' 'nonce-${nonce}' script.google.com *.googleusercontent.com;`,
+      'X-Frame-Options': 'SAMEORIGIN',
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'X-XSS-Protection': '1; mode=block'
+    };
 
-        // Get and validate session
-        const sessionId = e.parameter.sessionId;
-        console.log('Checking session ID:', sessionId);
-        
-        // If no session ID and no explicit login page request, show login
-        if (!sessionId && (!e.parameter.page || e.parameter.page !== 'login')) {
-            console.log('No session ID provided - showing login page');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
+    // Check session ID from URL parameters
+    const sessionId = e.parameter.sessionId;
+    console.log('Checking session ID:', sessionId);
 
-        // Get user for session
-        const user = sessionId ? getCurrentUser(sessionId) : null;
-        console.log('User from session:', user ? 'Found' : 'Not found');
+    // Get user from session
+    const user = sessionId ? getCurrentUser(sessionId) : null;
+    console.log('User from session:', user ? user.email : 'Not found');
 
-        // If no valid user and not login page, show login
-        if (!user && (!e.parameter.page || e.parameter.page !== 'login')) {
-            console.log('No valid user found - redirecting to login');
-            return HtmlService.createTemplateFromFile('Login')
-                .evaluate()
-                .setTitle('Login - 1PWR Procurement')
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-        }
-
-        // Handle different page requests
-        let template;
-        if (e.parameter.page === 'submitted') {
-            console.log('Handling submitted view request');
-            return serveSubmittedView(e);
-        }
-
-        if (e.parameter.page === 'prview') {
-            console.log('Handling PR view request');
-            console.log('PR Number:', e.parameter.pr);
-            const result = handlePRView(e.parameter.pr);
-            console.log('PR view handler completed');
-            return result;
-        }
-
-        if (e.parameter.page === 'form') {
-            console.log('Handling form page request');
-            try {
-                template = HtmlService.createTemplateFromFile('index');
-                // Add user context to template
-                template.user = user;
-                console.log('Form template created successfully');
-                const evaluated = template
-                    .evaluate()
-                    .setTitle('Submit Purchase Request')
-                    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-                    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-                console.log('Form template evaluated successfully');
-                return evaluated;
-            } catch (formError) {
-                console.log('ERROR: Error creating form:', formError.toString());
-                throw formError;
-            }
-        }
-
-        // Default to dashboard
-        console.log('Loading dashboard for user');
-        try {
-            console.log('Creating dashboard template');
-            template = HtmlService.createTemplateFromFile('DashboardWeb');
-            // Add user context to template
-            template.user = user;
-            template.sessionId = sessionId;
-
-            const deploymentUrl = ScriptApp.getService().getUrl();
-            console.log('Deployment URL:', deploymentUrl);
-            template.deploymentUrl = deploymentUrl;
-
-            console.log('Evaluating dashboard template');
-            const evaluated = template
-                .evaluate()
-                .setTitle('Dashboard')
-                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-                .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-                .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-            console.log('Dashboard template evaluated successfully');
-            return evaluated;
-        } catch (dashError) {
-            console.log('ERROR: Error creating dashboard:', dashError.toString());
-            console.log('Error stack:', dashError.stack);
-            throw dashError;
-        }
-
-    } catch (error) {
-        console.error('Error in doGet:', error);
-        return createErrorPage(error.message);
-    } finally {
-        console.log('==================== END doGet ====================');
+    let template;
+    if (!user && e.parameter.page !== 'login') {
+      // No valid session, redirect to login
+      return HtmlService.createHtmlOutput(
+        '<script>window.top.location.href = "' + getWebAppUrl('login') + '";</script>'
+      );
+    } else if (!user) {
+      // Serve login page
+      template = HtmlService.createTemplateFromFile('Login');
+      template.nonce = nonce;
+    } else {
+      // Valid session, handle authenticated routes
+      template = handleAuthenticatedRoute(e, user);
+      template.nonce = nonce;
+      template.user = user;
     }
+
+    // Create HTML output with security headers
+    const htmlOutput = template.evaluate()
+      .setTitle('1PWR Purchase Request System')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+
+    // Set all security headers
+    Object.keys(headers).forEach(key => {
+      htmlOutput.addHeader(key, headers[key]);
+    });
+
+    console.log('==================== END doGet ====================');
+    return htmlOutput;
+}
+
+/**
+ * Generate a unique nonce for CSP
+ */
+function generateNonce() {
+  return Utilities.getUuid();
 }
 
 /**
@@ -1471,6 +1428,9 @@ function resetPRNumbersForMonth() {
       `New month started: ${today.getFullYear()}${(today.getMonth() + 1).toString().padStart(2, '0')}`
     ]);
   }
+
+  console.log('PR numbering system reset complete');
+  
 }
 
 /**
@@ -2184,8 +2144,8 @@ function reinitializePRTracker() {
     // Add first PR number for current month
     const today = new Date();
     const currentYear = today.getFullYear();
-    const currentMonth = (today.getMonth() + 1).toString().padStart(2, '0');
-    const firstPR = `PR-${currentYear}${currentMonth}-001`;
+    const currentMonth = today.getMonth() + 1;
+    const firstPR = `PR-${currentYear}${currentMonth.toString().padStart(2, '0')}-001`;
     
     const firstRow = [
       firstPR,
@@ -2538,21 +2498,11 @@ function checkApprovedVendor(vendorName) {
         }
 
         const data = sheet.getDataRange().getValues();
-        const headers = data[0].map(header => header.toString().toLowerCase());
         
-        const nameCol = headers.indexOf('vendor name');
-        const statusCol = headers.indexOf('approved status (y/n)');
-        
-        if (nameCol === -1 || statusCol === -1) {
-            console.warn('Required columns not found in Vendor List');
-            return false;
-        }
-
-        // Search for vendor
+        // Skip header row and find vendor
         for (let i = 1; i < data.length; i++) {
-            if (data[i][nameCol] === vendorName && 
-                data[i][statusCol].toString().toUpperCase() === 'Y') {
-                return true;
+            if (data[i][0].trim() === vendorName) {
+                return data[i][1].trim() === 'Y'; // Return true if approved
             }
         }
         
@@ -3008,14 +2958,14 @@ function formatDateShort(date) {
 }
 
 function getDeploymentUrl() {
-  try {
-    const url = ScriptApp.getService().getUrl();
-    console.log('Deployment URL:', url);
-    return url;
-  } catch (error) {
-    console.error('Error getting deployment URL:', error);
-    return null;
-  }
+    try {
+        const url = ScriptApp.getService().getUrl();
+        console.log('Deployment URL:', url);
+        return url;
+    } catch (error) {
+        console.error('Error getting deployment URL:', error);
+        return null;
+    }
 }
 
 /**
@@ -3024,65 +2974,65 @@ function getDeploymentUrl() {
  * @returns {HtmlOutput} Appropriate page based on session
  */
 function doPost(e) {
-  console.log('Handling POST request');
+    console.log('Handling POST request');
   
-  try {
-    // Check if this is a form submission from login
-    if (e.parameter.sessionId) {
-      console.log('Session ID found in POST request');
-      
-      // Get user from session
-      const user = getCurrentUser(e.parameter.sessionId);
-      if (!user) {
-        console.log('No valid user found for session');
+    try {
+        // Check if this is a form submission from login
+        if (e.parameter.sessionId) {
+            console.log('Session ID found in POST request');
+            
+            // Get user from session
+            const user = getCurrentUser(e.parameter.sessionId);
+            if (!user) {
+                console.log('No valid user found for session');
+                return HtmlService.createTemplateFromFile('Login')
+                    .evaluate()
+                    .setTitle('Login - 1PWR Procurement')
+                    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+                    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+            }
+
+            // Handle AJAX requests from dashboard that include action parameter
+            if (e.parameter.action) {
+                // Process AJAX actions
+                return processAjaxRequest(e.parameter.action, user, e.parameter);
+            }
+            
+            console.log('Creating dashboard for user');
+            // Create dashboard page with session
+            const template = HtmlService.createTemplateFromFile('DashboardWeb');
+            template.user = user;
+            template.sessionId = e.parameter.sessionId;
+            
+            return template
+                .evaluate()
+                .setTitle('Dashboard')
+                .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+                .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+        }
+
+        console.log('No session ID in POST request, showing login page');
         return HtmlService.createTemplateFromFile('Login')
-          .evaluate()
-          .setTitle('Login - 1PWR Procurement')
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-      }
+            .evaluate()
+            .setTitle('Login - 1PWR Procurement')
+            .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+            .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 
-      // Handle AJAX requests from dashboard that include action parameter
-      if (e.parameter.action) {
-        // Process AJAX actions
-        return processAjaxRequest(e.parameter.action, user, e.parameter);
-      }
-      
-      console.log('Creating dashboard for user');
-      // Create dashboard page with session
-      const template = HtmlService.createTemplateFromFile('DashboardWeb');
-      template.user = user;
-      template.sessionId = e.parameter.sessionId;
-      
-      return template
-        .evaluate()
-        .setTitle('Dashboard')
-        .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-        .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    } catch (error) {
+        console.error('Error in doPost:', error);
+        return createErrorPage('An error occurred during navigation: ' + error.message);
     }
-
-    console.log('No session ID in POST request, showing login page');
-    return HtmlService.createTemplateFromFile('Login')
-      .evaluate()
-      .setTitle('Login - 1PWR Procurement')
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-
-  } catch (error) {
-    console.error('Error in doPost:', error);
-    return createErrorPage('An error occurred during navigation: ' + error.message);
-  }
 }
 
 // Helper function to process AJAX requests
 function processAjaxRequest(action, user, params) {
-  switch(action) {
-    case 'updateStatus':
-      return updateStatus(params.prNumber, params.newStatus, params.notes, user);
-    case 'getDashboardData':
-      return getDashboardData(params.organization, user);
-    // Add other AJAX actions as needed
-    default:
-      throw new Error('Unknown action: ' + action);
-  }
+    switch(action) {
+        case 'updateStatus':
+            return updateStatus(params.prNumber, params.newStatus, params.notes, user);
+        case 'getDashboardData':
+            return getDashboardData(params.organization, user);
+        // Add other AJAX actions as needed
+        default:
+            throw new Error('Unknown action: ' + action);
+    }
 }
