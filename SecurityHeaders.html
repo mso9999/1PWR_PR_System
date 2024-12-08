@@ -1,19 +1,25 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.5.2
+ * Version: 1.5.3
  * Last Updated: 2023-12-08
  *
  * Description:
  *   Provides security-related JavaScript functionality for the application.
  *   Implements MutationObserver patch and safe navigation handling.
  *
- * Changes in 1.5.2:
- *   - Fixed MutationObserver implementation
+ * Changes in 1.5.3:
+ *   - Added strict Content Security Policy
+ *   - Added Feature-Policy headers
+ *   - Improved iframe sandbox configuration
  ******************************************************************************************-->
 
 <!-- Base meta tags -->
 <meta charset="UTF-8">
 <meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://script.google.com https://*.googleusercontent.com; script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; frame-ancestors 'self';">
+<meta http-equiv="Permissions-Policy" content="accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
+<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
 
 <?!= include('script'); ?>
 <?!= include('style'); ?>
@@ -26,7 +32,17 @@
       mutations.forEach(function(mutation) {
         if (mutation.type === 'childList') {
           // Handle DOM changes here
-          console.log('DOM change detected');
+          const elements = mutation.target.getElementsByTagName('iframe');
+          for (let iframe of elements) {
+            // Set secure sandbox attributes for iframes
+            if (iframe.hasAttribute('sandbox')) {
+              const currentSandbox = iframe.getAttribute('sandbox').split(' ');
+              if (currentSandbox.includes('allow-scripts') && currentSandbox.includes('allow-same-origin')) {
+                // Remove allow-same-origin if allow-scripts is present
+                iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
+              }
+            }
+          }
         }
       });
     });
@@ -49,24 +65,19 @@ function safeNavigate(url) {
   try {
     if (!url) return;
     
-    // Only allow specific domains
+    // Validate URL
+    const urlObj = new URL(url, window.location.origin);
     const allowedDomains = [
       'script.google.com',
-      'googleusercontent.com'
+      'google.com',
+      window.location.hostname
     ];
     
-    const urlObj = new URL(url);
-    const isDomainAllowed = allowedDomains.some(domain => 
-      urlObj.hostname.endsWith(domain)
-    );
-    
-    if (!isDomainAllowed) {
-      console.error('Navigation blocked: domain not allowed');
-      return;
+    if (allowedDomains.some(domain => urlObj.hostname.endsWith(domain))) {
+      window.location.href = urlObj.href;
+    } else {
+      console.error('Navigation blocked: Invalid domain');
     }
-    
-    // Use replace to avoid adding to browser history
-    window.top.location.replace(url);
   } catch (error) {
     console.error('Navigation error:', error);
   }
@@ -74,8 +85,9 @@ function safeNavigate(url) {
 
 // Handle form submissions
 document.addEventListener('submit', function(e) {
-  e.preventDefault();
   const form = e.target;
-  safeNavigate(form.action);
+  if (!form.hasAttribute('data-safe-submit')) {
+    e.preventDefault();
+    console.warn('Form submission blocked: Missing data-safe-submit attribute');
+  }
 });
-</script>

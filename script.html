@@ -1145,6 +1145,12 @@ function copyToPreview() {
 function updatePreview() {
   const previewContent = document.getElementById('previewContent');
   
+  // Add null check
+  if (!previewContent) {
+    console.warn('Preview content element not found');
+    return;
+  }
+  
   // Clear existing content
   previewContent.innerHTML = '';
   
@@ -1406,18 +1412,24 @@ function updatePreview() {
    *   Initializes the preview, fetches the PR number, and sets up any required default states.
    *******************************************************************************************/
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize preview
     updatePreview();
-
-    // Fetch and display the PR number
-    google.script.run.withSuccessHandler(function(prNumber) {
-      document.getElementById('prNumber').textContent = prNumber;
-      formData.prNumber = prNumber; // Store in formData if needed
-    }).getPRNumber();
-
+    
+    // Fetch PR number
+    google.script.run
+      .withSuccessHandler(function(prNumber) {
+        document.getElementById('prNumber').textContent = prNumber;
+        formData.prNumber = prNumber;
+      })
+      .withFailureHandler(function(error) {
+        console.error('Failed to fetch PR number:', error);
+      })
+      .getPRNumber();
+    
     // Disable Section 4 button by default
     const section4Button = document.querySelector('#sectionMenu button[onclick="showSection(\'section4\')"]');
     section4Button.disabled = true;
-
+    
     updateSubmitButtonState(); // Initial state
   });
 
