@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.8
+ * @version 1.4.9
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.9 - 2024-12-08
+ * - Fix PRView template include name
+ * 
  * 1.4.8 - 2024-12-08
  * - Make template variable names consistent with new file structure
  * - Fix style include variables in BaseTemplate.html and Code.gs
@@ -236,7 +239,7 @@ function getTemplateForUser() {
     template.includePageSpecificScript = include('PRFormScripts');
     template.includeHeader = include('PRFormComponents');
   } else if (isPRViewPage()) {
-    template.includeContent = include('PRViewPage');
+    template.includeContent = include('PRView');
     template.includePageSpecificScript = include('PRViewScripts');
   } else if (isDashboardPage()) {
     template.includeContent = include('DashboardPage');
