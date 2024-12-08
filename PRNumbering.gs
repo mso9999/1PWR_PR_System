@@ -1,11 +1,16 @@
 /*******************************************************************************************
  * File: PRNumbering.gs
- * Version: 1.0
- * Last Updated: 2023-12-08
+ * Version: 1.1.1
+ * Last Updated: 2024-12-08
  *
  * Description:
  *   Handles PR number generation, tracking, and validation.
  *   Manages the PR Number Tracker sheet and ensures unique PR numbers.
+ *
+ * Changes in 1.1.0:
+ *   - Add better error handling in getPRNumber
+ *   - Add detailed logging for debugging
+ *   - Fix potential issue with monthRow being invalid
  *
  * Dependencies:
  *   - SharedUtils.gs: Utility functions
@@ -17,46 +22,65 @@
  * @returns {string} Next PR number
  */
 function getPRNumber() {
-  console.log('Generating new PR number');
+  console.log('Starting PR number generation');
   
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
-                               .getSheetByName('PR Number Tracker');
+    // Get the PR Number Tracker sheet
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    console.log('Opened spreadsheet:', SPREADSHEET_ID);
+    
+    const sheet = ss.getSheetByName('PR Number Tracker');
     if (!sheet) {
+      console.error('PR Number Tracker sheet not found');
       throw new Error('PR Number Tracker sheet not found');
     }
+    console.log('Found PR Number Tracker sheet');
 
+    // Get current year and month
     const now = new Date();
     const yearMonth = Utilities.formatDate(now, 'GMT', 'yyyyMM');
+    console.log('Current yearMonth:', yearMonth);
     
-    // Find or create row for current month
+    // Get all data from sheet
     const data = sheet.getDataRange().getValues();
+    console.log('Retrieved sheet data, rows:', data.length);
+    
+    // Find row for current month
     let monthRow = data.findIndex(row => row[0] === yearMonth);
+    console.log('Found monthRow:', monthRow);
     
     if (monthRow === -1) {
-      // Add new month row
+      console.log('Creating new month row for:', yearMonth);
       sheet.appendRow([yearMonth, 1]);
-      monthRow = sheet.getLastRow() - 1;
+      monthRow = data.length; // Use the new row index
+      console.log('Created new month row at index:', monthRow);
     }
     
     // Get and increment counter
-    const counter = data[monthRow][1];
+    const counter = monthRow === data.length ? 1 : data[monthRow][1];
+    console.log('Current counter:', counter);
+    
     const paddedCounter = String(counter).padStart(3, '0');
     const prNumber = `PR-${yearMonth}-${paddedCounter}`;
+    console.log('Generated PR number:', prNumber);
     
     // Update counter in sheet
-    sheet.getRange(monthRow + 1, 2).setValue(counter + 1);
+    const newCounter = counter + 1;
+    sheet.getRange(monthRow + 1, 2).setValue(newCounter);
+    console.log('Updated counter to:', newCounter);
     
     // Store in cache
     const cache = CacheService.getUserCache();
-    cache.put('reserved_pr_' + Session.getTemporaryActiveUserKey(), prNumber, 3600);
+    const cacheKey = 'reserved_pr_' + Session.getTemporaryActiveUserKey();
+    cache.put(cacheKey, prNumber, 3600);
+    console.log('Stored PR number in cache with key:', cacheKey);
     
-    console.log('Generated PR number:', prNumber);
     return prNumber;
     
   } catch (error) {
-    console.error('Error generating PR number:', error);
-    throw new Error('Failed to generate PR number');
+    console.error('Error in getPRNumber:', error.message);
+    console.error('Stack trace:', error.stack);
+    throw new Error(`Failed to generate PR number: ${error.message}`);
   }
 }
 

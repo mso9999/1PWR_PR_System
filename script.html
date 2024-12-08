@@ -1415,20 +1415,25 @@ function updatePreview() {
     // Initialize preview
     updatePreview();
     
-    // Fetch PR number
-    google.script.run
-      .withSuccessHandler(function(prNumber) {
-        document.getElementById('prNumber').textContent = prNumber;
-        formData.prNumber = prNumber;
-      })
-      .withFailureHandler(function(error) {
-        console.error('Failed to fetch PR number:', error);
-      })
-      .getPRNumber();
+    // Only fetch PR number if we're on the main form page
+    const prNumberElement = document.getElementById('prNumber');
+    if (prNumberElement) {
+      google.script.run
+        .withSuccessHandler(function(prNumber) {
+          prNumberElement.textContent = prNumber;
+          formData.prNumber = prNumber;
+        })
+        .withFailureHandler(function(error) {
+          console.error('Failed to fetch PR number:', error);
+        })
+        .getPRNumber();
+    }
     
     // Disable Section 4 button by default
     const section4Button = document.querySelector('#sectionMenu button[onclick="showSection(\'section4\')"]');
-    section4Button.disabled = true;
+    if (section4Button) {
+      section4Button.disabled = true;
+    }
     
     updateSubmitButtonState(); // Initial state
   });
@@ -1486,9 +1491,6 @@ function updateSubmitButtonState() {
 /**
  * Adds validation event listeners to the current section
  * Called after loading each section's fields
- */
-/**
- * Adds validation event listeners to the current section
  * @throws {Error} If sectionFields div is not found
  */
 function addValidationToSection() {
