@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.13
+ * @version 1.4.14
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.14 - 2024-12-08
+ * - Fix session validation function name (isValidSession -> validateSession)
+ * 
  * 1.4.13 - 2024-12-08
  * - Remove SharedUtils include from BaseTemplate (it's a .gs file)
  * 
@@ -266,7 +269,8 @@ function getTemplateForUser() {
  * Page type checks
  */
 function isLoginPage() {
-  return !Session.getActiveUser().getEmail() || !isValidSession();
+  const sessionId = Session.getActiveUser().getEmail();
+  return !sessionId || !validateSession(sessionId);
 }
 
 function isPRFormPage() {
