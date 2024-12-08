@@ -1,0 +1,680 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red21\green98\blue39;\red246\green247\blue249;\red46\green49\blue51;
+\red109\green109\blue109;\red251\green0\blue7;\red42\green42\blue42;\red20\green67\blue174;\red18\green115\blue126;
+\red162\green0\blue16;\red24\green25\blue27;\red77\green80\blue85;\red186\green6\blue115;\red97\green3\blue173;
+}
+{\*\expandedcolortbl;;\cssrgb\c7451\c45098\c20000;\cssrgb\c97255\c97647\c98039;\cssrgb\c23529\c25098\c26275;
+\cssrgb\c50196\c50196\c50196;\cssrgb\c100000\c0\c0;\cssrgb\c21961\c21961\c21961;\cssrgb\c9412\c35294\c73725;\cssrgb\c3529\c52157\c56863;
+\cssrgb\c70196\c7843\c7059;\cssrgb\c12549\c12941\c14118;\cssrgb\c37255\c38824\c40784;\cssrgb\c78824\c15294\c52549;\cssrgb\c46275\c15294\c73333;
+}
+\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 <!--\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 /*******************************************************************************\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * File: Login.html\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * Purpose: Authentication interface for 1PWR Procurement System\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * Version: 1.1\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * Last Updated: 2024-11-20\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * Integration Points:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * ------------------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * 1. Requestor List Sheet Structure:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column A: Name (username)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column B: Email \cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column C: Department\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column D: Role\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column E: Password\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Column F: Active (Y/N)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * 2. Server-Side Functions (SharedUtils.gs):\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - verifyUser(username, password)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - updateUserPassword(username, newPassword)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - getActiveRequestors()\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * 3. Authentication Flow:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - User selects name from dropdown (populated from Requestor List)\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Password verified against Requestor List\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Session created and stored in user cache\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Redirects to dashboard on success\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * 4. Password Reset Flow:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - User clicks reset password\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Selects username from dropdown\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Enters new password\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *    - Password updated in Requestor List\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * Dependencies:\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * -----------\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * - Tailwind CSS 2.2.19 for styling\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * - SharedUtils.gs for authentication functions\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 * - Code.gs for routing after login\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 *******************************************************************************/\cf4 \cb1 \strokec4 \
+\cf2 \cb3 \strokec2 -->\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 <!DOCTYPE\cf6 \strokec6  html\cf5 \strokec5 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 html\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 head\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 base\cf4 \strokec4  \cf9 \strokec9 target\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "_top"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 meta\cf4 \strokec4  \cf9 \strokec9 charset\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "utf-8"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 meta\cf4 \strokec4  \cf9 \strokec9 name\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "viewport"\cf4 \strokec4  \cf9 \strokec9 content\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "width=device-width, initial-scale=1"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cb1 \
+\cb3     \cf2 \strokec2 <!-- Include utilities first -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf4 \cb3 \strokec4 ?!= include('SessionUtilities'); ?>\cb1 \
+\cb3     \cb1 \
+\cb3     \cf2 \strokec2 <!-- Then other includes -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf4 \cb3 \strokec4 ?!= include('SecurityHeaders'); ?>\cb1 \
+\cb3     \cb1 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 link\cf4 \strokec4  \cf9 \strokec9 href\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"\cf4 \strokec4  \cf9 \strokec9 rel\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "stylesheet"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 title\cf7 \cb3 \strokec7 >\cf4 \cb3 \strokec4 1PWR Login\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 title\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 head\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 body\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "bg-gray-100"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 <!-- Main Container -->\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "min-h-screen flex items-center justify-center"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf2 \strokec2 <!-- Login Card -->\cf4 \cb1 \strokec4 \
+\cb3   \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "max-w-md w-full bg-white rounded-lg shadow-lg p-8"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 <!-- Logo Header -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "flex justify-center mb-8"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 img\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 src\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 alt\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "1PWR Logo"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "h-12"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 onerror\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>\uc0\u55357 \u56420 </text></svg>';"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3     \cf2 \strokec2 <!-- Login Form -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 form\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "loginForm"\cf4 \strokec4  \cf9 \strokec9 onsubmit\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "handleLogin(event)"\cf4 \strokec4  \cf9 \strokec9 autocomplete\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "off"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 <!-- Username Dropdown -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mb-6"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 label\cf4 \strokec4  \cf9 \strokec9 for\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "username"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "block text-gray-700 text-sm font-bold mb-2"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Username\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 label\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 select\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "username"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 name\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "username"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 required\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 option\cf4 \strokec4  \cf9 \strokec9 value\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 ""\cf7 \cb3 \strokec7 >\cf4 \cb3 \strokec4 Select User\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 option\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 select\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Password Field -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mb-6"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 label\cf4 \strokec4  \cf9 \strokec9 for\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "password"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "block text-gray-700 text-sm font-bold mb-2"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Password\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 label\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "relative"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 input\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "password"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "password"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 name\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "password"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 required\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "button"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 onclick\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "togglePassword()"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3             \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 svg\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "h-5 w-5"\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "eyeIcon"\cf4 \strokec4  \cf9 \strokec9 xmlns\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "http://www.w3.org/2000/svg"\cf4 \strokec4  \cf9 \strokec9 viewBox\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "0 0 20 20"\cf4 \strokec4  \cf9 \strokec9 fill\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "currentColor"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3               \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 path\cf4 \strokec4  \cf9 \strokec9 d\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "M10 12a2 2 0 100-4 2 2 0 000 4z"\cf4 \strokec4  \cf7 \cb3 \strokec7 />\cf4 \cb1 \strokec4 \
+\cb3               \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 path\cf4 \strokec4  \cf9 \strokec9 fill-rule\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "evenodd"\cf4 \strokec4  \cf9 \strokec9 d\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"\cf4 \strokec4  \cf9 \strokec9 clip-rule\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "evenodd"\cf4 \strokec4  \cf7 \cb3 \strokec7 />\cf4 \cb1 \strokec4 \
+\cb3             \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 svg\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Error Message Display -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "error"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "hidden mb-4 p-4 bg-red-100 text-red-700 rounded-md"\cf7 \cb3 \strokec7 ></\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Loading Indicator -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "loading"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "hidden mb-4 flex items-center justify-center"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"\cf7 \cb3 \strokec7 ></\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 span\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "ml-2 text-gray-600"\cf7 \cb3 \strokec7 >\cf4 \cb3 \strokec4 Authenticating...\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 span\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Submit Button -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "submit"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "loginButton"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150 ease-in-out"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         Login\cb1 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 form\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3     \cf2 \strokec2 <!-- Password Reset Link -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mt-4 text-center"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 onclick\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "showResetPassword()"\cf4 \cb1 \strokec4 \
+\cb3         \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "text-blue-600 hover:text-blue-800 text-sm transition duration-150 ease-in-out"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         Set/Reset Password\cb1 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3   \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 <!-- Password Reset Dialog -->\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetDialog"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3   \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "bg-white rounded-lg p-8 max-w-md w-full m-4"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 h3\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "text-lg font-bold mb-4"\cf7 \cb3 \strokec7 >\cf4 \cb3 \strokec4 Set/Reset Password\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 h3\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3     \cf2 \strokec2 <!-- Reset Password Form -->\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 form\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetForm"\cf4 \strokec4  \cf9 \strokec9 onsubmit\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "handlePasswordReset(event)"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 <!-- Reset Username Field -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mb-4"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 label\cf4 \strokec4  \cf9 \strokec9 for\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetUsername"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "block text-gray-700 text-sm font-bold mb-2"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Username\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 label\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 select\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetUsername"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 name\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetUsername"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 required\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "w-full px-3 py-2 border border-gray-300 rounded-md"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 option\cf4 \strokec4  \cf9 \strokec9 value\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 ""\cf7 \cb3 \strokec7 >\cf4 \cb3 \strokec4 Select User\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 option\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 select\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- New Password Field -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mb-4"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 label\cf4 \strokec4  \cf9 \strokec9 for\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "newPassword"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "block text-gray-700 text-sm font-bold mb-2"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           New Password\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 label\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "relative"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 input\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "password"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "newPassword"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 name\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "newPassword"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 required\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 minlength\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "8"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "w-full px-3 py-2 border border-gray-300 rounded-md pr-10"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 pattern\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]\{8,\}$"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 title\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "Password must be at least 8 characters long and include both letters and numbers"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "button"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 onclick\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "toggleResetPassword()"\cf4 \cb1 \strokec4 \
+\cb3             \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 hover:text-gray-800"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3             \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 svg\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "h-5 w-5"\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetEyeIcon"\cf4 \strokec4  \cf9 \strokec9 xmlns\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "http://www.w3.org/2000/svg"\cf4 \strokec4  \cf9 \strokec9 viewBox\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "0 0 20 20"\cf4 \strokec4  \cf9 \strokec9 fill\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "currentColor"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3               \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 path\cf4 \strokec4  \cf9 \strokec9 d\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "M10 12a2 2 0 100-4 2 2 0 000 4z"\cf4 \strokec4  \cf7 \cb3 \strokec7 />\cf4 \cb1 \strokec4 \
+\cb3               \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 path\cf4 \strokec4  \cf9 \strokec9 fill-rule\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "evenodd"\cf4 \strokec4  \cf9 \strokec9 d\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"\cf4 \strokec4  \cf9 \strokec9 clip-rule\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "evenodd"\cf4 \strokec4  \cf7 \cb3 \strokec7 />\cf4 \cb1 \strokec4 \
+\cb3             \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 svg\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 p\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "mt-1 text-sm text-gray-500"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Password must be at least 8 characters long and include both letters and numbers\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 p\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Reset Error Message -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetError"\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "hidden mb-4 p-4 bg-red-100 text-red-700 rounded-md"\cf7 \cb3 \strokec7 ></\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cb3       \cf2 \strokec2 <!-- Dialog Buttons -->\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 div\cf4 \strokec4  \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "flex justify-end space-x-4"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "button"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 onclick\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "hideResetPassword()"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "px-4 py-2 text-gray-600 hover:text-gray-800"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Cancel\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3         \cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 button\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 type\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "submit"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 id\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "resetButton"\cf4 \cb1 \strokec4 \
+\cb3           \cf9 \strokec9 class\cf7 \cb3 \strokec7 =\cf10 \cb3 \strokec10 "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3           Update Password\cb1 \
+\cb3         \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 button\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3       \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3     \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 form\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cb3   \cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 div\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 <!-- Client-side JavaScript -->\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 <\cf8 \cb3 \strokec8 script\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 let\cf4 \strokec4  \cf11 \strokec11 isLoginInProgress\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\
+\
+\
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 handleLogin\cf4 \strokec4 (\cf11 \strokec11 event\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 event\cf4 \strokec4 .\cf11 \strokec11 preventDefault\cf4 \strokec4 ();\cb1 \
+\
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 isLoginInProgress\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 log\cf4 \strokec4 (\cf10 \strokec10 'Login already in progress'\cf4 \strokec4 );\cb1 \
+\cb3         \cf8 \strokec8 return\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 log\cf4 \strokec4 (\cf10 \strokec10 'Starting login process'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 isLoginInProgress\cf4 \strokec4  = \cf8 \strokec8 true\cf4 \strokec4 ;\cb1 \
+\
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 username\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'username'\cf4 \strokec4 ).\cf11 \strokec11 value\cf4 \strokec4 ;\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 password\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'password'\cf4 \strokec4 ).\cf11 \strokec11 value\cf4 \strokec4 ;\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'error'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 loadingDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'loading'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 loginButton\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'loginButton'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 resetDialog\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetDialog'\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf12 \strokec12 // Preserve form state for potential password reset\cf4 \cb1 \strokec4 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 currentFormState\cf4 \strokec4  = \{\cb1 \
+\cb3         \cf11 \strokec11 username\cf4 \strokec4 : \cf11 \strokec11 username\cf4 \strokec4 ,\cb1 \
+\cb3         \cf11 \strokec11 hasActivePasswordReset\cf4 \strokec4 : \cf11 \strokec11 resetDialog\cf4 \strokec4  && !\cf11 \strokec11 resetDialog\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 contains\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 )\cb1 \
+\cb3     \};\cb1 \
+\
+\cb3     \cf12 \strokec12 // Clear previous errors and show loading state\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 loadingDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 remove\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 loginButton\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 true\cf4 \strokec4 ;\cb1 \
+\
+\cb3     \cf12 \strokec12 // First step: Verify user credentials\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3         .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Login failed:'\cf4 \strokec4 , \cf11 \strokec11 error\cf4 \strokec4 );\cb1 \
+\cb3             \cf11 \strokec11 showError\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 .\cf11 \strokec11 message\cf4 \strokec4  || \cf10 \strokec10 'Login failed. Please try again.'\cf4 \strokec4 );\cb1 \
+\cb3             \cf11 \strokec11 loadingDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3             \cf11 \strokec11 loginButton\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\cb3             \cf11 \strokec11 isLoginInProgress\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\
+\cb3             \cf12 \strokec12 // Preserve password reset state if active\cf4 \cb1 \strokec4 \
+\cb3             \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 currentFormState\cf4 \strokec4 .\cf11 \strokec11 hasActivePasswordReset\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf11 \strokec11 showResetPassword\cf4 \strokec4 ();\cb1 \
+\cb3             \}\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 result\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 log\cf4 \strokec4 (\cf10 \strokec10 'Received authentication response'\cf4 \strokec4 );\cb1 \
+\
+\cb3             \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 result\cf4 \strokec4 .\cf11 \strokec11 success\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\cf11 \strokec11 result\cf4 \strokec4 );\cb1 \
+\cb3                 \cf8 \strokec8 return\cf4 \strokec4 ;\cb1 \
+\cb3             \}\cb1 \
+\
+\cb3             \cf8 \strokec8 try\cf4 \strokec4  \{\cb1 \
+\cb3                 \cf12 \strokec12 // Store session ID using SessionUtils\cf4 \cb1 \strokec4 \
+\cb3                 \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 result\cf4 \strokec4 .\cf11 \strokec11 sessionId\cf4 \strokec4 ) \{\cb1 \
+\cb3                     \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 window\cf4 \strokec4 .\cf13 \strokec13 SessionUtils\cf4 \strokec4 ) \{\cb1 \
+\cb3                         \cf8 \strokec8 throw\cf4 \strokec4  \cf8 \strokec8 new\cf4 \strokec4  \cf13 \strokec13 Error\cf4 \strokec4 (\cf10 \strokec10 'Session management system not initialized'\cf4 \strokec4 );\cb1 \
+\cb3                     \}\cb1 \
+\cb3                     \cf13 \strokec13 SessionUtils\cf4 \strokec4 .\cf11 \strokec11 setSessionId\cf4 \strokec4 (\cf11 \strokec11 result\cf4 \strokec4 .\cf11 \strokec11 sessionId\cf4 \strokec4 );\cb1 \
+\
+\cb3                     \cf12 \strokec12 // Handle navigation with session management\cf4 \cb1 \strokec4 \
+\cb3                     \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3                         .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 redirectInfo\cf4 \strokec4 ) \{\cb1 \
+\cb3                             \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 redirectInfo\cf4 \strokec4  || !\cf11 \strokec11 redirectInfo\cf4 \strokec4 .\cf11 \strokec11 url\cf4 \strokec4 ) \{\cb1 \
+\cb3                                 \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\{ \cf11 \strokec11 message\cf4 \strokec4 : \cf10 \strokec10 'Failed to get redirect URL'\cf4 \strokec4  \});\cb1 \
+\cb3                                 \cf8 \strokec8 return\cf4 \strokec4 ;\cb1 \
+\cb3                             \}\cb1 \
+\
+\cb3                             \cf8 \strokec8 try\cf4 \strokec4  \{\cb1 \
+\cb3                                 \cf12 \strokec12 // Update loading state\cf4 \cb1 \strokec4 \
+\cb3                                 \cf11 \strokec11 loadingDiv\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf10 \strokec10 'Preparing dashboard...'\cf4 \strokec4 ;\cb1 \
+\
+\cb3                                 \cf12 \strokec12 // Clear any existing password reset state\cf4 \cb1 \strokec4 \
+\cb3                                 \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 resetInProgress\cf4 \strokec4 ) \{\cb1 \
+\cb3                                     \cf11 \strokec11 hideResetPassword\cf4 \strokec4 ();\cb1 \
+\cb3                                 \}\cb1 \
+\
+\cb3                                 \cf12 \strokec12 // Perform navigation with session\cf4 \cb1 \strokec4 \
+\cb3                                 \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 redirectUrl\cf4 \strokec4  = \cf13 \strokec13 SessionUtils\cf4 \strokec4 .\cf11 \strokec11 appendSessionToUrl\cf4 \strokec4 (\cf11 \strokec11 redirectInfo\cf4 \strokec4 .\cf11 \strokec11 url\cf4 \strokec4 );\cb1 \
+\cb3                                 \cf11 \strokec11 closeOrRedirect\cf4 \strokec4 (\cf11 \strokec11 redirectUrl\cf4 \strokec4 );\cb1 \
+\
+\cb3                             \} \cf8 \strokec8 catch\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\cb3                                 \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Error during navigation:'\cf4 \strokec4 , \cf11 \strokec11 e\cf4 \strokec4 );\cb1 \
+\cb3                                 \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\{ \cf11 \strokec11 message\cf4 \strokec4 : \cf10 \strokec10 'Navigation error occurred'\cf4 \strokec4  \});\cb1 \
+\cb3                             \}\cb1 \
+\cb3                         \})\cb1 \
+\cb3                         .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3                             \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Redirect URL request failed:'\cf4 \strokec4 , \cf11 \strokec11 error\cf4 \strokec4 );\cb1 \
+\cb3                             \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\{ \cf11 \strokec11 message\cf4 \strokec4 : \cf10 \strokec10 'Failed to complete login process'\cf4 \strokec4  \});\cb1 \
+\cb3                         \})\cb1 \
+\cb3                         .\cf11 \strokec11 getRedirectUrl\cf4 \strokec4 ();\cb1 \
+\
+\cb3                 \} \cf8 \strokec8 else\cf4 \strokec4  \{\cb1 \
+\cb3                     \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\{ \cf11 \strokec11 message\cf4 \strokec4 : \cf10 \strokec10 'Invalid session data received'\cf4 \strokec4  \});\cb1 \
+\cb3                 \}\cb1 \
+\
+\cb3             \} \cf8 \strokec8 catch\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Error during login success handling:'\cf4 \strokec4 , \cf11 \strokec11 e\cf4 \strokec4 );\cb1 \
+\cb3                 \cf11 \strokec11 handleLoginError\cf4 \strokec4 (\{ \cf11 \strokec11 message\cf4 \strokec4 : \cf10 \strokec10 'Error during login process'\cf4 \strokec4  \});\cb1 \
+\cb3             \}\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 verifyUser\cf4 \strokec4 (\cf11 \strokec11 username\cf4 \strokec4 , \cf11 \strokec11 password\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Preserve existing functionality for password visibility toggle\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 togglePassword\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 passwordField\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'password'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 eyeIcon\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'eyeIcon'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  === \cf10 \strokec10 'password'\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  = \cf10 \strokec10 'text'\cf4 \strokec4 ;\cb1 \
+\cb3         \cf11 \strokec11 eyeIcon\cf4 \strokec4 .\cf11 \strokec11 innerHTML\cf4 \strokec4  = \cf10 \strokec10 '<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />'\cf4 \strokec4 ;\cb1 \
+\cb3     \} \cf8 \strokec8 else\cf4 \strokec4  \{\cb1 \
+\cb3         \cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  = \cf10 \strokec10 'password'\cf4 \strokec4 ;\cb1 \
+\cb3         \cf11 \strokec11 eyeIcon\cf4 \strokec4 .\cf11 \strokec11 innerHTML\cf4 \strokec4  = \cf10 \strokec10 '<path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" /><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />'\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Initialize form and session management\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'DOMContentLoaded'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 log\cf4 \strokec4 (\cf10 \strokec10 'Login page initializing'\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf12 \strokec12 // Clear any existing session data\cf4 \cb1 \strokec4 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 window\cf4 \strokec4 .\cf13 \strokec13 SessionUtils\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf13 \strokec13 SessionUtils\cf4 \strokec4 .\cf11 \strokec11 clearSession\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf12 \strokec12 // Initialize user options and form fields\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 loadUserOptions\cf4 \strokec4 ();\cb1 \
+\cb3     \cf11 \strokec11 setupFormHandlers\cf4 \strokec4 ();\cb1 \
+\
+\cb3     \cf12 \strokec12 // Preserve navigation warning system\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 setupNavigationWarning\cf4 \strokec4 ();\cb1 \
+\cb3 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 setupFormHandlers\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 usernameField\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'username'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 passwordField\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'password'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'error'\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf12 \strokec12 // Clear error on input\cf4 \cb1 \strokec4 \
+\cb3     [\cf11 \strokec11 usernameField\cf4 \strokec4 , \cf11 \strokec11 passwordField\cf4 \strokec4 ].\cf11 \strokec11 forEach\cf4 \strokec4 (\cf11 \strokec11 field\cf4 \strokec4  => \{\cb1 \
+\cb3         \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 field\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 field\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'input'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 () \{\cb1 \
+\cb3                 \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3             \});\cb1 \
+\cb3         \}\cb1 \
+\cb3     \});\cb1 \
+\
+\cb3     \cf12 \strokec12 // Handle Enter key in password field\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 passwordField\cf4 \strokec4 ?.\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'keypress'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 key\cf4 \strokec4  === \cf10 \strokec10 'Enter'\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 preventDefault\cf4 \strokec4 ();\cb1 \
+\cb3             \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'loginButton'\cf4 \strokec4 )?.\cf11 \strokec11 click\cf4 \strokec4 ();\cb1 \
+\cb3         \}\cb1 \
+\cb3     \});\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 setupNavigationWarning\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 let\cf4 \strokec4  \cf11 \strokec11 formModified\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\
+\cb3     \cf12 \strokec12 // Track form modifications\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 querySelectorAll\cf4 \strokec4 (\cf10 \strokec10 'input, select'\cf4 \strokec4 ).\cf11 \strokec11 forEach\cf4 \strokec4 (\cf11 \strokec11 element\cf4 \strokec4  => \{\cb1 \
+\cb3         \cf11 \strokec11 element\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'change'\cf4 \strokec4 , () => \{\cb1 \
+\cb3             \cf11 \strokec11 formModified\cf4 \strokec4  = \cf8 \strokec8 true\cf4 \strokec4 ;\cb1 \
+\cb3         \});\cb1 \
+\cb3     \});\cb1 \
+\
+\cb3     \cf12 \strokec12 // Show warning on navigation if form is modified\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'beforeunload'\cf4 \strokec4 , (\cf11 \strokec11 e\cf4 \strokec4 ) => \{\cb1 \
+\cb3         \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 formModified\cf4 \strokec4  && !\cf11 \strokec11 isLoginInProgress\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 preventDefault\cf4 \strokec4 ();\cb1 \
+\cb3             \cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 returnValue\cf4 \strokec4  = \cf10 \strokec10 'You have unsaved changes. Are you sure you want to leave?'\cf4 \strokec4 ;\cb1 \
+\cb3             \cf8 \strokec8 return\cf4 \strokec4  \cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 returnValue\cf4 \strokec4 ;\cb1 \
+\cb3         \}\cb1 \
+\cb3     \});\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Load user options using google.script.run\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 loadUserOptions\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3         .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Failed to load users:'\cf4 \strokec4 , \cf11 \strokec11 error\cf4 \strokec4 );\cb1 \
+\cb3             \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorOption\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 createElement\cf4 \strokec4 (\cf10 \strokec10 'option'\cf4 \strokec4 );\cb1 \
+\cb3             \cf11 \strokec11 errorOption\cf4 \strokec4 .\cf11 \strokec11 text\cf4 \strokec4  = \cf10 \strokec10 'Error loading users'\cf4 \strokec4 ;\cb1 \
+\cb3             \cf11 \strokec11 errorOption\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 true\cf4 \strokec4 ;\cb1 \
+\cb3             \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'username'\cf4 \strokec4 ).\cf11 \strokec11 add\cf4 \strokec4 (\cf11 \strokec11 errorOption\cf4 \strokec4 );\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 users\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 select\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'username'\cf4 \strokec4 );\cb1 \
+\cb3             \cf12 \strokec12 // Clear existing options except default\cf4 \cb1 \strokec4 \
+\cb3             \cf8 \strokec8 while\cf4 \strokec4  (\cf11 \strokec11 select\cf4 \strokec4 .\cf11 \strokec11 options\cf4 \strokec4 .\cf11 \strokec11 length\cf4 \strokec4  > \cf9 \strokec9 1\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf11 \strokec11 select\cf4 \strokec4 .\cf11 \strokec11 remove\cf4 \strokec4 (\cf9 \strokec9 1\cf4 \strokec4 );\cb1 \
+\cb3             \}\cb1 \
+\cb3             \cf12 \strokec12 // Add user options\cf4 \cb1 \strokec4 \
+\cb3             \cf11 \strokec11 users\cf4 \strokec4 .\cf11 \strokec11 forEach\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 user\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 option\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 createElement\cf4 \strokec4 (\cf10 \strokec10 'option'\cf4 \strokec4 );\cb1 \
+\cb3                 \cf11 \strokec11 option\cf4 \strokec4 .\cf11 \strokec11 value\cf4 \strokec4  = \cf11 \strokec11 user\cf4 \strokec4 .\cf11 \strokec11 name\cf4 \strokec4 ;\cb1 \
+\cb3                 \cf11 \strokec11 option\cf4 \strokec4 .\cf11 \strokec11 text\cf4 \strokec4  = \cf11 \strokec11 user\cf4 \strokec4 .\cf11 \strokec11 name\cf4 \strokec4 ;\cb1 \
+\cb3                 \cf11 \strokec11 select\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf11 \strokec11 option\cf4 \strokec4 );\cb1 \
+\cb3             \});\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 getActiveRequestors\cf4 \strokec4 ();\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Initialize on page load\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'load'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 loadUserOptions\cf4 \strokec4 ();\cb1 \
+\cb3 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Show error message\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 showError\cf4 \strokec4 (\cf11 \strokec11 message\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'error'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf11 \strokec11 message\cf4 \strokec4 ;\cb1 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 remove\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Password reset dialog functions\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 showResetPassword\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetDialog'\cf4 \strokec4 ).\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 remove\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetError'\cf4 \strokec4 ).\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 hideResetPassword\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetDialog'\cf4 \strokec4 ).\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetForm'\cf4 \strokec4 ).\cf11 \strokec11 reset\cf4 \strokec4 ();\cb1 \
+\cb3     \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetError'\cf4 \strokec4 ).\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 toggleResetPassword\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 passwordField\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'newPassword'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 eyeIcon\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetEyeIcon'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  === \cf10 \strokec10 'password'\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  = \cf10 \strokec10 'text'\cf4 \strokec4 ;\cb1 \
+\cb3         \cf11 \strokec11 eyeIcon\cf4 \strokec4 .\cf11 \strokec11 innerHTML\cf4 \strokec4  = \cf10 \strokec10 '<path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />'\cf4 \strokec4 ;\cb1 \
+\cb3     \} \cf8 \strokec8 else\cf4 \strokec4  \{\cb1 \
+\cb3         \cf11 \strokec11 passwordField\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4  = \cf10 \strokec10 'password'\cf4 \strokec4 ;\cb1 \
+\cb3         \cf11 \strokec11 eyeIcon\cf4 \strokec4 .\cf11 \strokec11 innerHTML\cf4 \strokec4  = \cf10 \strokec10 '<path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" /><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />'\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Handle password reset form submission\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 handlePasswordReset\cf4 \strokec4 (\cf11 \strokec11 event\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 event\cf4 \strokec4 .\cf11 \strokec11 preventDefault\cf4 \strokec4 ();\cb1 \
+\cb3     \cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 username\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetUsername'\cf4 \strokec4 ).\cf11 \strokec11 value\cf4 \strokec4 ;\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 newPassword\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'newPassword'\cf4 \strokec4 ).\cf11 \strokec11 value\cf4 \strokec4 ;\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetError'\cf4 \strokec4 );\cb1 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 resetButton\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetButton'\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf12 \strokec12 // Validate input\cf4 \cb1 \strokec4 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 username\cf4 \strokec4  || !\cf11 \strokec11 newPassword\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 showResetError\cf4 \strokec4 (\cf10 \strokec10 'Please complete all fields'\cf4 \strokec4 );\cb1 \
+\cb3         \cf8 \strokec8 return\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf12 \strokec12 // Validate password complexity\cf4 \cb1 \strokec4 \
+\cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 passwordPattern\cf4 \strokec4  = \cf14 \strokec14 /^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]\{8,\}$/\cf4 \strokec4 ;\cb1 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 passwordPattern\cf4 \strokec4 .\cf11 \strokec11 test\cf4 \strokec4 (\cf11 \strokec11 newPassword\cf4 \strokec4 )) \{\cb1 \
+\cb3         \cf11 \strokec11 showResetError\cf4 \strokec4 (\cf10 \strokec10 'Password must be at least 8 characters long and include both letters and numbers'\cf4 \strokec4 );\cb1 \
+\cb3         \cf8 \strokec8 return\cf4 \strokec4 ;\cb1 \
+\cb3     \}\cb1 \
+\
+\cb3     \cf12 \strokec12 // Show loading state\cf4 \cb1 \strokec4 \
+\cb3     \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 true\cf4 \strokec4 ;\cb1 \
+\cb3     \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf10 \strokec10 'Updating...'\cf4 \strokec4 ;\cb1 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 add\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\
+\cb3     \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3         .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 result\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 result\cf4 \strokec4 .\cf11 \strokec11 success\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf12 \strokec12 // Show success message and close dialog\cf4 \cb1 \strokec4 \
+\cb3                 \cf11 \strokec11 hideResetPassword\cf4 \strokec4 ();\cb1 \
+\cb3                 \cf11 \strokec11 alert\cf4 \strokec4 (\cf10 \strokec10 'Password updated successfully'\cf4 \strokec4 );\cb1 \
+\cb3             \} \cf8 \strokec8 else\cf4 \strokec4  \{\cb1 \
+\cb3                 \cf12 \strokec12 // Show error\cf4 \cb1 \strokec4 \
+\cb3                 \cf11 \strokec11 showResetError\cf4 \strokec4 (\cf11 \strokec11 result\cf4 \strokec4 .\cf11 \strokec11 message\cf4 \strokec4  || \cf10 \strokec10 'Failed to update password'\cf4 \strokec4 );\cb1 \
+\cb3             \}\cb1 \
+\cb3             \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\cb3             \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf10 \strokec10 'Update Password'\cf4 \strokec4 ;\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3             \cf12 \strokec12 // Handle server errors\cf4 \cb1 \strokec4 \
+\cb3             \cf11 \strokec11 showResetError\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 .\cf11 \strokec11 message\cf4 \strokec4  || \cf10 \strokec10 'Failed to update password'\cf4 \strokec4 );\cb1 \
+\cb3             \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 disabled\cf4 \strokec4  = \cf8 \strokec8 false\cf4 \strokec4 ;\cb1 \
+\cb3             \cf11 \strokec11 resetButton\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf10 \strokec10 'Update Password'\cf4 \strokec4 ;\cb1 \
+\cb3         \})\cb1 \
+\cb3         .\cf11 \strokec11 updateUserPassword\cf4 \strokec4 (\cf11 \strokec11 username\cf4 \strokec4 , \cf11 \strokec11 newPassword\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Show reset password error message\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 showResetError\cf4 \strokec4 (\cf11 \strokec11 message\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 errorDiv\cf4 \strokec4  = \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetError'\cf4 \strokec4 );\cb1 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 textContent\cf4 \strokec4  = \cf11 \strokec11 message\cf4 \strokec4 ;\cb1 \
+\cb3     \cf11 \strokec11 errorDiv\cf4 \strokec4 .\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 remove\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Handle Enter key in password field\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'password'\cf4 \strokec4 ).\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'keypress'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 key\cf4 \strokec4  === \cf10 \strokec10 'Enter'\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 preventDefault\cf4 \strokec4 ();\cb1 \
+\cb3         \cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'loginButton'\cf4 \strokec4 ).\cf11 \strokec11 click\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\cb3 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Handle Escape key to close reset dialog\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'keydown'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 key\cf4 \strokec4  === \cf10 \strokec10 'Escape'\cf4 \strokec4  && !\cf11 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetDialog'\cf4 \strokec4 ).\cf11 \strokec11 classList\cf4 \strokec4 .\cf11 \strokec11 contains\cf4 \strokec4 (\cf10 \strokec10 'hidden'\cf4 \strokec4 )) \{\cb1 \
+\cb3         \cf11 \strokec11 hideResetPassword\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\cb3 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Close reset dialog when clicking outside\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 document\cf4 \strokec4 .\cf11 \strokec11 getElementById\cf4 \strokec4 (\cf10 \strokec10 'resetDialog'\cf4 \strokec4 ).\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'click'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 target\cf4 \strokec4  === \cf8 \strokec8 this\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 hideResetPassword\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\cb3 \});\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Session management utilities\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 getStoredSessionId\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 return\cf4 \strokec4  \cf11 \strokec11 localStorage\cf4 \strokec4 .\cf11 \strokec11 getItem\cf4 \strokec4 (\cf10 \strokec10 'sessionId'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 clearStoredSession\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf11 \strokec11 localStorage\cf4 \strokec4 .\cf11 \strokec11 removeItem\cf4 \strokec4 (\cf10 \strokec10 'sessionId'\cf4 \strokec4 );\cb1 \
+\cb3 \}\cb1 \
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Add this near your other utility functions\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf8 \cb3 \strokec8 function\cf4 \strokec4  \cf11 \strokec11 logout\cf4 \strokec4 () \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf8 \strokec8 const\cf4 \strokec4  \cf11 \strokec11 sessionId\cf4 \strokec4  = \cf13 \strokec13 SessionUtils\cf4 \strokec4 .\cf11 \strokec11 getSessionId\cf4 \strokec4 ();\cb1 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (\cf11 \strokec11 sessionId\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf12 \strokec12 // Clear client-side session first\cf4 \cb1 \strokec4 \
+\cb3         \cf13 \strokec13 SessionUtils\cf4 \strokec4 .\cf11 \strokec11 clearSession\cf4 \strokec4 ();\cb1 \
+\cb3         \cb1 \
+\cb3         \cf12 \strokec12 // Then notify server to clear the session\cf4 \cb1 \strokec4 \
+\cb3         \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3             .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 () \{\cb1 \
+\cb3                 \cf12 \strokec12 // Get fresh login page URL\cf4 \cb1 \strokec4 \
+\cb3                 \cf11 \strokec11 google\cf4 \strokec4 .\cf11 \strokec11 script\cf4 \strokec4 .\cf11 \strokec11 run\cf4 \cb1 \strokec4 \
+\cb3                     .\cf11 \strokec11 withSuccessHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 url\cf4 \strokec4 ) \{\cb1 \
+\cb3                         \cf11 \strokec11 closeOrRedirect\cf4 \strokec4 (\cf11 \strokec11 url\cf4 \strokec4  + \cf10 \strokec10 '?page=login'\cf4 \strokec4 );\cb1 \
+\cb3                     \})\cb1 \
+\cb3                     .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3                         \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Failed to get login URL:'\cf4 \strokec4 , \cf11 \strokec11 error\cf4 \strokec4 );\cb1 \
+\cb3                         \cf11 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 location\cf4 \strokec4 .\cf11 \strokec11 reload\cf4 \strokec4 (); \cf12 \strokec12 // Fallback to page reload\cf4 \cb1 \strokec4 \
+\cb3                     \})\cb1 \
+\cb3                     .\cf11 \strokec11 getWebAppUrl\cf4 \strokec4 ();\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf11 \strokec11 withFailureHandler\cf4 \strokec4 (\cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 error\cf4 \strokec4 ) \{\cb1 \
+\cb3                 \cf11 \strokec11 console\cf4 \strokec4 .\cf11 \strokec11 error\cf4 \strokec4 (\cf10 \strokec10 'Logout failed:'\cf4 \strokec4 , \cf11 \strokec11 error\cf4 \strokec4 );\cb1 \
+\cb3                 \cf12 \strokec12 // Still try to redirect to login even if server logout fails\cf4 \cb1 \strokec4 \
+\cb3                 \cf11 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 location\cf4 \strokec4 .\cf11 \strokec11 reload\cf4 \strokec4 ();\cb1 \
+\cb3             \})\cb1 \
+\cb3             .\cf11 \strokec11 removeSession\cf4 \strokec4 (\cf11 \strokec11 sessionId\cf4 \strokec4 );\cb1 \
+\cb3     \} \cf8 \strokec8 else\cf4 \strokec4  \{\cb1 \
+\cb3         \cf11 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 location\cf4 \strokec4 .\cf11 \strokec11 reload\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\cb3 \}\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf12 \cb3 \strokec12 // Add beforeunload handler to clear session on browser close\cf4 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf11 \cb3 \strokec11 window\cf4 \strokec4 .\cf11 \strokec11 addEventListener\cf4 \strokec4 (\cf10 \strokec10 'beforeunload'\cf4 \strokec4 , \cf8 \strokec8 function\cf4 \strokec4 (\cf11 \strokec11 e\cf4 \strokec4 ) \{\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf4 \cb3     \cf12 \strokec12 // Only clear if user is actually closing browser, not navigating\cf4 \cb1 \strokec4 \
+\cb3     \cf8 \strokec8 if\cf4 \strokec4  (!\cf11 \strokec11 e\cf4 \strokec4 .\cf11 \strokec11 currentTarget\cf4 \strokec4 .\cf11 \strokec11 performance\cf4 \strokec4 .\cf11 \strokec11 navigation\cf4 \strokec4 .\cf11 \strokec11 type\cf4 \strokec4 ) \{\cb1 \
+\cb3         \cf11 \strokec11 clearStoredSession\cf4 \strokec4 ();\cb1 \
+\cb3     \}\cb1 \
+\cb3 \});\cb1 \
+\
+\
+\
+\pard\pardeftab720\partightenfactor0
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 script\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 body\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+\cf7 \cb3 \strokec7 </\cf8 \cb3 \strokec8 html\cf7 \cb3 \strokec7 >\cf4 \cb1 \strokec4 \
+}
