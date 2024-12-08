@@ -1,9 +1,15 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.17
+ * @version 1.4.19
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.19 - 2024-12-08
+ * - Move SPREADSHEET_ID into CONFIG object for consistency
+ * 
+ * 1.4.18 - 2024-12-08
+ * - Add fallback error handling for error page creation
+ * 
  * 1.4.17 - 2024-12-08
  * - Add sandbox mode to error page
  * 
@@ -73,14 +79,10 @@
  ********************************************************************************************/
 
 /**
- * Global configuration constants
- */
-const SPREADSHEET_ID = '1QvvmP6mKJJgUe9LJJzKZQyLyiXIDCQFmRchbpGHxQtg';
-
-/**
  * Configuration constants
  */
 const CONFIG = {
+  SPREADSHEET_ID: '1QvvmP6mKJJgUe9LJJzKZQyLyiXIDCQFmRchbpGHxQtg',
   SHEETS: {
     MASTER_LOG: 'Master Log',
     PR_TRACKER: 'PR Number Tracker',
@@ -99,6 +101,9 @@ const CONFIG = {
     SUBMITTED: 'submitted'
   }
 };
+
+// For backward compatibility
+const SPREADSHEET_ID = CONFIG.SPREADSHEET_ID;
 
 /**
  * Column mapping for Master Log sheet
@@ -231,13 +236,51 @@ function include(filename) {
  * @returns {HtmlOutput} The rendered error page
  */
 function createErrorPage(message) {
-  const template = HtmlService.createTemplateFromFile('ErrorPage');
-  template.message = message;
-  template.includeSharedStyles = include('SharedStyles');
-  return template.evaluate()
+  try {
+    const template = HtmlService.createTemplateFromFile('ErrorPage');
+    template.message = message;
+    template.includeSharedStyles = include('SharedStyles');
+    return template.evaluate()
+      .setTitle('Error')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  } catch (error) {
+    // Fallback to basic error page if template fails
+    console.error('Error creating error page:', error);
+    return HtmlService.createHtmlOutput(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Error</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .error { color: #d32f2f; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .button { 
+              display: inline-block; 
+              padding: 10px 20px; 
+              background: #1976d2; 
+              color: white; 
+              text-decoration: none; 
+              border-radius: 4px; 
+              margin-top: 20px; 
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1 class="error">Error</h1>
+            <p>${message}</p>
+            <a href="<?= getWebAppUrl() ?>" class="button">Back to Home</a>
+          </div>
+        </body>
+      </html>
+    `)
     .setTitle('Error')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
 }
 
 /**
