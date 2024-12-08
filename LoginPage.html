@@ -1,7 +1,11 @@
 <!--*****************************************************************************************
  * File: Login.html
- * Version: 1.7 (Updated to use name dropdown and password authentication)
- * Last Updated: 2023-12-04
+ * Version: 1.8
+ * Last Updated: 2024-12-08
+ *
+ * Changes in 1.8:
+ *   - Remove direct include of SecurityHeaders (now handled by base template)
+ *   - Fix template evaluation
  *
  * Changes in 1.7:
  *   - Replaced email input with name dropdown
@@ -12,7 +16,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <?!= include('SecurityHeaders'); ?>
   <title>Login - 1PWR Procurement</title>
   <style>
     .container {

@@ -1,34 +1,140 @@
-<!-- Login page specific JavaScript -->
+<!--*****************************************************************************************
+ * File: LoginScripts.html
+ * Version: 1.2
+ * Last Updated: 2024-12-08
+ *
+ * Changes in 1.2:
+ *   - Remove direct includes (now handled by base template)
+ *   - Fix script initialization
+ *
+ * Changes in 1.1:
+ *   - Add session management
+ *   - Add user list loading
+ *   - Add login handling
+ ******************************************************************************************-->
+
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        handleLogin();
-      });
-    }
-  });
+// Session management functions
+function getStoredSessionId() {
+  try {
+    return localStorage.getItem('sessionId');
+  } catch (error) {
+    console.error('Error getting stored session:', error);
+    return null;
+  }
+}
 
-  function handleLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
+function setStoredSessionId(sessionId) {
+  try {
+    localStorage.setItem('sessionId', sessionId);
+  } catch (error) {
+    console.error('Error storing session:', error);
+  }
+}
+
+function clearStoredSession() {
+  try {
+    localStorage.removeItem('sessionId');
+  } catch (error) {
+    console.error('Error clearing session:', error);
+  }
+}
+
+// Initialize session management and load user list
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing session management');
+  initializeSession();
+  loadUserList();
+});
+
+function initializeSession() {
+  const sessionId = getStoredSessionId();
+  if (sessionId) {
+    console.log('Found stored session:', sessionId);
     google.script.run
-      .withSuccessHandler(onLoginSuccess)
-      .withFailureHandler(onLoginError)
-      .processLogin(email, password);
+      .withSuccessHandler(function(isValid) {
+        if (!isValid) {
+          console.log('Stored session is invalid, clearing');
+          clearStoredSession();
+        }
+      })
+      .validateSession(sessionId);
   }
+}
 
-  function onLoginSuccess(response) {
-    if (response.success) {
-      window.location.href = response.redirectUrl || ScriptApp.getService().getUrl();
-    } else {
-      showNotification('Error', response.message || 'Login failed', 'error');
-    }
+function loadUserList() {
+  const select = document.getElementById('userName');
+  if (!select) {
+    console.error('User name select element not found');
+    return;
   }
+  
+  google.script.run
+    .withSuccessHandler(function(users) {
+      // Clear existing options except the first one
+      while (select.options.length > 1) {
+        select.remove(1);
+      }
+      
+      // Add user options
+      users.forEach(function(user) {
+        const option = document.createElement('option');
+        option.value = user;
+        option.textContent = user;
+        select.appendChild(option);
+      });
+    })
+    .withFailureHandler(function(error) {
+      console.error('Error loading user list:', error);
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Error loading users';
+      select.appendChild(option);
+    })
+    .getUserList();
+}
 
-  function onLoginError(error) {
-    showNotification('Error', 'Login failed: ' + error, 'error');
+function handleLogin(event) {
+  event.preventDefault();
+  
+  const form = event.target;
+  const userName = form.userName.value;
+  const password = form.password.value;
+  const button = form.querySelector('button');
+  const errorDiv = document.querySelector('.error') || document.createElement('div');
+  errorDiv.className = 'error';
+  
+  if (!userName || !password) {
+    errorDiv.textContent = 'Please enter both name and password';
+    form.appendChild(errorDiv);
+    return;
   }
+  
+  // Disable form while processing
+  button.disabled = true;
+  button.textContent = 'Logging in...';
+  
+  google.script.run
+    .withSuccessHandler(function(result) {
+      if (result.success) {
+        console.log('Login successful, session:', result.sessionId);
+        setStoredSessionId(result.sessionId);
+        window.location.href = result.redirectUrl;
+      } else {
+        console.error('Login failed:', result.error);
+        errorDiv.textContent = result.error || 'Login failed';
+        form.appendChild(errorDiv);
+        button.disabled = false;
+        button.textContent = 'Login';
+      }
+    })
+    .withFailureHandler(function(error) {
+      console.error('Login error:', error);
+      errorDiv.textContent = 'An error occurred during login';
+      form.appendChild(errorDiv);
+      button.disabled = false;
+      button.textContent = 'Login';
+    })
+    .handleLogin(userName, password);
+}
 </script>
