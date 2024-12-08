@@ -1,12 +1,18 @@
 /*******************************************************************************************
  * File: SharedUtils.gs
- * Version: 1.1 (Restored from 11/29/2023)
- * Last Updated: 2023-11-29
+ * Version: 1.2
+ * Last Updated: 2023-12-08
  *
  * Description:
  *   Provides a centralized collection of utility functions used across the PR system.
  *   Contains helper functions for data formatting, validation, calculations, and
  *   common operations used by multiple components of the system.
+ *
+ * Changes in 1.2:
+ *   - Removed duplicate session management functions (now in auth.gs)
+ *   - Added proper error handling for requestor list loading
+ *   - Updated deprecated function references
+ *   - Added cross-references to auth.gs functions
  *
  * Relationship with Other Files:
  *   - Used by all .gs files in the system
@@ -124,6 +130,14 @@ function isAuthorized(user, requiredRole) {
     return false;
   }
 }
+
+/**
+ * Session Management
+ * Note: These functions are deprecated. Use corresponding functions from auth.gs instead:
+ * - getCurrentUser() -> getCurrentUserFromAuth()
+ * - validateSession() -> validateSessionFromAuth()
+ * - getWebAppUrl() -> getWebAppUrlFromAuth()
+ */
 
 /**
  * SharedUtils.gs (Refactored)

@@ -1,10 +1,19 @@
 /*******************************************************************************************
  * File: Code.gs
+ * Version: 1.2
+ * Last Updated: 2023-12-08
+ *
  * Description:
  *   This server-side script file contains all the Google Apps Script functions that handle
  *   data processing, retrieval, and storage for the custom purchase request web app. It
  *   interacts with the Google Sheets backend to fetch data for dropdowns, generate PR numbers,
  *   process form submissions, and perform validations.
+ *
+ * Changes in 1.2:
+ *   - Fixed session management error in requestor list loading
+ *   - Updated session handling to use auth.gs functions
+ *   - Improved error handling in getRequestorList()
+ *   - Enhanced session validation in processForm()
  *
  * Relationship with Other Files:
  *   - index.html: The client-side HTML structure that interacts with these server-side functions
@@ -2811,27 +2820,46 @@ function processAjaxRequest(action, user, params) {
 
 /**
  * Gets the list of requestors from the Requestor List sheet
- * @return {Array} Array of requestor objects with name and active status
+ * @return {Object} Object with success flag and either requestor list or error message
  */
 function getRequestorList() {
+  console.log('Getting requestor list');
+  
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('Requestor List');
-    const data = sheet.getDataRange().getValues();
-    const headers = data[0];
+    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+                               .getSheetByName('Requestor List');
     
-    // Get column indices
-    const nameCol = headers.indexOf('Name');
-    const activeCol = headers.indexOf('Active (Y/N)');
+    if (!sheet) {
+      console.error('Requestor List sheet not found');
+      return {
+        success: false,
+        error: 'Failed to load requestor list: Sheet not found'
+      };
+    }
 
-    // Skip header row and map data
-    return data.slice(1).map(row => ({
-      name: row[nameCol],
-      active: row[activeCol]
-    }));
+    const data = sheet.getDataRange().getValues();
+    // Skip header row and filter active requestors
+    const requestors = data.slice(1)
+      .filter(row => row[5] === 'Y')  // Only active requestors
+      .map(row => ({
+        name: row[0],
+        email: row[1],
+        department: row[2],
+        role: row[3]
+      }));
+
+    console.log(`Found ${requestors.length} active requestors`);
+    return {
+      success: true,
+      requestors: requestors
+    };
+
   } catch (error) {
-    console.error('Error getting requestor list:', error);
-    throw new Error('Failed to load requestor list');
+    console.error('Error loading requestor list:', error);
+    return {
+      success: false,
+      error: 'Failed to load requestor list: ' + error.toString()
+    };
   }
 }
 

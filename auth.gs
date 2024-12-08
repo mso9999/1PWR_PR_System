@@ -1,15 +1,17 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.3 (Consolidated and enhanced user and URL functions)
- * Last Updated: 2023-12-04
+ * Version: 1.4
+ * Last Updated: 2023-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
  *   Implements secure session storage using Google Apps Script Cache Service.
  *
- * Changes in 1.3:
- *   - Consolidated and enhanced user and URL functions
- *   - Improved error handling and logging
+ * Changes in 1.4:
+ *   - Fixed session management error by consolidating duplicate functions
+ *   - Added proper error handling for requestor list loading
+ *   - Improved session validation and user authentication flow
+ *   - Enhanced error logging for debugging purposes
  *******************************************************************************************/
 
 const SESSION_DURATION = 21600; // 6 hours in seconds
@@ -184,48 +186,6 @@ function getWebAppUrl(page) {
  * @return {Object|null} User information or null if invalid
  */
 function getCurrentUser(sessionId) {
-  console.log('Getting current user for session:', sessionId);
-  
-  try {
-    if (!sessionId) {
-      console.log('No session ID provided');
-      return null;
-    }
-
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = cache.get(key);
-    
-    if (!value) {
-      console.log('Session not found:', sessionId);
-      return null;
-    }
-
-    const userInfo = JSON.parse(value);
-    
-    // Validate user info structure
-    if (!userInfo.email || !userInfo.role) {
-      console.error('Invalid user info structure:', userInfo);
-      return null;
-    }
-
-    // Refresh session
-    cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
-    console.log('Session refreshed for user:', userInfo.email);
-
-    return userInfo;
-  } catch (error) {
-    console.error('Error getting current user:', error);
-    return null;
-  }
-}
-
-/**
- * Gets current user from session with enhanced validation
- * @param {string} sessionId - Session ID to validate
- * @return {Object|null} User information or null if invalid
- */
-function getCurrentUserFromAuth(sessionId) {
   console.log('Getting current user for session:', sessionId);
   
   try {
