@@ -1,12 +1,16 @@
 <!--*****************************************************************************************
  * File: BaseTemplate.html
- * Version: 1.0.2
+ * Version: 1.0.3
  * Last Updated: 2024-12-08
  *
  * Description:
  *   Base template for all pages in the PR System. Provides common structure and includes
  *   for styles, scripts, and security headers. Pages extend this template by providing
  *   their specific content and scripts.
+ *
+ * Changes in 1.0.3:
+ *   - Fix template evaluation with null values
+ *   - Add error handling for includes
  *
  * Changes in 1.0.2:
  *   - Added null checks for all includes
@@ -22,22 +26,26 @@
 <html>
 <head>
   <base target="_top">
-  <?!= includeSecurityHeaders || '' ?>
-  <?!= includeSharedStyles || '' ?>
-  <?!= includeScript || '' ?>
-  <?!= includePageSpecificStyles || '' ?>
-  <?!= includePageSpecificScript || '' ?>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <?!= typeof includeSecurityHeaders !== 'undefined' ? includeSecurityHeaders : '' ?>
+  <?!= typeof includeSharedStyles !== 'undefined' ? includeSharedStyles : '' ?>
+  <?!= typeof includePageSpecificStyles !== 'undefined' ? includePageSpecificStyles : '' ?>
+  <?!= typeof includeScript !== 'undefined' ? includeScript : '' ?>
+  <?!= typeof includePageSpecificScript !== 'undefined' ? includePageSpecificScript : '' ?>
   <title>1PWR Purchase Request System</title>
 </head>
 <body>
   <div id="app">
-    <?!= includeHeader || '' ?>
+    <?!= typeof includeHeader !== 'undefined' ? includeHeader : '' ?>
     
     <main>
-      <?!= includeContent || '' ?>
+      <?!= typeof includeContent !== 'undefined' ? includeContent : '' ?>
     </main>
     
-    <?!= includeFooter || '' ?>
+    <?!= typeof includeFooter !== 'undefined' ? includeFooter : '' ?>
   </div>
 </body>
 </html>
