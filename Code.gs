@@ -86,9 +86,6 @@ function setSecurityHeaders(output) {
   // Set sandbox mode for additional security
   output.setSandboxMode(HtmlService.SandboxMode.IFRAME);
   
-  // Force SSL for all requests
-  output.setForceSsl(true);
-  
   return output;
 }
 
@@ -101,6 +98,9 @@ function createSecureHtmlOutput(content) {
   const output = HtmlService.createHtmlOutput(content)
     .setTitle('1PWR Purchase Request System')
     .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+    
+  // Force SSL for all requests
+  HtmlService.setForceSsl(true);
     
   return setSecurityHeaders(output);
 }
