@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.22
+ * @version 1.4.23
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.23 - 2024-12-08
+ * - Fix error page creation and sandbox mode
+ * 
  * 1.4.22 - 2024-12-08
  * - Fix URL parsing to work in Google Apps Script environment
  * 
@@ -196,10 +199,44 @@ function doGet(e) {
       
   } catch (error) {
     console.error('Error in doGet:', error);
-    const sessionId = getSessionIdFromUrl();
-    return HtmlService.createHtmlOutput(createErrorPage(error.toString(), sessionId))
+    
+    // Create a basic error page without template
+    const errorHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Error</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .error { color: #d32f2f; }
+            .container { max-width: 600px; margin: 0 auto; }
+            .button {
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #1976d2;
+              color: white;
+              text-decoration: none;
+              border-radius: 4px;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1 class="error">Error</h1>
+            <p>${error.toString()}</p>
+            <p>Session ID: ${getSessionIdFromUrl() || 'none'}</p>
+            <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    return HtmlService.createHtmlOutput(errorHtml)
       .setTitle('Error')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
   }
 }
 
