@@ -1,28 +1,22 @@
 /*******************************************************************************************
- * File: Code.gs
- * Version: 1.4.1
- * Last Updated: 2024-12-08
- *
- * Description:
- *   Main controller for the PR system. Handles routing and includes.
- *   Functionality has been split into separate files for better organization:
- *   - Login.gs: Login and authentication
- *   - PRForm.gs: PR form handling
- *   - DataLists.gs: Data retrieval
- *   - PRNumbering.gs: PR number management
- *   - ExchangeRates.gs: Currency conversion
- *   - Setup.gs: System setup and configuration
- *
- * Changes in 1.4.1:
- *   - Fix setForceSsl implementation to use correct method chain
- *
- * Changes in 1.4.0:
- *   - Implement proper security headers using Apps Script native methods
- *   - Fix XFrameOptionsMode and setForceSsl implementation
- *   - Add createSecureHtmlOutput helper function
- *   - Remove custom meta tags in favor of Apps Script security methods
- *
- * Changes in 1.3:
+ * Main Code.gs file for the 1PWR Purchase Request System
+ * @version 1.4.2
+ * @lastModified 2024-12-08
+ * 
+ * Change Log:
+ * 1.4.2 - 2024-12-08
+ * - Fix setForceSsl implementation to use correct HtmlService method
+ * 
+ * 1.4.1 - 2024-12-08
+ * - Fix setForceSsl implementation to use correct method chain
+ * 
+ * 1.4.0 - 2024-12-08
+ * - Implement proper security headers using Apps Script native methods
+ * - Fix XFrameOptionsMode and setForceSsl implementation
+ * - Add createSecureHtmlOutput helper function
+ * - Remove custom meta tags in favor of Apps Script security methods
+ * 
+ * 1.3.0 - Previous version
  *   - Refactored into separate files for better organization
  *   - Reduced to minimal controller functionality
  *   - Improved routing and error handling
@@ -104,10 +98,12 @@ function setSecurityHeaders(output) {
  * @returns {HtmlOutput} Secured HTML output
  */
 function createSecureHtmlOutput(content) {
+  // Set global security settings
+  HtmlService.setForceSsl(true);  // Force SSL for all requests
+  
   const output = HtmlService.createHtmlOutput(content)
     .setTitle('1PWR Purchase Request System')
-    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png')
-    .setForceSsl(true);  // Force SSL for all requests
+    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
     
   return setSecurityHeaders(output);
 }
