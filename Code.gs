@@ -76,28 +76,33 @@ const COL = {
 
 /**
  * Sets security headers for the HTML output
- * @param {HtmlOutput} output - The HTML output to set headers for
+ * @param {HtmlOutput} output - The HTML output to set headers set
  * @returns {HtmlOutput} The HTML output with headers set
  */
 function setSecurityHeaders(output) {
-  // Set security headers
-  output.addMetaTag('Content-Security-Policy',
-    "default-src 'self' https://script.google.com https://*.googleusercontent.com; " +
-    "script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
-    "style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
-    "frame-ancestors 'self'");
-    
+  // Set X-Frame-Options using Apps Script's built-in method
   output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.SAMEORIGIN);
   
-  output.addMetaTag('X-Content-Type-Options', 'nosniff');
+  // Set sandbox mode for additional security
+  output.setSandboxMode(HtmlService.SandboxMode.IFRAME);
   
-  output.addMetaTag('Permissions-Policy',
-    'accelerometer=(), autoplay=(), camera=(), display-capture=(), document-domain=(), ' +
-    'encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), ' +
-    'microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), ' +
-    'screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()');
-    
+  // Force SSL for all requests
+  output.setForceSsl(true);
+  
   return output;
+}
+
+/**
+ * Creates HTML output with security settings
+ * @param {string} content - HTML content to wrap
+ * @returns {HtmlOutput} Secured HTML output
+ */
+function createSecureHtmlOutput(content) {
+  const output = HtmlService.createHtmlOutput(content)
+    .setTitle('1PWR Purchase Request System')
+    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
+    
+  return setSecurityHeaders(output);
 }
 
 /**
@@ -112,20 +117,20 @@ function doGet(e) {
     // Check for session
     const sessionId = e.parameter.sid;
     if (!sessionId) {
-      return setSecurityHeaders(serveLoginPage());
+      return createSecureHtmlOutput(serveLoginPage());
     }
     
     const user = getCurrentUserFromAuth(sessionId);
     if (!user) {
-      return setSecurityHeaders(serveLoginPage('Session expired'));
+      return createSecureHtmlOutput(serveLoginPage('Session expired'));
     }
     
     // Route to appropriate page
-    return setSecurityHeaders(handleAuthenticatedRoute(e, user));
+    return createSecureHtmlOutput(handleAuthenticatedRoute(e, user));
     
   } catch (error) {
     console.error('Error processing request:', error);
-    return setSecurityHeaders(createErrorPage(error.toString()));
+    return createSecureHtmlOutput(createErrorPage(error.toString()));
   }
 }
 
