@@ -214,7 +214,9 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    const template = HtmlService.createTemplateFromFile('BaseTemplate');
+    // Get base template content
+    const baseTemplateContent = HtmlService.createHtmlOutputFromFile('BaseTemplate').getContent();
+    const template = HtmlService.createTemplate(baseTemplateContent);
     
     // Common includes with error handling
     template.includeSecurityHeaders = include('SecurityHeaders') || '';
