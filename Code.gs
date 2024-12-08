@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.16
+ * @version 1.4.17
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.17 - 2024-12-08
+ * - Add sandbox mode to error page
+ * 
  * 1.4.16 - 2024-12-08
  * - Remove setSandboxMode from setSecurityHeaders to avoid double setting
  * 
@@ -233,6 +236,7 @@ function createErrorPage(message) {
   template.includeSharedStyles = include('SharedStyles');
   return template.evaluate()
     .setTitle('Error')
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
