@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.14
+ * @version 1.4.15
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.15 - 2024-12-08
+ * - Initialize page specific styles to null in template
+ * 
  * 1.4.14 - 2024-12-08
  * - Fix session validation function name (isValidSession -> validateSession)
  * 
@@ -244,6 +247,13 @@ function getTemplateForUser() {
   template.includeSecurityHeaders = include('SecurityHeaders');
   template.includeSharedStyles = include('SharedStyles');
   template.includeScript = include('script');
+  
+  // Initialize page specific includes
+  template.includePageSpecificStyles = null;
+  template.includePageSpecificScript = null;
+  template.includeHeader = null;
+  template.includeContent = null;
+  template.includeFooter = null;
   
   // Page specific content
   if (isLoginPage()) {
