@@ -1,24 +1,12 @@
 <!--*****************************************************************************************
  * File: script.html
- * Version: 1.1 (Restored from 11/29/2023)
- * Last Updated: 2023-11-29
+ * Version: 1.3
+ * Last Updated: 2024-12-08
  *
- * Description:
- *   Contains all client-side JavaScript functionality for the PR System. Handles
- *   form validation, dynamic UI updates, and communication with server-side
- *   scripts through google.script.run.
- *
- * Relationship with Other Files:
- *   - index.html: Main HTML structure that includes this script
- *   - style.html: CSS styles referenced by this script
- *   - Code.gs: Server-side functions called by this script
- *   - SharedUtils.gs: Shared utility functions
- *
- * Google Sheet Data Framework:
- *   - Interacts with server-side functions to:
- *     * Fetch dropdown data from various sheets
- *     * Submit form data to Master Log
- *     * Validate data against sheet constraints
+ * Changes in 1.3:
+ *   - Add session management code
+ *   - Add error handling for session operations
+ *   - Add logging for debugging
  ******************************************************************************************-->
 
 <!--
@@ -1565,4 +1553,66 @@ function validateSection(sectionId) {
     });
 }
 
+// Session management functions
+function getStoredSessionId() {
+  try {
+    return localStorage.getItem('sessionId');
+  } catch (error) {
+    console.error('Error getting stored session:', error);
+    return null;
+  }
+}
+
+function setStoredSessionId(sessionId) {
+  try {
+    if (!sessionId) {
+      console.error('Attempted to store null or empty session ID');
+      return;
+    }
+    localStorage.setItem('sessionId', sessionId);
+    console.log('Session ID stored successfully');
+  } catch (error) {
+    console.error('Error storing session:', error);
+  }
+}
+
+function clearStoredSession() {
+  try {
+    localStorage.removeItem('sessionId');
+    console.log('Session cleared successfully');
+  } catch (error) {
+    console.error('Error clearing session:', error);
+  }
+}
+
+// Initialize session management
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing session management');
+  initializeSession();
+});
+
+function initializeSession() {
+  const sessionId = getStoredSessionId();
+  if (sessionId) {
+    console.log('Found stored session, validating...');
+    google.script.run
+      .withSuccessHandler(function(isValid) {
+        if (!isValid) {
+          console.log('Stored session is invalid, clearing');
+          clearStoredSession();
+        } else {
+          console.log('Session validated successfully');
+        }
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error validating session:', error);
+        clearStoredSession();
+      })
+      .validateSession(sessionId);
+  } else {
+    console.log('No stored session found');
+  }
+}
+
+// Add any other shared utility functions below
 </script>

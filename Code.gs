@@ -1,9 +1,14 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.27
+ * @version 1.4.28
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.28 - 2024-12-08
+ * - Fix template evaluation error by setting sandbox mode before evaluation
+ * - Add check for empty base template content
+ * - Improve error messages in template handling
+ * 
  * 1.4.27 - 2024-12-08
  * - Use direct HTML output for error pages
  * - Fix sandbox mode handling
@@ -216,7 +221,13 @@ function getTemplateForUser() {
   try {
     // Get base template content
     const baseTemplateContent = HtmlService.createHtmlOutputFromFile('BaseTemplate').getContent();
+    if (!baseTemplateContent) {
+      throw new Error('Base template content is empty');
+    }
+    
+    // Create template with sandbox mode
     const template = HtmlService.createTemplate(baseTemplateContent);
+    template.setSandboxMode(HtmlService.SandboxMode.IFRAME);
     
     // Common includes with error handling
     template.includeSecurityHeaders = include('SecurityHeaders') || '';
@@ -251,14 +262,13 @@ function getTemplateForUser() {
     // Evaluate and set options
     return template.evaluate()
       .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
       
   } catch (error) {
     console.error('Error getting template:', error);
-    return createErrorPage(error);
+    return createErrorPage('Error loading page: ' + error.message);
   }
 }
 
