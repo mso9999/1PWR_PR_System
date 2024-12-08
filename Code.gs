@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.24
+ * @version 1.4.25
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.25 - 2024-12-08
+ * - Update template handling to always return login page by default
+ * 
  * 1.4.24 - 2024-12-08
  * - Update getUrlParameter to use event parameter
  * 
@@ -369,9 +372,10 @@ function getTemplateForUser() {
   template.includeFooter = null;
   
   // Page specific content
-  if (isLoginPage()) {
-    template.includeContent = include('LoginPage');
-    template.includePageSpecificScript = include('LoginScripts');
+  if (isDashboardPage()) {
+    template.includeContent = include('DashboardPage');
+    template.includePageSpecificScript = include('DashboardScripts');
+    template.includePageSpecificStyles = include('DashboardStyles');
   } else if (isPRFormPage()) {
     template.includeContent = include('PRFormPage');
     template.includePageSpecificScript = include('PRFormScripts');
@@ -379,11 +383,18 @@ function getTemplateForUser() {
   } else if (isPRViewPage()) {
     template.includeContent = include('PRView');
     template.includePageSpecificScript = include('PRViewScripts');
-  } else if (isDashboardPage()) {
-    template.includeContent = include('DashboardPage');
-    template.includePageSpecificScript = include('DashboardScripts');
-    template.includePageSpecificStyles = include('DashboardStyles');
+  } else {
+    // Default to login page if no other page is selected or session is invalid
+    template.includeContent = include('LoginPage');
+    template.includePageSpecificScript = include('LoginScripts');
   }
+  
+  // Ensure all includes have a value to prevent null mode errors
+  template.includePageSpecificStyles = template.includePageSpecificStyles || '';
+  template.includePageSpecificScript = template.includePageSpecificScript || '';
+  template.includeHeader = template.includeHeader || '';
+  template.includeContent = template.includeContent || '';
+  template.includeFooter = template.includeFooter || '';
   
   return template;
 }
