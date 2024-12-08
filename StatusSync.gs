@@ -30,7 +30,7 @@ function syncSubmittedSheet() {
     console.log('Starting Submitted sheet synchronization');
     
     try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         
         // Get Master Log data
         const masterSheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
@@ -186,7 +186,7 @@ function setupEditTrigger() {
     
     // Create new edit trigger
     ScriptApp.newTrigger('onMasterLogEdit')
-        .forSpreadsheet(SPREADSHEET_ID)
+        .forSpreadsheet(CONFIG.SPREADSHEET_ID)
         .onEdit()
         .create();
     

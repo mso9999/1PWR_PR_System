@@ -209,9 +209,9 @@ function getDashboardData(organization) {
     };
 
     // Open the spreadsheet using the configured SPREADSHEET_ID
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     if (!ss) {
-      throw new Error('Failed to open spreadsheet with ID: ' + SPREADSHEET_ID);
+      throw new Error('Failed to open spreadsheet with ID: ' + CONFIG.SPREADSHEET_ID);
     }
     Logger.log('Spreadsheet opened successfully.');
 
@@ -676,9 +676,9 @@ function updatePOStatus(poNumber, newStatus, notes) {
     Logger.log(`Updating status for PO ${poNumber} to ${newStatus}`);
 
     try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         if (!ss) {
-            throw new Error('Failed to open spreadsheet with ID: ' + SPREADSHEET_ID);
+            throw new Error('Failed to open spreadsheet with ID: ' + CONFIG.SPREADSHEET_ID);
         }
 
         const sheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
@@ -1067,9 +1067,9 @@ function viewPRDetails(prNumber) {
  */
 function getActiveOrganizations() {
     try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         if (!ss) {
-            throw new Error('Failed to open spreadsheet with ID: ' + SPREADSHEET_ID);
+            throw new Error('Failed to open spreadsheet with ID: ' + CONFIG.SPREADSHEET_ID);
         }
 
         const sheet = ss.getSheetByName(CONFIG.ORGANIZATIONS_TAB);

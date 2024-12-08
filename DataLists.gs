@@ -19,7 +19,7 @@ function getRequestorList() {
   console.log('Getting requestor list');
   
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Requestor List');
     
     if (!sheet) {
@@ -62,7 +62,7 @@ function getRequestorList() {
  */
 function getActiveApprovers() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Approver List');
     if (!sheet) {
       throw new Error('Approver List sheet not found');
@@ -91,7 +91,7 @@ function getActiveApprovers() {
  */
 function getProjectCategories() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Project Categories');
     if (!sheet) {
       throw new Error('Project Categories sheet not found');
@@ -117,7 +117,7 @@ function getProjectCategories() {
  */
 function getActiveSites() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Site List');
     if (!sheet) {
       throw new Error('Site List sheet not found');
@@ -143,7 +143,7 @@ function getActiveSites() {
  */
 function getExpenseTypes() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Expense Type');
     if (!sheet) {
       throw new Error('Expense Type sheet not found');
@@ -169,7 +169,7 @@ function getExpenseTypes() {
  */
 function getApprovedVendors() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Vendor List');
     if (!sheet) {
       throw new Error('Vendor List sheet not found');
@@ -196,7 +196,7 @@ function getApprovedVendors() {
  */
 function getActiveVehicles() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Vehicle List');
     if (!sheet) {
       throw new Error('Vehicle List sheet not found');

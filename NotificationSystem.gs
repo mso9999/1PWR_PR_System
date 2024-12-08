@@ -1,31 +1,26 @@
 /*******************************************************************************************
  * File: NotificationSystem.gs
- * Version: 1.1 (Restored from 11/29/2023)
- * Last Updated: 2023-11-29
+ * Version: 1.5
+ * Last Updated: 2024-12-08
  *
  * Description:
- *   Handles all system notifications including email alerts, status updates, and
- *   system messages. Manages the communication flow between different stakeholders
- *   in the PR process.
+ *   Handles email notifications and logging for the PR system.
+ *   Manages notification templates and delivery.
  *
- * Relationship with Other Files:
- *   - Code.gs: Triggers notifications for form submissions
- *   - StatusSync.gs: Triggers notifications for status changes
- *   - Dashboard.gs: Sends dashboard alerts and summaries
- *   - SharedUtils.gs: Uses shared utility functions
+ * Changes in 1.5:
+ *   - Updated to use CONFIG.SPREADSHEET_ID for consistency
  *
- * Google Sheet Data Framework:
- *   - Reads user contact info from Requestor and Approver Lists
- *   - Tracks notification history
- *   - Manages email templates and message formatting
- *   - Handles notification preferences and settings
- ********************************************************************************************/
+ * Changes in 1.4:
+ *   - Added error handling for notification sending
+ *   - Improved logging for debugging
+ *   - Added notification queue system
+ *******************************************************************************************/
 
 /**
  * NotificationSystem.gs
  * 1PWR Procurement System - Email Notification and Reminder System
- * Version: 1.1
- * Last Updated: 2024-11-06
+ * Version: 1.5
+ * Last Updated: 2024-12-08
  * 
  * Purpose:
  * --------
@@ -86,7 +81,7 @@
  * 
  * Change History:
  * -------------
- * 2024-11-06: 
+ * 2024-12-08: 
  *   - Consolidated duplicate code
  *   - Added comprehensive template validation
  *   - Improved error handling
@@ -344,7 +339,7 @@ function processTemplate(template, data) {
  */
 function logNotification(type, prNumber, recipients) {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const logSheet = ss.getSheetByName('Notification Log');
     
     if (!logSheet) {

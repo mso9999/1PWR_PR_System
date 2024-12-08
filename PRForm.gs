@@ -46,7 +46,7 @@ function processForm(formData) {
     const rowData = prepareRowData(formData, prNumber);
     
     // Insert into Master Log
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Master Log');
     sheet.appendRow(rowData);
     
@@ -234,7 +234,7 @@ function parseLineItems(data) {
  */
 function logSubmission(prNumber, user, formData) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Submission Log');
     if (!sheet) {
       console.warn('Submission Log sheet not found');
@@ -260,7 +260,7 @@ function logSubmission(prNumber, user, formData) {
  */
 function logProcessingError(error, formData) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Error Log');
     if (!sheet) {
       console.warn('Error Log sheet not found');

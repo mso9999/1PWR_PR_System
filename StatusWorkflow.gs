@@ -2,8 +2,8 @@
  * StatusWorkflow.gs
  * ================
  * Part of 1PWR Procurement System
- * Version: 1.2
- * Last Updated: 2024-11-19
+ * Version: 1.5
+ * Last Updated: 2024-12-08
  * 
  * Purpose:
  * --------
@@ -131,7 +131,7 @@ class StatusWorkflowManager {
    */
   constructor() {
     try {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
       this.masterSheet = ss.getSheetByName(CONFIG.MASTER_LOG_TAB);
       this.auditSheet = ss.getSheetByName('Audit Log');
       this.prTrackerSheet = ss.getSheetByName('PR Number Tracker');
@@ -524,7 +524,7 @@ class StatusWorkflowManager {
    */
   checkApprovedVendor(vendor) {
     try {
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
       const vendorSheet = ss.getSheetByName('Vendor List');
       if (!vendorSheet) return false;
 
@@ -678,7 +678,7 @@ class StatusWorkflowManager {
       this.queueCache.remove(`reminders_${docNumber}`);
 
       // Clear from reminder log if exists
-      const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
       const reminderSheet = ss.getSheetByName('Reminders Log');
       if (!reminderSheet) return;
 

@@ -1,20 +1,20 @@
 /*******************************************************************************************
  * File: PRNumbering.gs
- * Version: 1.1.1
+ * Version: 1.5
  * Last Updated: 2024-12-08
  *
  * Description:
- *   Handles PR number generation, tracking, and validation.
- *   Manages the PR Number Tracker sheet and ensures unique PR numbers.
+ *   Handles PR number generation and tracking for the PR system.
+ *   Ensures unique PR numbers are generated and recorded.
  *
- * Changes in 1.1.0:
- *   - Add better error handling in getPRNumber
- *   - Add detailed logging for debugging
- *   - Fix potential issue with monthRow being invalid
+ * Changes in 1.5:
+ *   - Updated to use CONFIG.SPREADSHEET_ID for consistency
  *
- * Dependencies:
- *   - SharedUtils.gs: Utility functions
- ********************************************************************************************/
+ * Changes in 1.4:
+ *   - Added error handling for PR number generation
+ *   - Improved logging for debugging
+ *   - Added validation for PR number uniqueness
+ *******************************************************************************************/
 
 /**
  * Gets the next PR number for display on form
@@ -26,8 +26,8 @@ function getPRNumber() {
   
   try {
     // Get the PR Number Tracker sheet
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-    console.log('Opened spreadsheet:', SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    console.log('Opened spreadsheet:', CONFIG.SPREADSHEET_ID);
     
     const sheet = ss.getSheetByName('PR Number Tracker');
     if (!sheet) {
@@ -102,7 +102,7 @@ function getReservedPRNumber() {
  */
 function recordPRNumber(prNumber) {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('PR Number Tracker');
     if (!sheet) {
       throw new Error('PR Number Tracker sheet not found');
@@ -135,7 +135,7 @@ function validatePRNumber(prNumber) {
     }
     
     // Check uniqueness
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Master Log');
     if (!sheet) {
       throw new Error('Master Log sheet not found');
@@ -155,7 +155,7 @@ function validatePRNumber(prNumber) {
  */
 function setupPRTrackerSheet() {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     let sheet = ss.getSheetByName('PR Number Tracker');
     
     if (!sheet) {
@@ -176,7 +176,7 @@ function setupPRTrackerSheet() {
  */
 function resetPRNumbersForMonth() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('PR Number Tracker');
     if (!sheet) {
       throw new Error('PR Number Tracker sheet not found');

@@ -54,7 +54,7 @@ function authenticate(username, password) {
   console.log('Authenticating user:', username);
   
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Requestor List');
     if (!sheet) {
       console.error('Requestor List sheet not found');

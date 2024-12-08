@@ -1,16 +1,20 @@
 /*******************************************************************************************
  * File: Setup.gs
- * Version: 1.0
- * Last Updated: 2023-12-08
+ * Version: 1.5
+ * Last Updated: 2024-12-08
  *
  * Description:
- *   Handles system setup, initialization, and verification.
- *   Contains functions for setting up sheets, triggers, and system configuration.
+ *   Handles initial setup and configuration validation for the PR system.
+ *   Manages system settings and sheet validation.
  *
- * Dependencies:
- *   - SharedUtils.gs: Utility functions
- *   - PRNumbering.gs: PR number management
- ********************************************************************************************/
+ * Changes in 1.5:
+ *   - Updated to use CONFIG.SPREADSHEET_ID for consistency
+ *
+ * Changes in 1.4:
+ *   - Added error handling for setup process
+ *   - Improved logging for debugging
+ *   - Added configuration validation
+ *******************************************************************************************/
 
 /**
  * Sets up initial system configuration
@@ -48,7 +52,7 @@ function setupSystem() {
  */
 function validateConfig() {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     
     // Check required sheets exist
     const requiredSheets = [
@@ -90,7 +94,7 @@ function validateConfig() {
  */
 function verifyPRTracker() {
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('PR Number Tracker');
     if (!sheet) {
       return false;

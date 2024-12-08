@@ -806,7 +806,7 @@ function verifyUser(username, password) {
 
     try {
         // Get Requestor List sheet
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         const sheet = ss.getSheetByName(CONFIG.REQUESTOR_SHEET_NAME);
         if (!sheet) {
             Logger.log('ERROR: User list sheet not found');
@@ -1267,7 +1267,7 @@ function validateSession(sessionId) {
     if (!sessionId) return null;
 
     try {
-        const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+        const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
         const sheet = ss.getSheetByName(SESSION_CONFIG.SHEET_NAME);
 
         if (!sheet) {

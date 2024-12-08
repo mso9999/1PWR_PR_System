@@ -200,7 +200,7 @@ function createLoginRedirect() {
  */
 function logStatusChange(prNumber, newStatus, notes, user) {
   try {
-    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const logSheet = ss.getSheetByName('Status Change Log');
     
     if (!logSheet) {
