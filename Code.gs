@@ -80,19 +80,23 @@ const COL = {
  * @returns {HtmlOutput} The HTML output with headers set
  */
 function setSecurityHeaders(output) {
-  const headers = output.getXFrameOptionsMode();
-  headers.append('Content-Security-Policy', 
+  // Set security headers
+  output.addMetaTag('Content-Security-Policy',
     "default-src 'self' https://script.google.com https://*.googleusercontent.com; " +
     "script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
     "style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
     "frame-ancestors 'self'");
-  headers.append('X-Frame-Options', 'SAMEORIGIN');
-  headers.append('X-Content-Type-Options', 'nosniff');
-  headers.append('Permissions-Policy', 
+    
+  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.SAMEORIGIN);
+  
+  output.addMetaTag('X-Content-Type-Options', 'nosniff');
+  
+  output.addMetaTag('Permissions-Policy',
     'accelerometer=(), autoplay=(), camera=(), display-capture=(), document-domain=(), ' +
     'encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), ' +
     'microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), ' +
     'screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()');
+    
   return output;
 }
 
