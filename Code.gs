@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.9
+ * @version 1.4.10
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.10 - 2024-12-08
+ * - Add SharedStyles include to error page template
+ * 
  * 1.4.9 - 2024-12-08
  * - Fix PRView template include name
  * 
@@ -203,6 +206,7 @@ function include(filename) {
 function createErrorPage(message) {
   const template = HtmlService.createTemplateFromFile('ErrorPage');
   template.message = message;
+  template.includeSharedStyles = include('SharedStyles');
   return template.evaluate()
     .setTitle('Error')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
