@@ -1,7 +1,7 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.3
- * Last Updated: 2023-12-08
+ * Version: 1.4.0
+ * Last Updated: 2024-12-08
  *
  * Description:
  *   Main controller for the PR system. Handles routing and includes.
@@ -12,6 +12,12 @@
  *   - PRNumbering.gs: PR number management
  *   - ExchangeRates.gs: Currency conversion
  *   - Setup.gs: System setup and configuration
+ *
+ * Changes in 1.4.0:
+ *   - Implement proper security headers using Apps Script native methods
+ *   - Fix XFrameOptionsMode and setForceSsl implementation
+ *   - Add createSecureHtmlOutput helper function
+ *   - Remove custom meta tags in favor of Apps Script security methods
  *
  * Changes in 1.3:
  *   - Refactored into separate files for better organization
