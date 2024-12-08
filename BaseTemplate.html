@@ -1,6 +1,6 @@
 <!--*****************************************************************************************
  * File: BaseTemplate.html
- * Version: 1.0.0
+ * Version: 1.0.1
  * Last Updated: 2024-12-08
  *
  * Description:
@@ -12,7 +12,6 @@
  *   - SecurityHeaders.html: Security configuration
  *   - SharedStyles.html: Common styles
  *   - script.html: Common JavaScript
- *   - SharedUtils.html: Utility functions
  *******************************************************************************************/
 -->
 <!DOCTYPE html>
@@ -22,7 +21,6 @@
   <?!= includeSecurityHeaders ?>
   <?!= includeSharedStyles ?>
   <?!= includeScript ?>
-  <?!= includeSharedUtils ?>
   <?!= includePageSpecificStyles || '' ?>
   <?!= includePageSpecificScript || '' ?>
 </head>
