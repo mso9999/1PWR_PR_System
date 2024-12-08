@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.7
+ * @version 1.4.8
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.8 - 2024-12-08
+ * - Make template variable names consistent with new file structure
+ * - Fix style include variables in BaseTemplate.html and Code.gs
+ * 
  * 1.4.7 - 2024-12-08
  * - Fix template include name for SharedStyles.html
  * 
@@ -220,7 +224,7 @@ function getTemplateForUser() {
   // Common includes
   template.includeSecurityHeaders = include('SecurityHeaders');
   template.includeSharedUtils = include('SharedUtils');
-  template.includeStyle = include('SharedStyles');  
+  template.includeSharedStyles = include('SharedStyles');
   template.includeScript = include('script');
   
   // Page specific content
@@ -237,7 +241,7 @@ function getTemplateForUser() {
   } else if (isDashboardPage()) {
     template.includeContent = include('DashboardPage');
     template.includePageSpecificScript = include('DashboardScripts');
-    template.includePageSpecificStyle = include('DashboardStyles');
+    template.includePageSpecificStyles = include('DashboardStyles');
   }
   
   return template;
