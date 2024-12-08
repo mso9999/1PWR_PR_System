@@ -55,14 +55,14 @@
  * These configurations govern the entire workflow behavior.
  */
 const STATUS_WORKFLOW = {
-  
   // PR status transitions
   PR_TRANSITIONS: {
-    'Submitted': ['In Queue', 'Revise and Resubmit', 'Rejected', 'Canceled'],
-    'In Queue': ['PR Ready', 'Revise and Resubmit', 'Rejected', 'Canceled'],
-    'Revise and Resubmit': ['Resubmitted', 'Canceled'],
-    'Resubmitted': ['Submitted', 'Canceled'],
-    'PR Ready': ['PO Pending Approval', 'Canceled'],
+    'Submitted': ['In Queue', 'Revise & Resubmit', 'Rejected', 'Canceled'],
+    'In Queue': ['Ordered', 'Revise & Resubmit', 'Rejected', 'Canceled'],
+    'Ordered': ['Purchase Order', 'Canceled'],
+    'Purchase Order': ['Completed', 'Canceled'],
+    'Revise & Resubmit': ['Submitted', 'Canceled'],
+    'Completed': ['Canceled'],
     'Rejected': ['Canceled'],
     'Canceled': []
   },
@@ -71,27 +71,13 @@ const STATUS_WORKFLOW = {
   PO_TRANSITIONS: {
     'PO Pending Approval': ['PO Approved', 'Rejected', 'Canceled'],
     'PO Approved': ['PO Ordered', 'Canceled'],
-    'PO Ordered': ['Completed', 'In Queue', 'Canceled'],
-    'Completed': ['Canceled'],
-    'Rejected': ['Canceled'],
-    'Canceled': []
-  },
-
-  // Valid status transitions matrix
-  // Key: current status, Value: array of allowed next statuses
-  VALID_TRANSITIONS: {
-    'Submitted': ['In Queue', 'Rejected', 'Revise and Resubmit', 'Canceled'],
-    'In Queue': ['Ordered', 'Revise and Resubmit', 'Rejected', 'Canceled'],
-    'Ordered': ['Completed', 'In Queue', 'Canceled'],
-    'Revise and Resubmit': ['Resubmitted', 'Canceled'],
-    'Resubmitted': ['Submitted', 'Canceled'],
+    'PO Ordered': ['Completed', 'Canceled'],
     'Completed': ['Canceled'],
     'Rejected': ['Canceled'],
     'Canceled': []
   },
 
   // Required fields for each status
-  // Maps status to required field definitions
   REQUIRED_FIELDS: {
     'Ordered': {
       fields: ['Link to PoP', 'Payment Date', 'Expected Landing Date'],
@@ -105,24 +91,28 @@ const STATUS_WORKFLOW = {
       fields: ['Procurement Notes'],
       columns: [COL.PROCUREMENT_NOTES]
     },
-    'Revise and Resubmit': {
+    'Revise & Resubmit': {
       fields: ['Procurement Notes'],
       columns: [COL.PROCUREMENT_NOTES]
+    },
+    'Purchase Order': {
+      fields: ['PO Number', 'PO Date'],
+      columns: [COL.PO_NUMBER, COL.PO_DATE]
     }
   },
 
   // Status-specific automated actions
-  // Maps status to array of action handlers to execute
   STATUS_ACTIONS: {
     'Ordered': ['resetAutoCancellation', 'startReminderSchedule'],
+    'Purchase Order': ['initializePOTracking'],
     'Completed': ['clearReminders', 'sendCompletionNotification'],
     'Canceled': ['clearReminders', 'sendCancellationNotification']
   },
 
   // Auto-cancellation configurations
-  AUTO_CANCEL_DAYS: 30, // Days after which to auto-cancel
-  AUTO_CANCEL_WARNING_DAYS: 25, // Days after which to send warning
-  SYSTEM_ADMIN_EMAIL: 'admin@1pwr.com', // System admin email
+  AUTO_CANCEL_DAYS: 30,
+  AUTO_CANCEL_WARNING_DAYS: 25,
+  SYSTEM_ADMIN_EMAIL: 'admin@1pwr.com',
   PROCUREMENT_EMAIL: 'procurement@1pwr.com',
   FINANCE_EMAIL: 'finance@1pwr.com'
 };
@@ -1226,4 +1216,3 @@ function generateLandingDateUpdateLink(poNumber) {
   const baseUrl = ScriptApp.getService().getUrl();
   return `${baseUrl}?action=updateLandingDate&doc=${encodeURIComponent(poNumber)}`;
 }
-

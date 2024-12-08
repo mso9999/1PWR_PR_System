@@ -37,7 +37,7 @@ const CONFIG = {
   SPREADSHEET_ID: '12QgLxtavdCa9FkfTeMDogXA0COYBCxmUZKHDXybOzaU',
 
   // Sheet Names
-  SHEET_NAME: '1PWR PO MASTER TRACKING',
+  SHEET_NAME: '1PWR PR MASTER TRACKING_New',
   MASTER_LOG_TAB: 'Master Log',
   CONFIG_TAB: 'Configuration',
   HISTORY_TAB: 'Landing Date History',
@@ -45,34 +45,46 @@ const CONFIG = {
   ORGANIZATIONS_TAB: 'Org List',
   REQUESTOR_SHEET_NAME: 'Requestor List',
   AUTH_LOG_TAB: 'Auth Log',
+  SESSION_LOG_TAB: 'Session Log',
+  PR_TRACKER_TAB: 'PR Number Tracker',
+  PO_TRACKER_TAB: 'PO Number Tracker',
+  AUDIT_LOG_TAB: 'Audit Log',
+
+  // View Sheet Names
+  IN_QUEUE_VIEW: 'In Queue',
+  ORDERED_VIEW: 'Ordered',
+  PURCHASE_ORDER_VIEW: 'Purchase Order',
+  SUBMITTED_VIEW: 'Submitted',
+  REVISE_RESUBMIT_VIEW: 'Revise & Resubmit',
+  COMPLETED_VIEW: 'Completed',
+  REJECTED_VIEW: 'Rejected',
+  CANCELED_VIEW: 'Canceled',
+
+  // Reference Sheet Names
+  VENDOR_LIST_TAB: 'Vendor List',
+  APPROVER_LIST_TAB: 'Approver List',
+  DEPARTMENT_LIST_TAB: 'Department List',
+  PROJECT_CATEGORIES_TAB: 'Project Categories',
+  SITE_LIST_TAB: 'Site List',
+  EXPENSE_TYPE_TAB: 'Expense Type',
+  VEHICLE_LIST_TAB: 'Vehicle List',
 
   // =============================
-  // Numbering and Identifiers
+  // System Configuration
   // =============================
-
+  
   // Purchase Order Prefix
   PO_PREFIX: 'PO-2024-',
 
-  // =============================
   // Email Addresses
-  // =============================
-
   PROCUREMENT_EMAIL: 'procurement@1pwrafrica.com',
   SYSTEM_ADMIN_EMAIL: 'admin@1pwrafrica.com',
   FINANCE_EMAIL: 'finance@1pwrafrica.com',
 
-  // =============================
   // System Limits and Timers
-  // =============================
-
-  // Maximum number of future months for planning
   MAX_FUTURE_MONTHS: 6,
-
-  // Auto-cancellation settings
   AUTO_CANCEL_WARNING_DAYS: 30,
   AUTO_CANCEL_DAYS: 40,
-
-  // Customs-related warnings
   CUSTOMS_WARNING_DAYS: 5
 };
 
@@ -81,80 +93,82 @@ const CONFIG = {
  */
 const COL = {
   // Basic Information (A-T)
-  PR_NUMBER: 0,           // A: PR Number
-  TIMESTAMP: 1,          // B: Timestamp
-  EMAIL: 2,              // C: Email
-  REQUESTOR_NAME: 3,     // D: Requestor Name
-  DEPARTMENT: 4,         // E: Requestor Department
-  DESCRIPTION: 5,        // F: Request Short Description
-  PROJECT_CATEGORY: 6,   // G: Project Category
-  ORGANIZATION: 7,       // H: Acquiring Organization
-  CURRENCY: 8,           // I: Currency
-  PAYMENT_FORMAT: 9,     // J: Payment Format
-  SITE_LOCATION: 10,     // K: Site Location(s)
-  EXPENSE_TYPE: 11,      // L: Expense Type(s)
-  REQUEST_CONTEXT: 12,   // M: Request Context
-  VEHICLE: 13,           // N: Vehicle
-  BUDGET_STATUS: 14,     // O: Budget Approval Status
-  DEADLINE_DATE: 15,     // P: Deadline Date
-  VENDOR: 16,           // Q: Vendor
-  URGENCY: 17,          // R: Urgency Status
-  APPROVER: 18,         // S: Approver
-  REQUESTOR_NOTES: 19,  // T: Requestor Notes
+  PR_NUMBER: 0,              // A: PR Number
+  TIMESTAMP: 1,              // B: Timestamp
+  EMAIL: 2,                  // C: Email
+  REQUESTOR_NAME: 3,         // D: Requestor Name
+  DEPARTMENT: 4,             // E: Requestor Department
+  DESCRIPTION: 5,            // F: Request Short Description
+  PROJECT_CATEGORY: 6,       // G: Project Category
+  ORGANIZATION: 7,           // H: Acquiring Organization
+  CURRENCY: 8,               // I: Currency
+  PAYMENT_FORMAT: 9,         // J: Payment Format
+  SITE_LOCATION: 10,         // K: Site Location(s)
+  EXPENSE_TYPE: 11,          // L: Expense Type(s)
+  REQUEST_CONTEXT: 12,       // M: Request Context
+  VEHICLE: 13,              // N: Vehicle
+  BUDGET_STATUS: 14,        // O: Budget Approval Status
+  DEADLINE_DATE: 15,        // P: Deadline Date
+  VENDOR: 16,               // Q: Vendor
+  URGENCY: 17,              // R: Urgency Status
+  APPROVER: 18,             // S: Approver
+  REQUESTOR_NOTES: 19,      // T: Requestor Notes
 
-  // Status and Processing (U-AH)
-  PR_STATUS: 20,        // U: PR Status
-  PR_AMOUNT: 21,        // V: PR Amount
-  QUOTES_REQUIRED: 22,  // W: 3 Quotes Required
-  CONTROLS_OVERRIDE: 23,// X: Controls Override (Y/N)
-  OVERRIDE_JUST: 24,    // Y: Override Justification (Text)
-  OVERRIDE_DATE: 25,    // Z: Override Date (Date/Time)
-  OVERRIDE_BY: 26,      // AA: Override By (Text)
-  QUOTES_LINK: 27,      // AB: Link to Quotes
-  QUOTES_DATE: 28,      // AC: Quotes Date
-  ADJ_REQUIRED: 29,     // AD: Adjudication Required
-  ADJ_NOTES: 30,        // AE: Link to Adj. Notes
-  ADJ_DATE: 31,        // AF: Adj. Date
-  PR_READY: 32,        // AG: PR Ready
-  PO_NUMBER: 33,       // AH: PO # Issued
+  // Status and Amount (U-V)
+  PR_STATUS: 20,            // U: PR Status
+  PR_AMOUNT: 21,            // V: PR Amount
 
-  // PO Processing (AI-AM)
-  PO_DATE: 34,         // AI: PO Date
-  PO_STATUS: 35,       // AJ: PO Status
-  PO_APPROVED_DATE: 36,// AK: PO Approved Date
-  PO_NUMBER_TEXT: 37,  // AL: PO Number (Text)
-  LINK_TO_POP: 38,     // AM: Link to PoP
+  // Controls and Override (W-AA)
+  QUOTES_REQUIRED: 22,      // W: 3 Quotes Required
+  CONTROLS_OVERRIDE: 23,    // X: Controls Override (Y/N)
+  OVERRIDE_JUSTIFICATION: 24, // Y: Override Justification
+  OVERRIDE_DATE: 25,        // Z: Override Date
+  OVERRIDE_BY: 26,          // AA: Override By
 
-  // Payment and Shipping (AN-AR)
-  PAYMENT_DATE: 39,    // AN: Payment Date
+  // Quote Management (AB-AF)
+  LINK_TO_QUOTES: 27,       // AB: Link to Quotes
+  QUOTES_DATE: 28,          // AC: Quotes Date
+  ADJ_REQUIRED: 29,         // AD: Adjudication Required
+  LINK_TO_ADJ: 30,          // AE: Link to Adj. Notes
+  ADJ_DATE: 31,            // AF: Adj. Date
+
+  // PR/PO Processing (AG-AN)
+  PR_READY: 32,            // AG: PR Ready
+  PO_ISSUED: 33,           // AH: PO # Issued
+  PO_DATE: 34,             // AI: PO Date
+  PO_STATUS: 35,           // AJ: PO Status
+  PO_APPROVED_DATE: 36,    // AK: PO Approved Date
+  PO_NUMBER: 37,           // AL: PO Number
+  LINK_TO_POP: 38,         // AM: Link to PoP
+  PAYMENT_DATE: 39,        // AN: Payment Date
+
+  // Shipping and Delivery (AO-AY)
   EXPECTED_SHIPPING_DATE: 40, // AO: Expected Shipping Date
   EXPECTED_LANDING_DATE: 41,  // AP: Expected Landing Date
-  SHIPPED: 42,         // AQ: Shipped
-  SHIPMENT_DATE: 43,   // AR: Shipment Date
-
-  // Customs and Delivery (AS-AW)
-  CUSTOMS_REQUIRED: 44,    // AS: Customs Clearance Required
-  CUSTOMS_DOCS: 45,        // AT: Link to Clearance Docs
+  SHIPPED_STATUS: 42,         // AQ: Shipped
+  SHIPMENT_DATE: 43,         // AR: Shipment Date
+  CUSTOMS_REQUIRED: 44,       // AS: Customs Clearance Required
+  LINK_TO_CLEARANCE: 45,      // AT: Link to Clearance Docs
   CUSTOMS_SUBMISSION_DATE: 46, // AU: Customs Submission Date
-  CUSTOMS_CLEARED: 47,     // AV: Customs Cleared
-  DATE_CLEARED: 48,        // AW: Date Cleared
+  CUSTOMS_CLEARED: 47,        // AV: Customs Cleared
+  DATE_CLEARED: 48,           // AW: Date Cleared
+  GOODS_LANDED: 49,           // AX: Goods Landed
+  LANDED_DATE: 50,            // AY: Landed Date
 
-  // Final Status (AX-AZ)
-  GOODS_LANDED: 49,     // AX: Goods Landed
-  LANDED_DATE: 50,      // AY: Landed Date
+  // Metrics and Tracking (AZ-BE)
+  DAYS_OPEN: 51,              // AZ: Days Open
+  QUEUE_POSITION: 52,         // BA: Queue Position
+  COMPLETION_PERCENTAGE: 53,   // BB: % Completed
+  TIME_TO_SHIP: 54,           // BC: Time to Ship
+  TIME_IN_CUSTOMS: 55,        // BD: Time in Customs
+  TIME_TO_LAND: 56,           // BE: Time to Land
 
-  // Tracking Fields (BA-BF)
-  DAYS_OPEN: 51,        // BA: Days Open
-  QUEUE_POSITION: 52,   // BB: Queue Position
-  COMPLETION: 53,       // BC: % Completed
-  TIME_TO_SHIP: 54,     // BD: Time to Ship
-  TIME_IN_CUSTOMS: 55,  // BE: Time in Customs
-  TIME_TO_LAND: 56,     // BF: Time to Land
-  PROCUREMENT_NOTES: 57, // BG: Procurement Notes
-  ITEM_LIST: 58,          // BG: Item
-  QTY_LIST: 59,           // BH: QTY
-  UOM_LIST: 60,           // BI: UOM
-  URL_LIST: 61            // BJ: URL
+  // Notes and Line Items (BF-BJ)
+  PROCUREMENT_NOTES: 57,      // BF: Procurement Notes
+  ITEM: 58,                   // BG: Item
+  QUANTITY: 59,               // BH: QTY
+  UOM: 60,                    // BI: UOM
+  URL: 61                     // BJ: URL
 };
 
 // Add backwards compatibility aliases
@@ -1269,8 +1283,8 @@ function validatePRNumber(prNumber) {
 
 /**
  * Function: resetPRNumbersForMonth()
- * Description: Optional utility function to reset PR numbers for a new month
- * Can be triggered manually or scheduled
+ * Utility function to reset PR numbers if needed
+ * Only run this manually when necessary
  */
 function resetPRNumbersForMonth() {
   // This function can be used if you need to perform any cleanup
@@ -1300,7 +1314,7 @@ function resetPRNumbersForMonth() {
 
 /**
  * Function: setupMonthlyTrigger()
- * Description: Sets up automatic monthly reset of PR numbers
+ * Sets up automatic monthly reset of PR numbers
  * Should be run once during system setup
  */
 function setupMonthlyTrigger() {
@@ -2533,11 +2547,14 @@ function getPRNumber() {
                 if (match) {
                     const num = parseInt(match[1], 10);
                     maxNumber = Math.max(maxNumber, num);
+                    console.log(`Found PR number: ${prNum}, extracted number: ${num}`);
                 }
             }
         });
 
-        // Generate next number
+        console.log(`Highest number found for ${currentYearMonth}: ${maxNumber}`);
+
+        // Increment and validate
         const nextNumber = maxNumber + 1;
         if (nextNumber > 999) {
             console.error(`PR number limit reached for ${currentYearMonth}`);
