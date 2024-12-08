@@ -213,9 +213,9 @@ function include(filename) {
  * @returns {Template} The template for the current user
  */
 function getTemplateForUser() {
-  const template = HtmlService.createTemplateFromFile('BaseTemplate');
-  
   try {
+    const template = HtmlService.createTemplateFromFile('BaseTemplate');
+    
     // Common includes with error handling
     template.includeSecurityHeaders = include('SecurityHeaders') || '';
     template.includeSharedStyles = include('SharedStyles') || '';
@@ -246,27 +246,17 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    return template;
+    // Evaluate and set options
+    return template.evaluate()
+      .setTitle('1PWR Purchase Request System')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+      
   } catch (error) {
     console.error('Error getting template:', error);
-    
-    // Return minimal template on error
-    return HtmlService.createTemplate(
-      '<!DOCTYPE html>' +
-      '<html>' +
-      '<head>' +
-      '<base target="_top">' +
-      '<title>Error</title>' +
-      '</head>' +
-      '<body>' +
-      '<div style="font-family: Arial, sans-serif; margin: 40px; max-width: 600px;">' +
-      '<h1 style="color: #d32f2f;">Error</h1>' +
-      '<p>' + error.toString() + '</p>' +
-      '<a href="' + ScriptApp.getService().getUrl() + '" style="display: inline-block; padding: 10px 20px; background-color: #1976d2; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px;">Back to Home</a>' +
-      '</div>' +
-      '</body>' +
-      '</html>'
-    );
+    return createErrorPage(error);
   }
 }
 
@@ -351,15 +341,7 @@ function doGet(e) {
     console.log('Event parameters:', e ? JSON.stringify(e.parameter) : 'none');
     
     // Get template based on user state
-    const template = getTemplateForUser();
-    
-    // Set standard options
-    return template.evaluate()
-      .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    return getTemplateForUser();
       
   } catch (error) {
     console.error('Error in doGet:', error);
