@@ -1,7 +1,11 @@
 <!--*****************************************************************************************
  * File: Login.html
- * Version: 1.8
+ * Version: 1.9
  * Last Updated: 2024-12-08
+ *
+ * Changes in 1.9:
+ *   - Remove HTML structure (now using base template)
+ *   - Keep only content for template inclusion
  *
  * Changes in 1.8:
  *   - Remove direct include of SecurityHeaders (now handled by base template)
@@ -13,238 +17,226 @@
  *   - Updated session management and login functionality
  ******************************************************************************************-->
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Login - 1PWR Procurement</title>
-  <style>
-    .container {
-      max-width: 400px;
-      margin: 50px auto;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 5px;
-      color: #555;
-    }
-    
-    select, input[type="password"] {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 16px;
-    }
-    
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #4285f4;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    
-    button:hover {
-      background-color: #357abd;
-    }
-    
-    .error {
-      color: #d93025;
-      margin-top: 5px;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>1PWR Procurement System</h1>
-    <div id="login-form">
-      <form id="login" onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <label for="username">Name:</label>
-          <select id="username" name="username" required>
-            <option value="">Select your name</option>
-          </select>
-          <div id="username-error" class="error"></div>
-        </div>
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input type="password" id="password" name="password" required>
-          <div id="password-error" class="error"></div>
-        </div>
-        <div class="form-group">
-          <button type="submit">Login</button>
-        </div>
-      </form>
+<style>
+  .container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  select, input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  button {
+    width: 100%;
+    padding: 10px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  button:hover {
+    background-color: #1565c0;
+  }
+  
+  .error-message {
+    color: #d32f2f;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+  }
+</style>
+
+<div class="container">
+  <h1>1PWR Procurement</h1>
+  <form id="loginForm" onsubmit="handleLogin(event)">
+    <div class="form-group">
+      <label for="userName">Name:</label>
+      <select id="userName" name="userName" required>
+        <option value="">Select your name</option>
+      </select>
     </div>
-  </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+    <button type="submit">Login</button>
+    <div id="errorMessage" class="error-message"></div>
+  </form>
+</div>
 
-  <script nonce="<?!= nonce ?>">
-    // Session management utilities
-    const SESSION_KEY = '1pwr_session';
+<script nonce="<?!= nonce ?>">
+  // Session management utilities
+  const SESSION_KEY = '1pwr_session';
+  
+  function getStoredSessionId() {
+    try {
+      return sessionStorage.getItem(SESSION_KEY);
+    } catch (error) {
+      console.error('Error accessing session storage:', error);
+      return null;
+    }
+  }
+  
+  function setStoredSessionId(sessionId) {
+    try {
+      sessionStorage.setItem(SESSION_KEY, sessionId);
+    } catch (error) {
+      console.error('Error storing session ID:', error);
+    }
+  }
+  
+  function clearStoredSession() {
+    try {
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch (error) {
+      console.error('Error clearing session:', error);
+    }
+  }
+
+  // Initialize session management and load user list
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing session management');
+    initializeSession();
+    loadUserList();
+  });
+
+  function initializeSession() {
+    console.log('Initializing session management, current URL:', window.location.href);
+    const sessionId = getStoredSessionId();
+    console.log('Session ID check result:', sessionId ? 'Found' : 'Not found');
     
-    function getStoredSessionId() {
-      try {
-        return sessionStorage.getItem(SESSION_KEY);
-      } catch (error) {
-        console.error('Error accessing session storage:', error);
-        return null;
-      }
+    if (!sessionId) {
+      console.log('No session ID found, clearing session');
+      clearStoredSession();
     }
+  }
+
+  function loadUserList() {
+    const select = document.getElementById('userName');
+    const usernameError = document.getElementById('errorMessage');
     
-    function setStoredSessionId(sessionId) {
-      try {
-        sessionStorage.setItem(SESSION_KEY, sessionId);
-      } catch (error) {
-        console.error('Error storing session ID:', error);
-      }
-    }
-    
-    function clearStoredSession() {
-      try {
-        sessionStorage.removeItem(SESSION_KEY);
-      } catch (error) {
-        console.error('Error clearing session:', error);
-      }
-    }
-
-    // Initialize session management and load user list
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('DOM loaded, initializing session management');
-      initializeSession();
-      loadUserList();
-    });
-
-    function initializeSession() {
-      console.log('Initializing session management, current URL:', window.location.href);
-      const sessionId = getStoredSessionId();
-      console.log('Session ID check result:', sessionId ? 'Found' : 'Not found');
-      
-      if (!sessionId) {
-        console.log('No session ID found, clearing session');
-        clearStoredSession();
-      }
-    }
-
-    function loadUserList() {
-      const select = document.getElementById('username');
-      const usernameError = document.getElementById('username-error');
-      
-      google.script.run
-        .withSuccessHandler(function(users) {
-          // Clear existing options except the first one
-          while (select.options.length > 1) {
-            select.remove(1);
+    google.script.run
+      .withSuccessHandler(function(users) {
+        // Clear existing options except the first one
+        while (select.options.length > 1) {
+          select.remove(1);
+        }
+        
+        // Add active users to the dropdown
+        users.forEach(function(user) {
+          if (user.active === 'Y') {
+            const option = document.createElement('option');
+            option.value = user.name;
+            option.textContent = user.name;
+            select.appendChild(option);
           }
+        });
+      })
+      .withFailureHandler(function(error) {
+        console.error('Error loading user list:', error);
+        usernameError.textContent = 'Failed to load user list. Please refresh the page.';
+      })
+      .getRequestorList();
+  }
+
+  function handleLogin(event) {
+    event.preventDefault();
+    
+    const usernameSelect = document.getElementById('userName');
+    const passwordInput = document.getElementById('password');
+    const usernameError = document.getElementById('errorMessage');
+    
+    // Clear previous errors
+    usernameError.textContent = '';
+    
+    const username = usernameSelect.value.trim();
+    const password = passwordInput.value.trim();
+    
+    if (!username) {
+      usernameError.textContent = 'Please select your name';
+      return;
+    }
+    
+    if (!password) {
+      usernameError.textContent = 'Please enter your password';
+      return;
+    }
+
+    // Show loading state
+    const submitButton = event.target.querySelector('button');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Logging in...';
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          console.log('Login successful, storing session');
+          setStoredSessionId(result.sessionId);
           
-          // Add active users to the dropdown
-          users.forEach(function(user) {
-            if (user.active === 'Y') {
-              const option = document.createElement('option');
-              option.value = user.name;
-              option.textContent = user.name;
-              select.appendChild(option);
-            }
-          });
-        })
-        .withFailureHandler(function(error) {
-          console.error('Error loading user list:', error);
-          usernameError.textContent = 'Failed to load user list. Please refresh the page.';
-        })
-        .getRequestorList();
-    }
-
-    function handleLogin(event) {
-      event.preventDefault();
-      
-      const usernameSelect = document.getElementById('username');
-      const passwordInput = document.getElementById('password');
-      const usernameError = document.getElementById('username-error');
-      const passwordError = document.getElementById('password-error');
-      
-      // Clear previous errors
-      usernameError.textContent = '';
-      passwordError.textContent = '';
-      
-      const username = usernameSelect.value.trim();
-      const password = passwordInput.value.trim();
-      
-      if (!username) {
-        usernameError.textContent = 'Please select your name';
-        return;
-      }
-      
-      if (!password) {
-        passwordError.textContent = 'Please enter your password';
-        return;
-      }
-
-      // Show loading state
-      const submitButton = event.target.querySelector('button');
-      const originalText = submitButton.textContent;
-      submitButton.disabled = true;
-      submitButton.textContent = 'Logging in...';
-
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            console.log('Login successful, storing session');
-            setStoredSessionId(result.sessionId);
-            
-            // Create a form to handle the redirection
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = window.location.href;
-            
-            // Add session ID as hidden input
-            const sessionInput = document.createElement('input');
-            sessionInput.type = 'hidden';
-            sessionInput.name = 'sessionId';
-            sessionInput.value = result.sessionId;
-            form.appendChild(sessionInput);
-            
-            // Add page parameter as hidden input
-            const pageInput = document.createElement('input');
-            pageInput.type = 'hidden';
-            pageInput.name = 'page';
-            pageInput.value = 'dashboard';
-            form.appendChild(pageInput);
-            
-            // Add the form to the document and submit it
-            document.body.appendChild(form);
-            form.submit();
-          } else {
-            passwordError.textContent = result.message || 'Login failed. Please check your password and try again.';
-            submitButton.disabled = false;
-            submitButton.textContent = originalText;
-          }
-        })
-        .withFailureHandler(function(error) {
-          console.error('Login error:', error);
-          passwordError.textContent = 'An error occurred during login. Please try again.';
+          // Create a form to handle the redirection
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = window.location.href;
+          
+          // Add session ID as hidden input
+          const sessionInput = document.createElement('input');
+          sessionInput.type = 'hidden';
+          sessionInput.name = 'sessionId';
+          sessionInput.value = result.sessionId;
+          form.appendChild(sessionInput);
+          
+          // Add page parameter as hidden input
+          const pageInput = document.createElement('input');
+          pageInput.type = 'hidden';
+          pageInput.name = 'page';
+          pageInput.value = 'dashboard';
+          form.appendChild(pageInput);
+          
+          // Add the form to the document and submit it
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          usernameError.textContent = result.message || 'Login failed. Please check your password and try again.';
           submitButton.disabled = false;
           submitButton.textContent = originalText;
-        })
-        .authenticateUser(username, password);
-    }
-  </script>
-</body>
-</html>
+        }
+      })
+      .withFailureHandler(function(error) {
+        console.error('Login error:', error);
+        usernameError.textContent = 'An error occurred during login. Please try again.';
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+      })
+      .authenticateUser(username, password);
+  }
+</script>
