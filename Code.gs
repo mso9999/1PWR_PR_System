@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.6
+ * @version 1.4.7
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.7 - 2024-12-08
+ * - Fix template include name for SharedStyles.html
+ * 
  * 1.4.6 - 2024-12-08
  * - Refactored template system to use BaseTemplate.html
  * - Updated file naming convention for consistency
@@ -217,7 +220,7 @@ function getTemplateForUser() {
   // Common includes
   template.includeSecurityHeaders = include('SecurityHeaders');
   template.includeSharedUtils = include('SharedUtils');
-  template.includeSharedStyles = include('SharedStyles');
+  template.includeStyle = include('SharedStyles');  
   template.includeScript = include('script');
   
   // Page specific content
