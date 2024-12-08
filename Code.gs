@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.23
+ * @version 1.4.24
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.24 - 2024-12-08
+ * - Update getUrlParameter to use event parameter
+ * 
  * 1.4.23 - 2024-12-08
  * - Fix error page creation and sandbox mode
  * 
@@ -186,6 +189,10 @@ function createSecureHtmlOutput(content) {
  */
 function doGet(e) {
   try {
+    // Store event object globally
+    currentEvent = e;
+    console.log('Event parameters:', e ? JSON.stringify(e.parameter) : 'none');
+    
     // Get template based on user state
     const template = getTemplateForUser();
     
@@ -381,6 +388,9 @@ function getTemplateForUser() {
   return template;
 }
 
+// Store event object globally for parameter access
+let currentEvent = null;
+
 /**
  * Gets URL parameters from the current request
  * @param {string} paramName - Name of parameter to get
@@ -388,6 +398,12 @@ function getTemplateForUser() {
  */
 function getUrlParameter(paramName) {
   try {
+    // First try to get parameter from event object
+    if (currentEvent && currentEvent.parameter && currentEvent.parameter[paramName]) {
+      return currentEvent.parameter[paramName];
+    }
+    
+    // Fallback to URL parsing if no event parameter
     const url = ScriptApp.getService().getUrl();
     const params = url.split('?')[1];
     if (!params) return '';
