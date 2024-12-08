@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.26
+ * @version 1.4.27
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.27 - 2024-12-08
+ * - Use direct HTML output for error pages
+ * - Fix sandbox mode handling
+ * 
  * 1.4.26 - 2024-12-08
  * - Add defensive template handling
  * - Update include function to handle errors
@@ -269,6 +273,75 @@ function getTemplateForUser() {
 }
 
 /**
+ * Creates an error page with the given message
+ * @param {string} error - The error to display
+ * @returns {HtmlOutput} The error page
+ */
+function createErrorPage(error) {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Error</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 40px; 
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+    }
+    .container { 
+      max-width: 600px;
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .error { 
+      color: #d32f2f;
+      margin-top: 0;
+    }
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #1976d2;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 20px;
+      transition: background-color 0.2s;
+    }
+    .button:hover {
+      background-color: #1565c0;
+    }
+    .session-id {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="error">Error</h1>
+    <p>${error.toString()}</p>
+    <p class="session-id">Session ID: ${getSessionIdFromUrl() || 'none'}</p>
+    <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
+  </div>
+</body>
+</html>`;
+
+  return HtmlService.createHtmlOutput(html)
+    .setTitle('Error')
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
+}
+
+/**
  * Handles GET requests and routing
  * @param {Object} e - Event object
  * @returns {HtmlOutput} Rendered page
@@ -281,43 +354,18 @@ function doGet(e) {
     
     // Get template based on user state
     const template = getTemplateForUser();
-    const output = template.evaluate();
     
     // Set standard options
-    output.setTitle('1PWR Purchase Request System')
-          .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-          .setFaviconUrl('https://www.google.com/images/favicon.ico');
-    
-    return output;
+    return template.evaluate()
+      .setTitle('1PWR Purchase Request System')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
       
   } catch (error) {
     console.error('Error in doGet:', error);
-    
-    // Create a basic error page without template
-    const errorHtml = HtmlService.createTemplate(
-      '<!DOCTYPE html>' +
-      '<html>' +
-      '<head>' +
-      '<base target="_top">' +
-      '<title>Error</title>' +
-      '</head>' +
-      '<body>' +
-      '<div style="font-family: Arial, sans-serif; margin: 40px; max-width: 600px;">' +
-      '<h1 style="color: #d32f2f;">Error</h1>' +
-      '<p>' + error.toString() + '</p>' +
-      '<p>Session ID: ' + (getSessionIdFromUrl() || 'none') + '</p>' +
-      '<a href="' + ScriptApp.getService().getUrl() + '" style="display: inline-block; padding: 10px 20px; background-color: #1976d2; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px;">Back to Home</a>' +
-      '</div>' +
-      '</body>' +
-      '</html>'
-    );
-    
-    return errorHtml.evaluate()
-      .setTitle('Error')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
+    return createErrorPage(error);
   }
 }
 
@@ -346,62 +394,6 @@ function handleAuthenticatedRoute(e, user) {
       
     default:
       return createErrorPage('Invalid page requested');
-  }
-}
-
-/**
- * Creates an error page with the given message
- * @param {string} message - The error message to display
- * @param {string} sessionId - Session ID to include in error page
- * @returns {HtmlOutput} The rendered error page
- */
-function createErrorPage(message, sessionId) {
-  try {
-    const template = HtmlService.createTemplateFromFile('ErrorPage');
-    template.message = message;
-    template.sessionId = sessionId;
-    template.includeSharedStyles = include('SharedStyles');
-    return template.evaluate()
-      .setTitle('Error')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  } catch (error) {
-    // Fallback to basic error page if template fails
-    console.error('Error creating error page:', error);
-    return HtmlService.createHtmlOutput(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Error</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .error { color: #d32f2f; }
-            .container { max-width: 600px; margin: 0 auto; }
-            .button { 
-              display: inline-block; 
-              padding: 10px 20px; 
-              background: #1976d2; 
-              color: white; 
-              text-decoration: none; 
-              border-radius: 4px; 
-              margin-top: 20px; 
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1 class="error">Error</h1>
-            <p>${message}</p>
-            <p>Session ID: ${sessionId}</p>
-            <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
-          </div>
-        </body>
-      </html>
-    `)
-    .setTitle('Error')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   }
 }
 
