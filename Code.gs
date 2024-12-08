@@ -1,6 +1,6 @@
 /*******************************************************************************************
  * File: Code.gs
- * Version: 1.4.0
+ * Version: 1.4.1
  * Last Updated: 2024-12-08
  *
  * Description:
@@ -12,6 +12,9 @@
  *   - PRNumbering.gs: PR number management
  *   - ExchangeRates.gs: Currency conversion
  *   - Setup.gs: System setup and configuration
+ *
+ * Changes in 1.4.1:
+ *   - Fix setForceSsl implementation to use correct method chain
  *
  * Changes in 1.4.0:
  *   - Implement proper security headers using Apps Script native methods
@@ -103,10 +106,8 @@ function setSecurityHeaders(output) {
 function createSecureHtmlOutput(content) {
   const output = HtmlService.createHtmlOutput(content)
     .setTitle('1PWR Purchase Request System')
-    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
-    
-  // Force SSL for all requests
-  HtmlService.setForceSsl(true);
+    .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png')
+    .setForceSsl(true);  // Force SSL for all requests
     
   return setSecurityHeaders(output);
 }
