@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.15
+ * @version 1.4.16
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.16 - 2024-12-08
+ * - Remove setSandboxMode from setSecurityHeaders to avoid double setting
+ * 
  * 1.4.15 - 2024-12-08
  * - Initialize page specific styles to null in template
  * 
@@ -127,12 +130,18 @@ const COL = {
  * @returns {HtmlOutput} The HTML output with headers set
  */
 function setSecurityHeaders(output) {
-  // Set X-Frame-Options using Apps Script's built-in method
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // Set Content Security Policy
+  output.addMetaTag('Content-Security-Policy', 
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+    "https://apis.google.com https://1pwrafrica.com https://www.google.com " +
+    "https://accounts.google.com https://ssl.gstatic.com https://www.gstatic.com " +
+    "https://fonts.googleapis.com https://fonts.gstatic.com; " +
+    "img-src * data: https:; " +
+    "connect-src 'self' https://apis.google.com https://accounts.google.com; " +
+    "frame-src 'self' https://accounts.google.com https://apis.google.com;"
+  );
   
-  // Set sandbox mode for additional security
-  // Note: We only use allow-scripts without allow-same-origin to prevent sandbox escape
-  output.setSandboxMode(HtmlService.SandboxMode.NATIVE);
+  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   
   return output;
 }
