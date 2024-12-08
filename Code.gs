@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.3
+ * @version 1.4.4
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.4 - 2024-12-08
+ * - Update sandbox mode to prevent sandbox escape
+ * - Remove unrecognized features from permissions policy
+ * 
  * 1.4.3 - 2024-12-08
  * - Remove setForceSsl as Apps Script enforces HTTPS by default
  * 
@@ -90,7 +94,8 @@ function setSecurityHeaders(output) {
   output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   
   // Set sandbox mode for additional security
-  output.setSandboxMode(HtmlService.SandboxMode.IFRAME);
+  // Note: We only use allow-scripts without allow-same-origin to prevent sandbox escape
+  output.setSandboxMode(HtmlService.SandboxMode.NATIVE);
   
   return output;
 }
