@@ -1,9 +1,18 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.5
+ * @version 1.4.6
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.6 - 2024-12-08
+ * - Refactored template system to use BaseTemplate.html
+ * - Updated file naming convention for consistency
+ * - Simplified doGet function to use new template system
+ * 
+ * 1.4.5 - 2024-12-08
+ * - Update PR number fetching logic
+ * - Add null checks for DOM elements
+ * 
  * 1.4.4 - 2024-12-08
  * - Update sandbox mode to prevent sandbox escape
  * - Remove unrecognized features from permissions policy
@@ -119,26 +128,23 @@ function createSecureHtmlOutput(content) {
  * @returns {HtmlOutput} Rendered page
  */
 function doGet(e) {
-  console.log('Processing GET request:', e.parameter);
-  
   try {
-    // Check for session
-    const sessionId = e.parameter.sid;
-    if (!sessionId) {
-      return createSecureHtmlOutput(serveLoginPage());
-    }
+    // Get template based on user state
+    const template = getTemplateForUser();
     
-    const user = getCurrentUserFromAuth(sessionId);
-    if (!user) {
-      return createSecureHtmlOutput(serveLoginPage('Session expired'));
-    }
-    
-    // Route to appropriate page
-    return createSecureHtmlOutput(handleAuthenticatedRoute(e, user));
-    
+    return template
+      .evaluate()
+      .setTitle('1PWR Purchase Request System')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+      
   } catch (error) {
-    console.error('Error processing request:', error);
-    return createSecureHtmlOutput(createErrorPage(error.toString()));
+    console.error('Error in doGet:', error);
+    return HtmlService.createHtmlOutput(createErrorPage(error.toString()))
+      .setTitle('Error')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
   }
 }
 
@@ -199,4 +205,63 @@ function createErrorPage(message) {
  */
 function getWebAppUrl(page = '') {
   return getWebAppUrlFromAuth(page);
+}
+
+/**
+ * Gets the template for the current user
+ * @returns {Template} The template for the current user
+ */
+function getTemplateForUser() {
+  const template = HtmlService.createTemplateFromFile('BaseTemplate');
+  
+  // Common includes
+  template.includeSecurityHeaders = include('SecurityHeaders');
+  template.includeSharedUtils = include('SharedUtils');
+  template.includeSharedStyles = include('SharedStyles');
+  template.includeScript = include('script');
+  
+  // Page specific content
+  if (isLoginPage()) {
+    template.includeContent = include('LoginPage');
+    template.includePageSpecificScript = include('LoginScripts');
+  } else if (isPRFormPage()) {
+    template.includeContent = include('PRFormPage');
+    template.includePageSpecificScript = include('PRFormScripts');
+    template.includeHeader = include('PRFormComponents');
+  } else if (isPRViewPage()) {
+    template.includeContent = include('PRViewPage');
+    template.includePageSpecificScript = include('PRViewScripts');
+  } else if (isDashboardPage()) {
+    template.includeContent = include('DashboardPage');
+    template.includePageSpecificScript = include('DashboardScripts');
+    template.includePageSpecificStyle = include('DashboardStyles');
+  }
+  
+  return template;
+}
+
+/**
+ * Page type checks
+ */
+function isLoginPage() {
+  return !Session.getActiveUser().getEmail() || !isValidSession();
+}
+
+function isPRFormPage() {
+  const page = getPageFromUrl();
+  return page === 'form' || page === '';
+}
+
+function isPRViewPage() {
+  return getPageFromUrl() === 'view';
+}
+
+function isDashboardPage() {
+  return getPageFromUrl() === 'dashboard';
+}
+
+function getPageFromUrl() {
+  const url = ScriptApp.getService().getUrl();
+  const params = new URL(url).searchParams;
+  return params.get('page') || '';
 }

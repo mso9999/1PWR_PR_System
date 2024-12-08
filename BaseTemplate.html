@@ -1,0 +1,44 @@
+<!--*****************************************************************************************
+ * File: BaseTemplate.html
+ * Version: 1.0.0
+ * Last Updated: 2024-12-08
+ *
+ * Description:
+ *   Base template for all pages in the PR System. Provides common structure and includes
+ *   for styles, scripts, and security headers. Pages extend this template by providing
+ *   their specific content and scripts.
+ *
+ * Dependencies:
+ *   - SecurityHeaders.html: Security configuration
+ *   - SharedStyles.html: Common styles
+ *   - script.html: Common JavaScript
+ *   - SharedUtils.html: Utility functions
+ *******************************************************************************************/
+-->
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <?!= includeSecurityHeaders ?>
+  <?!= includeSharedStyles ?>
+  <?!= includeScript ?>
+  <?!= includeSharedUtils ?>
+  <?!= includePageSpecificStyle || '' ?>
+  <?!= includePageSpecificScript || '' ?>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <?!= includeHeader || '' ?>
+    </header>
+    
+    <main>
+      <?!= includeContent ?>
+    </main>
+    
+    <footer>
+      <?!= includeFooter || '' ?>
+    </footer>
+  </div>
+</body>
+</html>

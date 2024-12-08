@@ -1480,11 +1480,24 @@ function checkAllFieldsComplete() {
  * Updates submit button appearance based on field completion
  */
 function updateSubmitButtonState() {
-  const submitButton = document.querySelector('#rightSide button[onclick="submitForm()"]');
-  if (checkAllFieldsComplete()) {
-    submitButton.classList.add('all-fields-complete');
-  } else {
-    submitButton.classList.remove('all-fields-complete');
+  const submitButton = document.getElementById('submitButton');
+  if (!submitButton) {
+    console.log('Submit button not found - this is expected on non-form pages');
+    return;
+  }
+  
+  const requiredFields = document.querySelectorAll('[required]');
+  let allFilled = true;
+  
+  requiredFields.forEach(field => {
+    if (!field.value) {
+      allFilled = false;
+    }
+  });
+  
+  submitButton.disabled = !allFilled;
+  if (submitButton.classList) {
+    submitButton.classList.toggle('disabled', !allFilled);
   }
 }
 

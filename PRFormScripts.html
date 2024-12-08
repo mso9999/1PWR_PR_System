@@ -1,0 +1,136 @@
+<!-- PR Form specific JavaScript -->
+<script>
+  // Form data object to store all form values
+  let formData = {
+    prNumber: '',
+    requestor: '',
+    department: '',
+    items: [],
+    totalAmount: 0,
+    currency: 'USD'
+  };
+
+  /*******************************************************************************************
+   * Form Preview Functions
+   *******************************************************************************************/
+  function updatePreview() {
+    const previewContent = document.getElementById('previewContent');
+    if (!previewContent) return;
+
+    let previewHtml = generatePreviewHtml();
+    previewContent.innerHTML = previewHtml;
+    updateTotalAmount();
+  }
+
+  function generatePreviewHtml() {
+    return `
+      <div class="preview-section">
+        <h3>Purchase Request Details</h3>
+        <p><strong>PR Number:</strong> ${formData.prNumber || ''}</p>
+        <p><strong>Requestor:</strong> ${formData.requestor || ''}</p>
+        <p><strong>Department:</strong> ${formData.department || ''}</p>
+        <p><strong>Total Amount:</strong> ${formData.currency} ${formData.totalAmount.toFixed(2)}</p>
+      </div>
+    `;
+  }
+
+  /*******************************************************************************************
+   * Form Validation and Submission
+   *******************************************************************************************/
+  function updateSubmitButtonState() {
+    const submitButton = document.getElementById('submitButton');
+    if (!submitButton) return;
+    
+    const requiredFields = document.querySelectorAll('[required]');
+    let allFilled = true;
+    
+    requiredFields.forEach(field => {
+      if (!field.value) {
+        allFilled = false;
+      }
+    });
+    
+    submitButton.disabled = !allFilled;
+    submitButton.classList.toggle('disabled', !allFilled);
+  }
+
+  function submitForm() {
+    if (!validateForm()) return;
+
+    const submitButton = document.getElementById('submitButton');
+    submitButton.disabled = true;
+    
+    google.script.run
+      .withSuccessHandler(onFormSubmitSuccess)
+      .withFailureHandler(onFormSubmitFailure)
+      .submitPRForm(formData);
+  }
+
+  function validateForm() {
+    // Add form-specific validation logic here
+    return true;
+  }
+
+  function onFormSubmitSuccess(response) {
+    showNotification('Success', 'Purchase Request submitted successfully!', 'success');
+    resetForm();
+  }
+
+  function onFormSubmitFailure(error) {
+    showNotification('Error', 'Failed to submit Purchase Request: ' + error, 'error');
+    const submitButton = document.getElementById('submitButton');
+    submitButton.disabled = false;
+  }
+
+  /*******************************************************************************************
+   * Form Field Event Handlers
+   *******************************************************************************************/
+  function updateTotalAmount() {
+    let total = 0;
+    formData.items.forEach(item => {
+      total += parseFloat(item.amount) || 0;
+    });
+    formData.totalAmount = total;
+    
+    const totalElement = document.getElementById('totalAmount');
+    if (totalElement) {
+      totalElement.textContent = `${formData.currency} ${total.toFixed(2)}`;
+    }
+  }
+
+  function onFieldChange(fieldId, value) {
+    formData[fieldId] = value;
+    updatePreview();
+    updateSubmitButtonState();
+  }
+
+  /*******************************************************************************************
+   * Event Listeners and Initializations
+   *******************************************************************************************/
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize preview
+    updatePreview();
+    
+    // Fetch PR number
+    google.script.run
+      .withSuccessHandler(function(prNumber) {
+        formData.prNumber = prNumber;
+        document.getElementById('prNumber').textContent = prNumber;
+        updatePreview();
+      })
+      .withFailureHandler(function(error) {
+        console.error('Failed to fetch PR number:', error);
+      })
+      .getPRNumber();
+    
+    // Set up field event listeners
+    const formFields = document.querySelectorAll('input, select, textarea');
+    formFields.forEach(field => {
+      field.addEventListener('change', function() {
+        onFieldChange(field.id, field.value);
+      });
+    });
+    
+    updateSubmitButtonState();
+  });
+</script>

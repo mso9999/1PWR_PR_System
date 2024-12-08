@@ -1,0 +1,34 @@
+<!-- Login page specific JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleLogin();
+      });
+    }
+  });
+
+  function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    google.script.run
+      .withSuccessHandler(onLoginSuccess)
+      .withFailureHandler(onLoginError)
+      .processLogin(email, password);
+  }
+
+  function onLoginSuccess(response) {
+    if (response.success) {
+      window.location.href = response.redirectUrl || ScriptApp.getService().getUrl();
+    } else {
+      showNotification('Error', response.message || 'Login failed', 'error');
+    }
+  }
+
+  function onLoginError(error) {
+    showNotification('Error', 'Login failed: ' + error, 'error');
+  }
+</script>
