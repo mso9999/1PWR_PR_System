@@ -1,0 +1,125 @@
+<!--*****************************************************************************************
+ * File: DashboardContent.html
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Contains the HTML structure and content templates for the dashboard view.
+ *   Defines the layout for PR status cards, metrics displays, and interactive
+ *   elements of the dashboard interface.
+ *
+ * Relationship with Other Files:
+ *   - DashboardWeb.html: Main dashboard container
+ *   - DashboardStyles.html: Styling for content
+ *   - DashboardScripts.html: Content interactions
+ *   - Dashboard.gs: Data provider
+ *
+ * Content Framework:
+ *   - Status card templates
+ *   - Metric display layouts
+ *   - Filter and sort controls
+ *   - Action buttons
+ ******************************************************************************************-->
+
+<!-- Organization Toggle Section -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="flex justify-center">
+    <div class="relative w-64">
+      <select 
+        id="orgSelect" 
+        onchange="handleOrgChange(this.value)"
+        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 pl-3 pr-10 text-base"
+      >
+        <option value="">All Organizations</option>
+        <!-- Options will be populated dynamically -->
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div class="bg-white rounded-lg shadow">
+    <!-- Status Grid Layout -->
+    <div class="grid grid-cols-7 gap-4 p-6">
+      <!-- Submitted Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          <a href="#" onclick="viewSubmitted(); return false;" class="cursor-pointer">
+            Submitted [<span id="submittedCount" class="text-blue-600">0</span>]
+          </a>
+        </h3>
+        <div id="submittedList"
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="Submitted">
+        </div>
+      </div>
+
+      <!-- In Queue Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          In Queue [<span id="inQueueCount" class="text-yellow-600">0</span>]
+        </h3>
+        <div id="inQueueList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="In Queue">
+        </div>
+      </div>
+
+      <!-- Ordered Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          Ordered [<span id="orderedCount" class="text-green-600">0</span>]
+        </h3>
+        <div id="orderedList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="Ordered">
+        </div>
+      </div>
+
+      <!-- Completed Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          Completed [<span id="completedCount" class="text-gray-600">0</span>]
+        </h3>
+        <div id="completedList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="Completed">
+        </div>
+      </div>
+
+      <!-- R&R Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          R&R [<span id="rAndRCount" class="text-orange-600">0</span>]
+        </h3>
+        <div id="rAndRList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="R&R">
+        </div>
+      </div>
+
+      <!-- Rejected Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          Rejected [<span id="rejectedCount" class="text-red-600">0</span>]
+        </h3>
+        <div id="rejectedList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="Rejected">
+        </div>
+      </div>
+
+      <!-- Canceled Status Section -->
+      <div class="text-center">
+        <h3 class="text-lg font-semibold">
+          Canceled [<span id="canceledCount" class="text-gray-400">0</span>]
+        </h3>
+        <div id="canceledList" 
+          class="mt-4 border rounded-lg p-4 min-h-[200px] overflow-y-auto"
+          data-status="Canceled">
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

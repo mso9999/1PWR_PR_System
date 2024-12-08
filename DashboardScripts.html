@@ -1,0 +1,268 @@
+<!--*****************************************************************************************
+ * File: DashboardScripts.html
+ * Version: 1.1 (Restored from 11/29/2023)
+ * Last Updated: 2023-11-29
+ *
+ * Description:
+ *   Provides JavaScript functionality specific to the dashboard interface.
+ *   Handles dashboard interactions, data updates, filtering, and dynamic
+ *   UI updates.
+ *
+ * Relationship with Other Files:
+ *   - DashboardWeb.html: Main dashboard template
+ *   - DashboardStyles.html: Styling for elements
+ *   - Dashboard.gs: Backend controller
+ *   - SharedUtils.gs: Utility functions
+ *
+ * Google Sheet Data Framework:
+ *   - Interacts with dashboard data from:
+ *     * Master Log Sheet
+ *     * Status metrics
+ *     * User permissions
+ ******************************************************************************************-->
+
+/**
+ * 1PWR Procurement System - Dashboard JavaScript
+ * --------------------------------------------
+ * This script handles all client-side functionality for the procurement dashboard,
+ * including organization filtering, data loading, auto-refresh, and UI updates.
+ */
+
+//==============================================================================
+// Global State Management
+//==============================================================================
+let selectedOrg = '1PWR LESOTHO'; // Current selected organization (empty for all)
+let refreshInterval = null; // Auto-refresh interval handler
+let lastUpdateTime = null; // Last data update timestamp
+
+//==============================================================================
+// Status to Element ID Mapping
+//==============================================================================
+const statusCountIdMap = {
+    'Submitted': 'submittedCount',
+    'In Queue': 'inQueueCount',
+    'Ordered': 'orderedCount',
+    'Completed': 'completedCount',
+    'R&R': 'rAndRCount',
+    'Rejected': 'rejectedCount',
+    'Canceled': 'canceledCount'
+};
+
+const statusListIdMap = {
+    'Submitted': 'submittedList',
+    'In Queue': 'inQueueList',
+    'Ordered': 'orderedList',
+    'Completed': 'completedList',
+    'R&R': 'rAndRList',
+    'Rejected': 'rejectedList',
+    'Canceled': 'canceledList'
+};
+
+//==============================================================================
+// Initialization & Setup
+//==============================================================================
+function initializeDashboard() {
+    console.log('Starting dashboard initialization');
+    setupEventListeners();
+    startAutoRefresh();
+}
+
+function setupEventListeners() {
+    console.log('Setting up event listeners');
+
+    // Organization selection handling
+    const orgSelect = document.getElementById('orgSelect');
+    if (orgSelect) {
+        orgSelect.addEventListener('change', function() {
+            handleOrgChange(this.value);
+        });
+    }
+
+    // PR list item clicks
+    document.querySelectorAll('[id$="List"]').forEach(list => {
+        list.addEventListener('click', function(e) {
+            const prItem = e.target.closest('.pr-item');
+            if (prItem) {
+                const prNumber = prItem.getAttribute('data-pr');
+                if (prNumber) {
+                    viewPRDetails(prNumber);
+                }
+            }
+        });
+    });
+
+    // Visibility change handling for refresh management
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+}
+
+//==============================================================================
+// Data Loading & Dashboard Updates
+//==============================================================================
+function loadDashboardData() {
+    console.log('Loading dashboard data for org:', selectedOrg);
+    showLoading();
+
+    const sessionId = SessionUtils.getSessionId();
+    if (!sessionId) {
+        window.location.href = '?page=login';
+        return;
+    }
+
+    google.script.run
+        .withSuccessHandler(function(response) {
+            hideLoading();
+            if (!response || !response.success) {
+                if (response.sessionExpired) {
+                    window.location.href = '?page=login';
+                } else {
+                    showError(response.error || 'Failed to load dashboard data');
+                }
+                return;
+            }
+            updateDashboard(response.data);
+            updateLastUpdated(response.timestamp);
+        })
+        .withFailureHandler(function(error) {
+            console.error('Failed to load dashboard data:', error);
+            showError('Error loading dashboard data: ' + error);
+            hideLoading();
+        })
+        .getDashboardData(sessionId, selectedOrg);
+}
+
+function updateDashboard(data) {
+    console.log('Updating dashboard with data:', data);
+
+    // Update status counts
+    Object.entries(data.countsByStatus).forEach(([status, count]) => {
+        const countElementId = statusCountIdMap[status];
+        if (countElementId) {
+            const element = document.getElementById(countElementId);
+            if (element) element.textContent = count;
+        }
+    });
+
+    // Update PR lists
+    Object.entries(data.prs).forEach(([status, prs]) => {
+        const listElementId = statusListIdMap[status];
+        if (listElementId) {
+            const element = document.getElementById(listElementId);
+            if (element) element.innerHTML = generatePRList(prs);
+        }
+    });
+}
+
+function generatePRList(prs) {
+    if (!prs.length) {
+        return '<p class="text-gray-500 text-sm">No PRs</p>';
+    }
+
+    return prs.map(pr => `
+        <div class="pr-item hover:bg-gray-50 p-2 rounded mb-2" data-pr="${pr.prNumber}">
+            <div class="text-left">
+                <a href="#" onclick="viewPRDetails('${pr.prNumber}'); return false;" 
+                   class="font-medium text-blue-600 hover:text-blue-900">
+                    ${pr.prNumber}
+                </a>
+                <div class="text-sm text-gray-600 truncate" title="${pr.description}">
+                    ${pr.description}
+                </div>
+                <div class="text-xs text-gray-500">
+                    ${formatDate(pr.timestamp)} - ${pr.requestor}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+//==============================================================================
+// Navigation & Actions
+//==============================================================================
+function submitNewPR() {
+    const sessionId = SessionUtils.getSessionId();
+    if (!sessionId) {
+        window.location.href = '?page=login';
+        return;
+    }
+
+    window.location.href = `?page=form&sessionId=${encodeURIComponent(sessionId)}`;
+}
+
+function viewPRDetails(prNumber) {
+    const sessionId = SessionUtils.getSessionId();
+    if (!sessionId) {
+        window.location.href = '?page=login';
+        return;
+    }
+
+    window.location.href = `?page=prview&pr=${encodeURIComponent(prNumber)}&sessionId=${encodeURIComponent(sessionId)}`;
+}
+
+function viewSubmitted() {
+    const sessionId = SessionUtils.getSessionId();
+    if (!sessionId) {
+        window.location.href = '?page=login';
+        return;
+    }
+
+    window.location.href = `?page=submitted&sessionId=${encodeURIComponent(sessionId)}`;
+}
+
+//==============================================================================
+// UI Utilities
+//==============================================================================
+function showLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.remove('hidden');
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.classList.add('hidden');
+}
+
+function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'fixed top-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50';
+    errorDiv.innerHTML = `
+        <strong class="font-bold">Error:</strong>
+        <span class="block sm:inline">${message}</span>
+    `;
+    document.body.appendChild(errorDiv);
+    setTimeout(() => errorDiv.remove(), 5000);
+}
+
+function formatDate(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString();
+}
+
+function updateLastUpdated(timestamp) {
+    const element = document.getElementById('lastUpdate');
+    if (element) element.textContent = new Date(timestamp).toLocaleString();
+    lastUpdateTime = timestamp;
+}
+
+//==============================================================================
+// Auto-refresh Management
+//==============================================================================
+function startAutoRefresh() {
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(() => {
+        if (!document.hidden) loadDashboardData();
+    }, 300000); // 5 minutes
+}
+
+function handleVisibilityChange() {
+    if (document.hidden) {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+        }
+    } else {
+        loadDashboardData();
+        startAutoRefresh();
+    }
+} 

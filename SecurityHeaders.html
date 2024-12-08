@@ -1,0 +1,81 @@
+<!--*****************************************************************************************
+ * File: SecurityHeaders.html
+ * Version: 1.5.2
+ * Last Updated: 2023-12-08
+ *
+ * Description:
+ *   Provides security-related JavaScript functionality for the application.
+ *   Implements MutationObserver patch and safe navigation handling.
+ *
+ * Changes in 1.5.2:
+ *   - Fixed MutationObserver implementation
+ ******************************************************************************************-->
+
+<!-- Base meta tags -->
+<meta charset="UTF-8">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
+<?!= include('script'); ?>
+<?!= include('style'); ?>
+
+<script nonce="<?!= nonce ?>">
+// Initialize MutationObserver safely
+(function() {
+  if (typeof MutationObserver !== 'undefined') {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+          // Handle DOM changes here
+          console.log('DOM change detected');
+        }
+      });
+    });
+
+    // Start observing when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      const targetNode = document.body;
+      if (targetNode) {
+        observer.observe(targetNode, {
+          childList: true,
+          subtree: true
+        });
+      }
+    });
+  }
+})();
+
+// Safe navigation handling
+function safeNavigate(url) {
+  try {
+    if (!url) return;
+    
+    // Only allow specific domains
+    const allowedDomains = [
+      'script.google.com',
+      'googleusercontent.com'
+    ];
+    
+    const urlObj = new URL(url);
+    const isDomainAllowed = allowedDomains.some(domain => 
+      urlObj.hostname.endsWith(domain)
+    );
+    
+    if (!isDomainAllowed) {
+      console.error('Navigation blocked: domain not allowed');
+      return;
+    }
+    
+    // Use replace to avoid adding to browser history
+    window.top.location.replace(url);
+  } catch (error) {
+    console.error('Navigation error:', error);
+  }
+}
+
+// Handle form submissions
+document.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const form = e.target;
+  safeNavigate(form.action);
+});
+</script>
