@@ -1,9 +1,15 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.19
+ * @version 1.4.21
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.21 - 2024-12-08
+ * - Add session ID to error page when validation fails
+ * 
+ * 1.4.20 - 2024-12-08
+ * - Fix isLoginPage to get session ID from URL parameters
+ * 
  * 1.4.19 - 2024-12-08
  * - Move SPREADSHEET_ID into CONFIG object for consistency
  * 
@@ -187,7 +193,8 @@ function doGet(e) {
       
   } catch (error) {
     console.error('Error in doGet:', error);
-    return HtmlService.createHtmlOutput(createErrorPage(error.toString()))
+    const sessionId = getSessionIdFromUrl();
+    return HtmlService.createHtmlOutput(createErrorPage(error.toString(), sessionId))
       .setTitle('Error')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
   }
@@ -233,12 +240,14 @@ function include(filename) {
 /**
  * Creates an error page with the given message
  * @param {string} message - The error message to display
+ * @param {string} sessionId - Session ID to include in error page
  * @returns {HtmlOutput} The rendered error page
  */
-function createErrorPage(message) {
+function createErrorPage(message, sessionId) {
   try {
     const template = HtmlService.createTemplateFromFile('ErrorPage');
     template.message = message;
+    template.sessionId = sessionId;
     template.includeSharedStyles = include('SharedStyles');
     return template.evaluate()
       .setTitle('Error')
@@ -272,6 +281,7 @@ function createErrorPage(message) {
           <div class="container">
             <h1 class="error">Error</h1>
             <p>${message}</p>
+            <p>Session ID: ${sessionId}</p>
             <a href="<?= getWebAppUrl() ?>" class="button">Back to Home</a>
           </div>
         </body>
@@ -335,8 +345,19 @@ function getTemplateForUser() {
  * Page type checks
  */
 function isLoginPage() {
-  const sessionId = Session.getActiveUser().getEmail();
-  return !sessionId || !validateSession(sessionId);
+  const url = ScriptApp.getService().getUrl();
+  const params = new URL(url).searchParams;
+  const sessionId = params.get('sessionId');
+  console.log('Checking session:', sessionId);
+  
+  try {
+    const isValid = validateSession(sessionId);
+    console.log('Session validation result:', isValid);
+    return !sessionId || !isValid;
+  } catch (error) {
+    console.error('Error validating session:', error, 'sessionId:', sessionId);
+    return true;
+  }
 }
 
 function isPRFormPage() {
@@ -356,4 +377,10 @@ function getPageFromUrl() {
   const url = ScriptApp.getService().getUrl();
   const params = new URL(url).searchParams;
   return params.get('page') || '';
+}
+
+function getSessionIdFromUrl() {
+  const url = ScriptApp.getService().getUrl();
+  const params = new URL(url).searchParams;
+  return params.get('sessionId');
 }

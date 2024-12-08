@@ -1,11 +1,15 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.5
- * Last Updated: 2023-12-08
+ * Version: 1.6
+ * Last Updated: 2024-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
  *   Implements secure session storage using Google Apps Script Cache Service.
+ *
+ * Changes in 1.6:
+ *   - Added more logging to validateSession
+ *   - Improved error handling in session validation
  *
  * Changes in 1.5:
  *   - Updated to use CONFIG.SPREADSHEET_ID for consistency
@@ -143,14 +147,29 @@ function removeSession(sessionId) {
  * @return {boolean} Validity status
  */
 function validateSession(sessionId) {
-  const userInfo = getUserFromSession(sessionId);
-  if (!userInfo) {
+  console.log('Starting session validation for:', sessionId);
+  
+  if (!sessionId) {
+    console.log('No session ID provided');
     return false;
   }
 
-  // Refresh session
-  storeSession(sessionId, userInfo);
-  return true;
+  try {
+    const userInfo = getUserFromSession(sessionId);
+    console.log('User info from session:', userInfo ? 'found' : 'not found');
+    
+    if (!userInfo) {
+      return false;
+    }
+
+    // Refresh session
+    const refreshed = storeSession(sessionId, userInfo);
+    console.log('Session refresh status:', refreshed ? 'success' : 'failed');
+    return refreshed;
+  } catch (error) {
+    console.error('Session validation error:', error);
+    return false;
+  }
 }
 
 /**
