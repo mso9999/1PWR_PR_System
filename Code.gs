@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.2
+ * @version 1.4.3
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.3 - 2024-12-08
+ * - Remove setForceSsl as Apps Script enforces HTTPS by default
+ * 
  * 1.4.2 - 2024-12-08
  * - Fix setForceSsl implementation to use correct HtmlService method
  * 
@@ -98,9 +101,6 @@ function setSecurityHeaders(output) {
  * @returns {HtmlOutput} Secured HTML output
  */
 function createSecureHtmlOutput(content) {
-  // Set global security settings
-  HtmlService.setForceSsl(true);  // Force SSL for all requests
-  
   const output = HtmlService.createHtmlOutput(content)
     .setTitle('1PWR Purchase Request System')
     .setFaviconUrl('https://1pwrafrica.com/wp-content/uploads/2018/11/logo.png');
