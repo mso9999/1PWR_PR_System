@@ -1,11 +1,14 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.4
+ * Version: 1.5
  * Last Updated: 2023-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
  *   Implements secure session storage using Google Apps Script Cache Service.
+ *
+ * Changes in 1.5:
+ *   - Updated to use CONFIG.SPREADSHEET_ID for consistency
  *
  * Changes in 1.4:
  *   - Fixed session management error by consolidating duplicate functions
@@ -27,7 +30,7 @@ function authenticateUser(username, password) {
   console.log('Starting authentication for user:', username);
   
   try {
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID)
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
                                .getSheetByName('Requestor List');
     if (!sheet) {
       console.error('Requestor List sheet not found');
