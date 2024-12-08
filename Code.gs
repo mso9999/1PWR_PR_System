@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.21
+ * @version 1.4.22
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.22 - 2024-12-08
+ * - Fix URL parsing to work in Google Apps Script environment
+ * 
  * 1.4.21 - 2024-12-08
  * - Add session ID to error page when validation fails
  * 
@@ -342,12 +345,35 @@ function getTemplateForUser() {
 }
 
 /**
+ * Gets URL parameters from the current request
+ * @param {string} paramName - Name of parameter to get
+ * @returns {string} Parameter value or empty string
+ */
+function getUrlParameter(paramName) {
+  try {
+    const url = ScriptApp.getService().getUrl();
+    const params = url.split('?')[1];
+    if (!params) return '';
+    
+    const paramPairs = params.split('&');
+    for (const pair of paramPairs) {
+      const [key, value] = pair.split('=');
+      if (key === paramName) {
+        return decodeURIComponent(value || '');
+      }
+    }
+    return '';
+  } catch (error) {
+    console.error('Error getting URL parameter:', error);
+    return '';
+  }
+}
+
+/**
  * Page type checks
  */
 function isLoginPage() {
-  const url = ScriptApp.getService().getUrl();
-  const params = new URL(url).searchParams;
-  const sessionId = params.get('sessionId');
+  const sessionId = getUrlParameter('sessionId');
   console.log('Checking session:', sessionId);
   
   try {
@@ -361,26 +387,21 @@ function isLoginPage() {
 }
 
 function isPRFormPage() {
-  const page = getPageFromUrl();
-  return page === 'form' || page === '';
+  return getUrlParameter('page') === 'form' || getUrlParameter('page') === '';
 }
 
 function isPRViewPage() {
-  return getPageFromUrl() === 'view';
+  return getUrlParameter('page') === 'view';
 }
 
 function isDashboardPage() {
-  return getPageFromUrl() === 'dashboard';
+  return getUrlParameter('page') === 'dashboard';
 }
 
 function getPageFromUrl() {
-  const url = ScriptApp.getService().getUrl();
-  const params = new URL(url).searchParams;
-  return params.get('page') || '';
+  return getUrlParameter('page') || '';
 }
 
 function getSessionIdFromUrl() {
-  const url = ScriptApp.getService().getUrl();
-  const params = new URL(url).searchParams;
-  return params.get('sessionId');
+  return getUrlParameter('sessionId');
 }
