@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.25
+ * @version 1.4.26
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.26 - 2024-12-08
+ * - Add defensive template handling
+ * - Update include function to handle errors
+ * 
  * 1.4.25 - 2024-12-08
  * - Update template handling to always return login page by default
  * 
@@ -186,6 +190,85 @@ function createSecureHtmlOutput(content) {
 }
 
 /**
+ * Includes HTML files in templates
+ * @param {string} filename - Name of file to include
+ * @returns {string} File contents or empty string if error
+ */
+function include(filename) {
+  try {
+    if (!filename) return '';
+    return HtmlService.createHtmlOutputFromFile(filename).getContent();
+  } catch (error) {
+    console.error('Error including file:', filename, error);
+    return '';
+  }
+}
+
+/**
+ * Gets the template for the current user
+ * @returns {Template} The template for the current user
+ */
+function getTemplateForUser() {
+  const template = HtmlService.createTemplateFromFile('BaseTemplate');
+  
+  try {
+    // Common includes with error handling
+    template.includeSecurityHeaders = include('SecurityHeaders') || '';
+    template.includeSharedStyles = include('SharedStyles') || '';
+    template.includeScript = include('script') || '';
+    
+    // Initialize page specific includes
+    template.includePageSpecificStyles = '';
+    template.includePageSpecificScript = '';
+    template.includeHeader = '';
+    template.includeContent = '';
+    template.includeFooter = '';
+    
+    // Page specific content
+    if (isDashboardPage()) {
+      template.includeContent = include('DashboardPage') || '';
+      template.includePageSpecificScript = include('DashboardScripts') || '';
+      template.includePageSpecificStyles = include('DashboardStyles') || '';
+    } else if (isPRFormPage()) {
+      template.includeContent = include('PRFormPage') || '';
+      template.includePageSpecificScript = include('PRFormScripts') || '';
+      template.includeHeader = include('PRFormComponents') || '';
+    } else if (isPRViewPage()) {
+      template.includeContent = include('PRView') || '';
+      template.includePageSpecificScript = include('PRViewScripts') || '';
+    } else {
+      // Default to login page if no other page is selected or session is invalid
+      template.includeContent = include('LoginPage') || '';
+      template.includePageSpecificScript = include('LoginScripts') || '';
+    }
+    
+    return template;
+  } catch (error) {
+    console.error('Error getting template:', error);
+    
+    // Return minimal template on error
+    const errorTemplate = HtmlService.createTemplate(
+      '<!DOCTYPE html>' +
+      '<html>' +
+      '<head>' +
+      '<base target="_top">' +
+      '<title>Error</title>' +
+      '</head>' +
+      '<body>' +
+      '<div style="font-family: Arial, sans-serif; margin: 40px; max-width: 600px;">' +
+      '<h1 style="color: #d32f2f;">Error</h1>' +
+      '<p>' + error.toString() + '</p>' +
+      '<a href="' + ScriptApp.getService().getUrl() + '" style="display: inline-block; padding: 10px 20px; background-color: #1976d2; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px;">Back to Home</a>' +
+      '</div>' +
+      '</body>' +
+      '</html>'
+    );
+    
+    return errorTemplate;
+  }
+}
+
+/**
  * Handles GET requests and routing
  * @param {Object} e - Event object
  * @returns {HtmlOutput} Rendered page
@@ -198,52 +281,40 @@ function doGet(e) {
     
     // Get template based on user state
     const template = getTemplateForUser();
+    const output = template.evaluate();
     
-    return template
-      .evaluate()
-      .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    // Set standard options
+    output.setTitle('1PWR Purchase Request System')
+          .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+          .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+          .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+          .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    
+    return output;
       
   } catch (error) {
     console.error('Error in doGet:', error);
     
     // Create a basic error page without template
-    const errorHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Error</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1">
-          <style>
-            body { font-family: Arial, sans-serif; margin: 40px; }
-            .error { color: #d32f2f; }
-            .container { max-width: 600px; margin: 0 auto; }
-            .button {
-              display: inline-block;
-              padding: 10px 20px;
-              background-color: #1976d2;
-              color: white;
-              text-decoration: none;
-              border-radius: 4px;
-              margin-top: 20px;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <h1 class="error">Error</h1>
-            <p>${error.toString()}</p>
-            <p>Session ID: ${getSessionIdFromUrl() || 'none'}</p>
-            <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
-          </div>
-        </body>
-      </html>
-    `;
+    const errorHtml = HtmlService.createTemplate(
+      '<!DOCTYPE html>' +
+      '<html>' +
+      '<head>' +
+      '<base target="_top">' +
+      '<title>Error</title>' +
+      '</head>' +
+      '<body>' +
+      '<div style="font-family: Arial, sans-serif; margin: 40px; max-width: 600px;">' +
+      '<h1 style="color: #d32f2f;">Error</h1>' +
+      '<p>' + error.toString() + '</p>' +
+      '<p>Session ID: ' + (getSessionIdFromUrl() || 'none') + '</p>' +
+      '<a href="' + ScriptApp.getService().getUrl() + '" style="display: inline-block; padding: 10px 20px; background-color: #1976d2; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px;">Back to Home</a>' +
+      '</div>' +
+      '</body>' +
+      '</html>'
+    );
     
-    return HtmlService.createHtmlOutput(errorHtml)
+    return errorHtml.evaluate()
       .setTitle('Error')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
@@ -276,15 +347,6 @@ function handleAuthenticatedRoute(e, user) {
     default:
       return createErrorPage('Invalid page requested');
   }
-}
-
-/**
- * Includes HTML files in templates
- * @param {string} filename - Name of file to include
- * @returns {string} File contents
- */
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 /**
@@ -332,7 +394,7 @@ function createErrorPage(message, sessionId) {
             <h1 class="error">Error</h1>
             <p>${message}</p>
             <p>Session ID: ${sessionId}</p>
-            <a href="<?= getWebAppUrl() ?>" class="button">Back to Home</a>
+            <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
           </div>
         </body>
       </html>
@@ -350,87 +412,6 @@ function createErrorPage(message, sessionId) {
  */
 function getWebAppUrl(page = '') {
   return getWebAppUrlFromAuth(page);
-}
-
-/**
- * Gets the template for the current user
- * @returns {Template} The template for the current user
- */
-function getTemplateForUser() {
-  const template = HtmlService.createTemplateFromFile('BaseTemplate');
-  
-  // Common includes
-  template.includeSecurityHeaders = include('SecurityHeaders');
-  template.includeSharedStyles = include('SharedStyles');
-  template.includeScript = include('script');
-  
-  // Initialize page specific includes
-  template.includePageSpecificStyles = null;
-  template.includePageSpecificScript = null;
-  template.includeHeader = null;
-  template.includeContent = null;
-  template.includeFooter = null;
-  
-  // Page specific content
-  if (isDashboardPage()) {
-    template.includeContent = include('DashboardPage');
-    template.includePageSpecificScript = include('DashboardScripts');
-    template.includePageSpecificStyles = include('DashboardStyles');
-  } else if (isPRFormPage()) {
-    template.includeContent = include('PRFormPage');
-    template.includePageSpecificScript = include('PRFormScripts');
-    template.includeHeader = include('PRFormComponents');
-  } else if (isPRViewPage()) {
-    template.includeContent = include('PRView');
-    template.includePageSpecificScript = include('PRViewScripts');
-  } else {
-    // Default to login page if no other page is selected or session is invalid
-    template.includeContent = include('LoginPage');
-    template.includePageSpecificScript = include('LoginScripts');
-  }
-  
-  // Ensure all includes have a value to prevent null mode errors
-  template.includePageSpecificStyles = template.includePageSpecificStyles || '';
-  template.includePageSpecificScript = template.includePageSpecificScript || '';
-  template.includeHeader = template.includeHeader || '';
-  template.includeContent = template.includeContent || '';
-  template.includeFooter = template.includeFooter || '';
-  
-  return template;
-}
-
-// Store event object globally for parameter access
-let currentEvent = null;
-
-/**
- * Gets URL parameters from the current request
- * @param {string} paramName - Name of parameter to get
- * @returns {string} Parameter value or empty string
- */
-function getUrlParameter(paramName) {
-  try {
-    // First try to get parameter from event object
-    if (currentEvent && currentEvent.parameter && currentEvent.parameter[paramName]) {
-      return currentEvent.parameter[paramName];
-    }
-    
-    // Fallback to URL parsing if no event parameter
-    const url = ScriptApp.getService().getUrl();
-    const params = url.split('?')[1];
-    if (!params) return '';
-    
-    const paramPairs = params.split('&');
-    for (const pair of paramPairs) {
-      const [key, value] = pair.split('=');
-      if (key === paramName) {
-        return decodeURIComponent(value || '');
-      }
-    }
-    return '';
-  } catch (error) {
-    console.error('Error getting URL parameter:', error);
-    return '';
-  }
 }
 
 /**
@@ -469,3 +450,37 @@ function getPageFromUrl() {
 function getSessionIdFromUrl() {
   return getUrlParameter('sessionId');
 }
+
+/**
+ * Gets URL parameters from the current request
+ * @param {string} paramName - Name of parameter to get
+ * @returns {string} Parameter value or empty string
+ */
+function getUrlParameter(paramName) {
+  try {
+    // First try to get parameter from event object
+    if (currentEvent && currentEvent.parameter && currentEvent.parameter[paramName]) {
+      return currentEvent.parameter[paramName];
+    }
+    
+    // Fallback to URL parsing if no event parameter
+    const url = ScriptApp.getService().getUrl();
+    const params = url.split('?')[1];
+    if (!params) return '';
+    
+    const paramPairs = params.split('&');
+    for (const pair of paramPairs) {
+      const [key, value] = pair.split('=');
+      if (key === paramName) {
+        return decodeURIComponent(value || '');
+      }
+    }
+    return '';
+  } catch (error) {
+    console.error('Error getting URL parameter:', error);
+    return '';
+  }
+}
+
+// Store event object globally for parameter access
+let currentEvent = null;
