@@ -75,6 +75,28 @@ const COL = {
 };
 
 /**
+ * Sets security headers for the HTML output
+ * @param {HtmlOutput} output - The HTML output to set headers for
+ * @returns {HtmlOutput} The HTML output with headers set
+ */
+function setSecurityHeaders(output) {
+  const headers = output.getXFrameOptionsMode();
+  headers.append('Content-Security-Policy', 
+    "default-src 'self' https://script.google.com https://*.googleusercontent.com; " +
+    "script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
+    "style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; " +
+    "frame-ancestors 'self'");
+  headers.append('X-Frame-Options', 'SAMEORIGIN');
+  headers.append('X-Content-Type-Options', 'nosniff');
+  headers.append('Permissions-Policy', 
+    'accelerometer=(), autoplay=(), camera=(), display-capture=(), document-domain=(), ' +
+    'encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), ' +
+    'microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), ' +
+    'screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()');
+  return output;
+}
+
+/**
  * Handles GET requests and routing
  * @param {Object} e - Event object
  * @returns {HtmlOutput} Rendered page
@@ -86,20 +108,20 @@ function doGet(e) {
     // Check for session
     const sessionId = e.parameter.sid;
     if (!sessionId) {
-      return serveLoginPage();
+      return setSecurityHeaders(serveLoginPage());
     }
     
     const user = getCurrentUserFromAuth(sessionId);
     if (!user) {
-      return serveLoginPage('Session expired');
+      return setSecurityHeaders(serveLoginPage('Session expired'));
     }
     
     // Route to appropriate page
-    return handleAuthenticatedRoute(e, user);
+    return setSecurityHeaders(handleAuthenticatedRoute(e, user));
     
   } catch (error) {
     console.error('Error processing request:', error);
-    return createErrorPage(error.toString());
+    return setSecurityHeaders(createErrorPage(error.toString()));
   }
 }
 

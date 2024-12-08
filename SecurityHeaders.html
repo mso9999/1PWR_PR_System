@@ -1,25 +1,26 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.5.3
+ * Version: 1.5.4
  * Last Updated: 2023-12-08
  *
  * Description:
  *   Provides security-related JavaScript functionality for the application.
  *   Implements MutationObserver patch and safe navigation handling.
  *
- * Changes in 1.5.3:
- *   - Added strict Content Security Policy
- *   - Added Feature-Policy headers
- *   - Improved iframe sandbox configuration
+ * Changes in 1.5.4:
+ *   - Removed meta CSP headers (now handled by HTTP headers)
+ *   - Updated Permissions-Policy to use supported features only
+ *   - Removed meta X-Frame-Options (now handled by HTTP headers)
+ *   - Enhanced iframe sandbox security
  ******************************************************************************************-->
 
 <!-- Base meta tags -->
 <meta charset="UTF-8">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https://script.google.com https://*.googleusercontent.com; script-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://script.google.com https://*.googleusercontent.com; frame-ancestors 'self';">
-<meta http-equiv="Permissions-Policy" content="accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()">
-<meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
+
+<!-- Updated Permissions-Policy with only supported features -->
+<meta http-equiv="Permissions-Policy" content="accelerometer=(), autoplay=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()">
 
 <?!= include('script'); ?>
 <?!= include('style'); ?>
@@ -36,11 +37,11 @@
           for (let iframe of elements) {
             // Set secure sandbox attributes for iframes
             if (iframe.hasAttribute('sandbox')) {
-              const currentSandbox = iframe.getAttribute('sandbox').split(' ');
-              if (currentSandbox.includes('allow-scripts') && currentSandbox.includes('allow-same-origin')) {
-                // Remove allow-same-origin if allow-scripts is present
-                iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
-              }
+              // Never allow both allow-scripts and allow-same-origin
+              iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
+            } else {
+              // Add sandbox attribute if missing
+              iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
             }
           }
         }
@@ -91,3 +92,4 @@ document.addEventListener('submit', function(e) {
     console.warn('Form submission blocked: Missing data-safe-submit attribute');
   }
 });
+</script>
