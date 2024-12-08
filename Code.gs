@@ -81,7 +81,7 @@ const COL = {
  */
 function setSecurityHeaders(output) {
   // Set X-Frame-Options using Apps Script's built-in method
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.SAMEORIGIN);
+  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   
   // Set sandbox mode for additional security
   output.setSandboxMode(HtmlService.SandboxMode.IFRAME);
