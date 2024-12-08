@@ -1,61 +1,57 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Error - 1PWR PR System</title>
-    <?!= include('SecurityHeaders'); ?>
-    <?!= include('SharedStyles'); ?>
-    <style>
-      .error-container {
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 20px;
-        text-align: center;
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      }
-      
-      .error-icon {
-        font-size: 48px;
-        color: #dc3545;
-        margin-bottom: 20px;
-      }
-      
-      .error-message {
-        color: #343a40;
-        font-size: 18px;
-        margin-bottom: 20px;
-        line-height: 1.5;
-      }
-      
-      .back-button {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #007bff;
-        color: white;
-        text-decoration: none;
-        border-radius: 4px;
-        transition: background-color 0.3s;
-      }
-      
-      .back-button:hover {
-        background-color: #0056b3;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="error-container">
-      <div class="error-icon">⚠️</div>
-      <h1>Oops! Something went wrong</h1>
-      <div class="error-message">
-        <?= message ?>
-      </div>
-      <a href="<?= getWebAppUrlFromAuth() ?>" class="back-button">Back to Dashboard</a>
-    </div>
-    
-    <?!= include('script'); ?>
-  </body>
-</html>
+<!--*****************************************************************************************
+ * File: ErrorPage.html
+ * Version: 1.0.0
+ * Last Updated: 2024-12-08
+ *
+ * Description:
+ *   Error page template that extends BaseTemplate.html. Displays error messages to users
+ *   in a user-friendly format with an option to return to the previous page.
+ *******************************************************************************************/
+-->
+
+<style>
+  .error-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .error-icon {
+    font-size: 48px;
+    color: #dc3545;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    color: #343a40;
+    font-size: 18px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .back-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+  }
+  
+  .back-button:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+<div class="error-container">
+  <div class="error-icon">⚠️</div>
+  <div class="error-message">
+    <?= message ?>
+  </div>
+  <a href="javascript:window.history.back();" class="back-button">Go Back</a>
+</div>

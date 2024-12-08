@@ -1,9 +1,12 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.11
+ * @version 1.4.12
  * @lastModified 2024-12-08
  * 
  * Change Log:
+ * 1.4.12 - 2024-12-08
+ * - Update ErrorPage.html to use BaseTemplate structure
+ * 
  * 1.4.11 - 2024-12-08
  * - Fix style include in ErrorPage.html to use include function directly
  * 
