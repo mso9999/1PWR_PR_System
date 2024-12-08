@@ -1,11 +1,14 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.5.4
- * Last Updated: 2023-12-08
+ * Version: 1.5.5
+ * Last Updated: 2024-12-08
  *
  * Description:
- *   Provides security-related JavaScript functionality for the application.
- *   Implements MutationObserver patch and safe navigation handling.
+ *   Provides security-related meta tags and headers for the application.
+ *
+ * Changes in 1.5.5:
+ *   - Removed redundant script and style includes
+ *   - Fixed nonce handling
  *
  * Changes in 1.5.4:
  *   - Removed meta CSP headers (now handled by HTTP headers)
@@ -20,89 +23,46 @@
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 
 <!-- Updated Permissions-Policy with only supported features -->
-<meta http-equiv="Permissions-Policy" content="
-  accelerometer=(),
-  autoplay=(),
-  camera=(),
-  cross-origin-isolated=(),
-  display-capture=(),
-  encrypted-media=(),
-  fullscreen=(),
-  geolocation=(),
-  gyroscope=(),
-  keyboard-map=(),
-  magnetometer=(),
-  microphone=(),
-  midi=(),
-  payment=(),
-  picture-in-picture=(),
-  publickey-credentials-get=(),
-  screen-wake-lock=(),
-  sync-xhr=(),
-  usb=(),
-  web-share=(),
-  xr-spatial-tracking=()">
+<meta http-equiv="Permissions-Policy" content="accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(),usb=(),web-share=(),xr-spatial-tracking=()">
 
-<?!= include('script'); ?>
-<?!= include('style'); ?>
-
-<script nonce="<?!= nonce ?>">
+<script>
 // Initialize MutationObserver safely
 (function() {
-  if (typeof MutationObserver !== 'undefined') {
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList') {
-          // Handle DOM changes here
-          const elements = mutation.target.getElementsByTagName('iframe');
-          for (let iframe of elements) {
-            // Set secure sandbox attributes for iframes
-            if (iframe.hasAttribute('sandbox')) {
-              // Never allow both allow-scripts and allow-same-origin
-              iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
-            } else {
-              // Add sandbox attribute if missing
-              iframe.setAttribute('sandbox', 'allow-scripts allow-forms allow-popups');
-            }
+  'use strict';
+  
+  // Patch MutationObserver to prevent XSS
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach(function(node) {
+          if (node.tagName === 'SCRIPT' && !node.hasAttribute('nonce')) {
+            node.remove();
           }
-        }
-      });
-    });
-
-    // Start observing when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-      const targetNode = document.body;
-      if (targetNode) {
-        observer.observe(targetNode, {
-          childList: true,
-          subtree: true
         });
       }
     });
-  }
+  });
+  
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true
+  });
 })();
 
-// Safe navigation handling
+// Safe URL navigation
 function safeNavigate(url) {
+  if (!url) return false;
+  
   try {
-    if (!url) return;
-    
-    // Validate URL
     const urlObj = new URL(url, window.location.origin);
-    const allowedDomains = [
-      'script.google.com',
-      'google.com',
-      window.location.hostname
-    ];
-    
-    if (allowedDomains.some(domain => urlObj.hostname.endsWith(domain))) {
-      window.location.href = urlObj.href;
-    } else {
-      console.error('Navigation blocked: Invalid domain');
+    if (urlObj.origin === window.location.origin) {
+      window.location.href = url;
+      return true;
     }
-  } catch (error) {
-    console.error('Navigation error:', error);
+  } catch (e) {
+    console.error('Invalid URL:', e);
   }
+  return false;
 }
 
 // Handle form submissions
@@ -110,7 +70,7 @@ document.addEventListener('submit', function(e) {
   const form = e.target;
   if (!form.hasAttribute('data-safe-submit')) {
     e.preventDefault();
-    console.warn('Form submission blocked: Missing data-safe-submit attribute');
+    return false;
   }
 });
 </script>

@@ -1,12 +1,16 @@
 <!--*****************************************************************************************
  * File: BaseTemplate.html
- * Version: 1.0.1
+ * Version: 1.0.2
  * Last Updated: 2024-12-08
  *
  * Description:
  *   Base template for all pages in the PR System. Provides common structure and includes
  *   for styles, scripts, and security headers. Pages extend this template by providing
  *   their specific content and scripts.
+ *
+ * Changes in 1.0.2:
+ *   - Added null checks for all includes
+ *   - Fixed template evaluation
  *
  * Dependencies:
  *   - SecurityHeaders.html: Security configuration
@@ -18,25 +22,22 @@
 <html>
 <head>
   <base target="_top">
-  <?!= includeSecurityHeaders ?>
-  <?!= includeSharedStyles ?>
-  <?!= includeScript ?>
+  <?!= includeSecurityHeaders || '' ?>
+  <?!= includeSharedStyles || '' ?>
+  <?!= includeScript || '' ?>
   <?!= includePageSpecificStyles || '' ?>
   <?!= includePageSpecificScript || '' ?>
+  <title>1PWR Purchase Request System</title>
 </head>
 <body>
   <div id="app">
-    <header>
-      <?!= includeHeader || '' ?>
-    </header>
+    <?!= includeHeader || '' ?>
     
     <main>
-      <?!= includeContent ?>
+      <?!= includeContent || '' ?>
     </main>
     
-    <footer>
-      <?!= includeFooter || '' ?>
-    </footer>
+    <?!= includeFooter || '' ?>
   </div>
 </body>
 </html>
