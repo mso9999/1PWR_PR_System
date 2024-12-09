@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.32
+ * @version 1.4.33
  * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.33 - 2024-12-09
+ * - Simplify template creation using createTemplateFromFile
+ * - Fix sandbox mode error in template handling
+ * 
  * 1.4.32 - 2024-12-09
  * - Fix template mode error by using createHtmlOutput
  * - Simplify template creation process
@@ -235,24 +239,10 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create base HTML output with sandbox mode
-    const output = HtmlService.createHtmlOutput()
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setTitle('1PWR Purchase Request System')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
-
-    // Get base template content
-    const baseTemplateContent = HtmlService.createHtmlOutputFromFile('BaseTemplate').getContent();
-    if (!baseTemplateContent) {
-      throw new Error('Base template content is empty');
-    }
-    
-    // Create template
-    const template = HtmlService.createTemplate(baseTemplateContent);
+    // Create template directly from file
+    const template = HtmlService.createTemplateFromFile('BaseTemplate');
     if (!template) {
-      throw new Error('Failed to create template from base content');
+      throw new Error('Failed to create template from base file');
     }
     
     // Common includes with error handling
@@ -285,14 +275,13 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Evaluate template and set content
-    const evaluated = template.evaluate();
-    if (!evaluated) {
-      throw new Error('Failed to evaluate template');
-    }
-    
-    output.setContent(evaluated.getContent());
-    return output;
+    // Return evaluated template with all options
+    return template.evaluate()
+      .setTitle('1PWR Purchase Request System')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
       
   } catch (error) {
     console.error('Error getting template:', error);
@@ -306,6 +295,7 @@ function getTemplateForUser() {
  * @returns {HtmlOutput} The error page
  */
 function createErrorPage(error) {
+  // Create a simple error page without using templates
   const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -341,24 +331,17 @@ function createErrorPage(error) {
       text-decoration: none;
       border-radius: 4px;
       margin-top: 20px;
-      transition: background-color 0.2s;
     }
     .button:hover {
       background-color: #1565c0;
-    }
-    .session-id {
-      color: #666;
-      font-size: 0.9em;
-      margin-top: 1rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1 class="error">Error</h1>
-    <p>${error.toString()}</p>
-    <p class="session-id">Session ID: ${getSessionIdFromUrl() || 'none'}</p>
-    <a href="${ScriptApp.getService().getUrl()}" class="button">Back to Home</a>
+    <h2 class="error">Error</h2>
+    <p>${error}</p>
+    <a href="/" class="button">Return to Login</a>
   </div>
 </body>
 </html>`;
@@ -366,7 +349,8 @@ function createErrorPage(error) {
   return HtmlService.createHtmlOutput(html)
     .setTitle('Error')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY);
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 /**
