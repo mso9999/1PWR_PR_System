@@ -14,5 +14,15 @@
     "https://www.googleapis.com/auth/userinfo.email",
     "https://www.googleapis.com/auth/gmail.send",
     "https://mail.google.com/"
-  ]
+  ],
+  "executionApi": {
+    "access": "ANYONE"
+  },
+  "sheets": {
+    "macros": [{
+      "menuName": "1PWR Purchase Request System",
+      "functionName": "onOpen",
+      "defaultShortcut": "Ctrl+Alt+Shift+1"
+    }]
+  }
 }
