@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.34
+ * @version 1.4.35
  * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.35 - 2024-12-09
+ * - Fix template sandbox mode handling
+ * - Properly set sandbox mode on template creation
+ * 
  * 1.4.34 - 2024-12-09
  * - Set sandbox mode before template evaluation
  * - Fix template evaluation with force sandbox mode
@@ -243,11 +247,10 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Set sandbox mode first
-    HtmlService.setDefaultSandboxMode(HtmlService.SandboxMode.IFRAME);
+    // Create template with sandbox mode
+    const template = HtmlService.createTemplateFromFile('BaseTemplate')
+      .setTitle('1PWR Purchase Request System');
     
-    // Create template from file with sandbox mode already set
-    const template = HtmlService.createTemplateFromFile('BaseTemplate');
     if (!template) {
       throw new Error('Failed to create template from base file');
     }
@@ -282,12 +285,22 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Return evaluated template with all options
-    return template.evaluate()
+    // Create HTML output with sandbox mode
+    const output = HtmlService.createHtmlOutput()
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setTitle('1PWR Purchase Request System')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    
+    // Evaluate template and set content
+    const evaluated = template.evaluate();
+    if (!evaluated) {
+      throw new Error('Failed to evaluate template');
+    }
+    
+    output.setContent(evaluated.getContent());
+    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
