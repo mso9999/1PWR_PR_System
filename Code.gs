@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.29
- * @lastModified 2024-12-08
+ * @version 1.4.30
+ * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.30 - 2024-12-09
+ * - Update SPREADSHEET_ID to point to correct Google Sheet
+ * - Fix spreadsheet reference for PR system
+ * 
  * 1.4.29 - 2024-12-08
  * - Fix sandbox mode setting by moving it after template evaluation
  * - Add more error handling for template creation
@@ -117,7 +121,7 @@
  * Configuration constants
  */
 const CONFIG = {
-  SPREADSHEET_ID: '1QvvmP6mKJJgUe9LJJzKZQyLyiXIDCQFmRchbpGHxQtg',
+  SPREADSHEET_ID: '12QgLxtavdCa9FkfTeMDogXA0COYBCxmUZKHDXybOzaU',
   SHEETS: {
     MASTER_LOG: 'Master Log',
     PR_TRACKER: 'PR Number Tracker',
