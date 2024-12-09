@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.30
+ * @version 1.4.31
  * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.31 - 2024-12-09
+ * - Fix template mode error by setting sandbox mode on HtmlOutput
+ * - Add error handling for template creation and evaluation
+ * 
  * 1.4.30 - 2024-12-09
  * - Update SPREADSHEET_ID to point to correct Google Sheet
  * - Fix spreadsheet reference for PR system
@@ -228,7 +232,16 @@ function include(filename) {
 function getTemplateForUser() {
   try {
     // Get base template content
-    const baseTemplateContent = HtmlService.createHtmlOutputFromFile('BaseTemplate').getContent();
+    const baseTemplate = HtmlService.createHtmlOutputFromFile('BaseTemplate');
+    if (!baseTemplate) {
+      throw new Error('Failed to create base template');
+    }
+    
+    // Set sandbox mode on the base template
+    baseTemplate.setSandboxMode(HtmlService.SandboxMode.IFRAME);
+    
+    // Get the content after setting sandbox mode
+    const baseTemplateContent = baseTemplate.getContent();
     if (!baseTemplateContent) {
       throw new Error('Base template content is empty');
     }
@@ -278,7 +291,6 @@ function getTemplateForUser() {
     // Then set all the options
     return evaluated
       .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
