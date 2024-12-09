@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.31
+ * @version 1.4.32
  * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.32 - 2024-12-09
+ * - Fix template mode error by using createHtmlOutput
+ * - Simplify template creation process
+ * 
  * 1.4.31 - 2024-12-09
  * - Fix template mode error by setting sandbox mode on HtmlOutput
  * - Add error handling for template creation and evaluation
@@ -231,17 +235,16 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
+    // Create base HTML output with sandbox mode
+    const output = HtmlService.createHtmlOutput()
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setTitle('1PWR Purchase Request System')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+
     // Get base template content
-    const baseTemplate = HtmlService.createHtmlOutputFromFile('BaseTemplate');
-    if (!baseTemplate) {
-      throw new Error('Failed to create base template');
-    }
-    
-    // Set sandbox mode on the base template
-    baseTemplate.setSandboxMode(HtmlService.SandboxMode.IFRAME);
-    
-    // Get the content after setting sandbox mode
-    const baseTemplateContent = baseTemplate.getContent();
+    const baseTemplateContent = HtmlService.createHtmlOutputFromFile('BaseTemplate').getContent();
     if (!baseTemplateContent) {
       throw new Error('Base template content is empty');
     }
@@ -282,18 +285,14 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Evaluate template first
+    // Evaluate template and set content
     const evaluated = template.evaluate();
     if (!evaluated) {
       throw new Error('Failed to evaluate template');
     }
     
-    // Then set all the options
-    return evaluated
-      .setTitle('1PWR Purchase Request System')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    output.setContent(evaluated.getContent());
+    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
