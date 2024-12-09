@@ -1,9 +1,13 @@
 /*******************************************************************************************
  * Main Code.gs file for the 1PWR Purchase Request System
- * @version 1.4.33
+ * @version 1.4.34
  * @lastModified 2024-12-09
  * 
  * Change Log:
+ * 1.4.34 - 2024-12-09
+ * - Set sandbox mode before template evaluation
+ * - Fix template evaluation with force sandbox mode
+ * 
  * 1.4.33 - 2024-12-09
  * - Simplify template creation using createTemplateFromFile
  * - Fix sandbox mode error in template handling
@@ -239,7 +243,10 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create template directly from file
+    // Set sandbox mode first
+    HtmlService.setDefaultSandboxMode(HtmlService.SandboxMode.IFRAME);
+    
+    // Create template from file with sandbox mode already set
     const template = HtmlService.createTemplateFromFile('BaseTemplate');
     if (!template) {
       throw new Error('Failed to create template from base file');
@@ -278,14 +285,13 @@ function getTemplateForUser() {
     // Return evaluated template with all options
     return template.evaluate()
       .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
       
   } catch (error) {
     console.error('Error getting template:', error);
-    return createErrorPage('Error loading page: ' + error.message);
+    return createErrorPage(error);
   }
 }
 
