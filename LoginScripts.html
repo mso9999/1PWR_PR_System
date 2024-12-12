@@ -39,42 +39,42 @@ function loadUserList() {
   console.log('Clearing error message');
   errorMessage.style.display = 'none';
   
-  console.log('Calling getRequestorList()...');
+  console.log('Calling google.script.run.getActiveRequestors()...');
   google.script.run
-    .withSuccessHandler(function(response) {
-      console.log('getRequestorList response:', response);
-      if (!response || !response.success) {
-        console.error('Failed to load requestors:', response ? response.error : 'No response');
-        errorMessage.textContent = response ? response.error : 'Failed to load user list';
-        errorMessage.style.display = 'block';
+    .withSuccessHandler(function(users) {
+      console.log('getActiveRequestors success, users:', users);
+      if (!users || !Array.isArray(users)) {
+        console.error('Invalid users data received:', users);
         return;
       }
-
-      console.log(`Found ${response.requestors.length} requestors`);
-
-      // Clear existing options except the first one
-      console.log('Clearing existing options');
-      while (select.options.length > 1) {
-        select.remove(1);
-      }
       
-      // Add active requestors to the dropdown
-      console.log('Adding requestors to dropdown');
-      response.requestors.forEach(function(user) {
+      // Clear existing options
+      select.innerHTML = '';
+      
+      // Add default option
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = '-- Select User --';
+      select.appendChild(defaultOption);
+      
+      // Add user options
+      users.forEach(function(user) {
+        console.log('Adding user:', user);
         const option = document.createElement('option');
-        option.value = user.name;
-        option.textContent = user.name;
+        option.value = user;
+        option.textContent = user;
         select.appendChild(option);
       });
-      console.log('Finished adding requestors');
+      
+      console.log('User list populated successfully');
     })
     .withFailureHandler(function(error) {
-      console.error('Error loading user list:', error);
+      console.error('Failed to load users:', error);
       errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
       errorMessage.style.display = 'block';
     })
-    .getRequestorList();
-  console.log('getRequestorList() called');
+    .getActiveRequestors();
+  console.log('getActiveRequestors() called');
 }
 
 function handleLogin(event) {
