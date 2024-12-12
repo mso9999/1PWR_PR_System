@@ -379,6 +379,42 @@ function handleAuthenticatedRoute(e, user) {
 }
 
 /**
+ * Serves the dashboard page with data for the authenticated user
+ * @param {Object} user - Authenticated user object
+ * @returns {HtmlOutput} Dashboard page
+ */
+function serveDashboard(user) {
+  try {
+    // Get organization from URL parameter or default to empty (all orgs)
+    const organization = getUrlParameter('org') || '';
+    
+    // Get dashboard data
+    const dashboardData = getDashboardData(organization);
+    
+    // Create template data object
+    const templateData = {
+      user: user,
+      data: dashboardData,
+      organizations: getActiveOrganizations()
+    };
+
+    // Create HTML template
+    const template = HtmlService.createTemplateFromFile('DashboardPage');
+    template.data = templateData;
+    
+    // Evaluate template and set security headers
+    const output = template.evaluate()
+      .setTitle('1PWR PR System - Dashboard')
+      .setFaviconUrl('https://www.google.com/favicon.ico');
+    
+    return setSecurityHeaders(output);
+  } catch (error) {
+    console.error('Error serving dashboard:', error);
+    return createErrorPage('Failed to load dashboard. Please try again later.');
+  }
+}
+
+/**
  * Gets the web app URL
  * @param {string} page - Optional page parameter
  * @returns {string} Web app URL
