@@ -42,11 +42,21 @@ function authenticateUser(username, password) {
     }
 
     const data = sheet.getDataRange().getValues();
-    const userRow = data.find(row => 
-      row[0].toString().toLowerCase() === username.toLowerCase() && 
-      row[4] === password && 
-      row[5] === 'Y'
-    );
+    console.log('Found', data.length, 'rows in Requestor List');
+    console.log('Header row:', data[0]);
+    
+    // Find user row where:
+    // Column A (index 0) = Name
+    // Column E (index 4) = Password
+    // Column D (index 3) = Active status ('Y')
+    const userRow = data.find(row => {
+      const nameMatch = row[0].toString().toLowerCase() === username.toLowerCase();
+      const passwordMatch = row[4] === password;
+      const isActive = row[3] === 'Y';
+      
+      console.log(`Checking row: name=${nameMatch}, password=${passwordMatch}, active=${isActive}`);
+      return nameMatch && passwordMatch && isActive;
+    });
 
     if (!userRow) {
       console.log('Authentication failed for user:', username);
@@ -56,10 +66,10 @@ function authenticateUser(username, password) {
     // Create session
     const sessionId = Utilities.getUuid();
     const userInfo = {
-      name: userRow[0],
-      email: userRow[1],
-      department: userRow[2],
-      role: userRow[3],
+      name: userRow[0],    // Name (Column A)
+      email: userRow[1],   // Email (Column B)
+      department: userRow[2], // Department (Column C)
+      role: userRow[5],    // Role (Column F)
       timestamp: new Date().toISOString()
     };
 
