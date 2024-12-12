@@ -247,7 +247,10 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create template with a simpler approach
+    // First set the default sandbox mode globally
+    HtmlService.setDefaultSandboxMode(HtmlService.SandboxMode.IFRAME);
+    
+    // Create template
     const template = HtmlService.createTemplateFromFile('BaseTemplate');
     
     // Common includes with error handling
@@ -280,13 +283,14 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Return evaluated template with minimal configuration
-    return template.evaluate()
+    // First evaluate the template
+    const output = template.evaluate()
       .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
+      
+    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
