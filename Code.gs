@@ -285,19 +285,21 @@ function getTemplateForUser() {
     }
     
     // Evaluate template and configure output
-    const output = template.evaluate();
+    const evaluated = template.evaluate();
     
-    if (!output) {
+    if (!evaluated) {
       throw new Error('Failed to evaluate template');
     }
     
-    // Configure HTML output settings
-    return output
+    // Create HTML output with proper sandbox mode
+    const output = HtmlService.createHtmlOutput(evaluated.getContent())
       .setTitle('1PWR Purchase Request System')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    
+    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
