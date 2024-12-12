@@ -19,144 +19,175 @@
  ******************************************************************************************-->
 
 <script>
-// Initialize login form and load user list
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, initializing login form');
-  console.log('Calling loadUserList()...');
-  loadUserList();
-});
+// Wrap everything in a try-catch to catch any initialization errors
+try {
+  console.log('LoginScripts.html loaded');
+  
+  // Initialize login form and load user list
+  document.addEventListener('DOMContentLoaded', function() {
+    try {
+      console.log('DOM loaded, initializing login form');
+      console.log('Calling loadUserList()...');
+      loadUserList();
+    } catch (error) {
+      console.error('Error in DOMContentLoaded handler:', error);
+    }
+  });
 
-function loadUserList() {
-  console.log('loadUserList() started');
-  const select = document.getElementById('userName');
-  const errorMessage = document.getElementById('errorMessage');
-  
-  if (!select) {
-    console.error('userName select element not found');
-    return;
-  }
-  
-  console.log('Clearing error message');
-  errorMessage.style.display = 'none';
-  
-  console.log('Calling google.script.run.getRequestorList()...');
-  google.script.run
-    .withSuccessHandler(function(response) {
-      console.log('getRequestorList success, response:', response);
-      if (!response || !response.success) {
-        console.error('Failed to load requestors:', response ? response.error : 'No response');
-        if (errorMessage) {
-          errorMessage.textContent = response ? response.error : 'Failed to load user list';
-          errorMessage.style.display = 'block';
-        }
-        return;
-      }
-      
-      const users = response.requestors;
-      console.log(`Found ${users.length} requestors`);
-      
-      // Clear existing options
-      select.innerHTML = '';
-      
-      // Add default option
-      const defaultOption = document.createElement('option');
-      defaultOption.value = '';
-      defaultOption.textContent = '-- Select User --';
-      select.appendChild(defaultOption);
-      
-      // Add user options
-      users.forEach(function(user) {
-        console.log('Adding user:', user.name);
-        const option = document.createElement('option');
-        option.value = user.name;
-        option.textContent = user.name;
-        select.appendChild(option);
-      });
-      
-      console.log('User list populated successfully');
-    })
-    .withFailureHandler(function(error) {
-      console.error('Failed to load users:', error);
+  function loadUserList() {
+    console.log('loadUserList() started');
+    const select = document.getElementById('userName');
+    const errorMessage = document.getElementById('errorMessage');
+    
+    if (!select) {
+      const error = 'userName select element not found';
+      console.error(error);
       if (errorMessage) {
-        errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
+        errorMessage.textContent = error;
         errorMessage.style.display = 'block';
       }
-    })
-    .getRequestorList();
-  console.log('getRequestorList() called');
-}
-
-function handleLogin(event) {
-  event.preventDefault();
-  
-  const usernameSelect = document.getElementById('userName');
-  const passwordInput = document.getElementById('password');
-  const errorMessage = document.getElementById('errorMessage');
-  errorMessage.style.display = 'none';
-  
-  const username = usernameSelect.value.trim();
-  const password = passwordInput.value.trim();
-  
-  if (!username) {
-    errorMessage.textContent = 'Please select your name';
-    errorMessage.style.display = 'block';
-    return;
+      return;
+    }
+    
+    if (!google || !google.script || !google.script.run) {
+      const error = 'google.script.run not available';
+      console.error(error);
+      if (errorMessage) {
+        errorMessage.textContent = error;
+        errorMessage.style.display = 'block';
+      }
+      return;
+    }
+    
+    console.log('Clearing error message');
+    errorMessage.style.display = 'none';
+    
+    console.log('Calling google.script.run.getRequestorList()...');
+    google.script.run
+      .withSuccessHandler(function(response) {
+        console.log('getRequestorList success, response:', response);
+        if (!response || !response.success) {
+          console.error('Failed to load requestors:', response ? response.error : 'No response');
+          if (errorMessage) {
+            errorMessage.textContent = response ? response.error : 'Failed to load user list';
+            errorMessage.style.display = 'block';
+          }
+          return;
+        }
+        
+        const users = response.requestors;
+        console.log(`Found ${users.length} requestors`);
+        
+        // Clear existing options
+        select.innerHTML = '';
+        
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = '-- Select User --';
+        select.appendChild(defaultOption);
+        
+        // Add user options
+        users.forEach(function(user) {
+          console.log('Adding user:', user.name);
+          const option = document.createElement('option');
+          option.value = user.name;
+          option.textContent = user.name;
+          select.appendChild(option);
+        });
+        
+        console.log('User list populated successfully');
+      })
+      .withFailureHandler(function(error) {
+        console.error('Failed to load users:', error);
+        if (errorMessage) {
+          errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
+          errorMessage.style.display = 'block';
+        }
+      })
+      .getRequestorList();
+    console.log('getRequestorList() called');
   }
-  
-  if (!password) {
-    errorMessage.textContent = 'Please enter your password';
-    errorMessage.style.display = 'block';
-    return;
-  }
 
-  // Show loading state
-  const submitButton = event.target.querySelector('button');
-  const originalText = submitButton.textContent;
-  submitButton.disabled = true;
-  submitButton.textContent = 'Logging in...';
+  function handleLogin(event) {
+    event.preventDefault();
+    
+    const usernameSelect = document.getElementById('userName');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.style.display = 'none';
+    
+    const username = usernameSelect.value.trim();
+    const password = passwordInput.value.trim();
+    
+    if (!username) {
+      errorMessage.textContent = 'Please select your name';
+      errorMessage.style.display = 'block';
+      return;
+    }
+    
+    if (!password) {
+      errorMessage.textContent = 'Please enter your password';
+      errorMessage.style.display = 'block';
+      return;
+    }
 
-  google.script.run
-    .withSuccessHandler(function(result) {
-      if (result.success) {
-        console.log('Login successful, storing session');
-        setStoredSessionId(result.sessionId);
-        
-        // Create a form to handle the redirection
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = window.location.href;
-        
-        // Add session ID as hidden input
-        const sessionInput = document.createElement('input');
-        sessionInput.type = 'hidden';
-        sessionInput.name = 'sessionId';
-        sessionInput.value = result.sessionId;
-        form.appendChild(sessionInput);
-        
-        // Add page parameter as hidden input
-        const pageInput = document.createElement('input');
-        pageInput.type = 'hidden';
-        pageInput.name = 'page';
-        pageInput.value = 'dashboard';
-        form.appendChild(pageInput);
-        
-        // Add the form to the document and submit it
-        document.body.appendChild(form);
-        form.submit();
-      } else {
-        errorMessage.textContent = result.message || 'Login failed. Please check your password and try again.';
+    // Show loading state
+    const submitButton = event.target.querySelector('button');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Logging in...';
+
+    google.script.run
+      .withSuccessHandler(function(result) {
+        if (result.success) {
+          console.log('Login successful, storing session');
+          setStoredSessionId(result.sessionId);
+          
+          // Create a form to handle the redirection
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = window.location.href;
+          
+          // Add session ID as hidden input
+          const sessionInput = document.createElement('input');
+          sessionInput.type = 'hidden';
+          sessionInput.name = 'sessionId';
+          sessionInput.value = result.sessionId;
+          form.appendChild(sessionInput);
+          
+          // Add page parameter as hidden input
+          const pageInput = document.createElement('input');
+          pageInput.type = 'hidden';
+          pageInput.name = 'page';
+          pageInput.value = 'dashboard';
+          form.appendChild(pageInput);
+          
+          // Add the form to the document and submit it
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          errorMessage.textContent = result.message || 'Login failed. Please check your password and try again.';
+          errorMessage.style.display = 'block';
+          submitButton.disabled = false;
+          submitButton.textContent = originalText;
+        }
+      })
+      .withFailureHandler(function(error) {
+        console.error('Login error:', error);
+        errorMessage.textContent = 'An error occurred during login. Please try again.';
         errorMessage.style.display = 'block';
         submitButton.disabled = false;
         submitButton.textContent = originalText;
-      }
-    })
-    .withFailureHandler(function(error) {
-      console.error('Login error:', error);
-      errorMessage.textContent = 'An error occurred during login. Please try again.';
-      errorMessage.style.display = 'block';
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
-    })
-    .authenticateUser(username, password);
+      })
+      .authenticateUser(username, password);
+  }
+} catch (error) {
+  console.error('Error initializing LoginScripts:', error);
+  const errorMessage = document.getElementById('errorMessage');
+  if (errorMessage) {
+    errorMessage.textContent = 'Failed to initialize login page. Please refresh.';
+    errorMessage.style.display = 'block';
+  }
 }
 </script>
