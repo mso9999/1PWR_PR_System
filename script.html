@@ -36,6 +36,18 @@
 -->
 
 <script>
+  // Initialize google.script.run error handling
+  if (typeof google !== 'undefined' && google.script && google.script.run) {
+    // Add default error handler
+    google.script.run.withFailureHandler(function(error) {
+      console.error('Server error:', error);
+    });
+    
+    console.log('Google Apps Script client initialized');
+  } else {
+    console.error('Google Apps Script client not available');
+  }
+  
   /*******************************************************************************************
    * Global Variables
    * Description:
