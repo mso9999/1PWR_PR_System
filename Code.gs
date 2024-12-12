@@ -247,12 +247,8 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create template
+    // Create template with a simpler approach
     const template = HtmlService.createTemplateFromFile('BaseTemplate');
-    
-    if (!template) {
-      throw new Error('Failed to create template from base file');
-    }
     
     // Common includes with error handling
     template.includeSecurityHeaders = include('SecurityHeaders') || '';
@@ -284,22 +280,13 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Evaluate template and configure output
-    const evaluated = template.evaluate();
-    
-    if (!evaluated) {
-      throw new Error('Failed to evaluate template');
-    }
-    
-    // Create HTML output with proper sandbox mode
-    const output = HtmlService.createHtmlOutput(evaluated.getContent())
+    // Return evaluated template with minimal configuration
+    return template.evaluate()
       .setTitle('1PWR Purchase Request System')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
-    
-    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
