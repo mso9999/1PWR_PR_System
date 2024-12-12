@@ -1,30 +1,18 @@
 <!--*****************************************************************************************
  * File: SecurityHeaders.html
- * Version: 1.5.5
- * Last Updated: 2024-12-08
+ * Version: 1.5.6
+ * Last Updated: 2024-12-12
  *
  * Description:
- *   Provides security-related meta tags and headers for the application.
+ *   Provides client-side security features for the application.
+ *   All HTTP security headers are now handled by Code.gs.
  *
- * Changes in 1.5.5:
- *   - Removed redundant script and style includes
- *   - Fixed nonce handling
- *
- * Changes in 1.5.4:
- *   - Removed meta CSP headers (now handled by HTTP headers)
- *   - Updated Permissions-Policy to use supported features only
- *   - Removed meta X-Frame-Options (now handled by HTTP headers)
- *   - Enhanced iframe sandbox security
+ * Changes in 1.5.6:
+ *   - Removed all meta tags (now handled by Code.gs)
+ *   - Focus on client-side JavaScript security
  ******************************************************************************************-->
 
-<!-- Base meta tags -->
-<meta charset="UTF-8">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
-
-<!-- Updated Permissions-Policy with only supported features -->
-<meta http-equiv="Permissions-Policy" content="accelerometer=(),autoplay=(),camera=(),cross-origin-isolated=(),display-capture=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),keyboard-map=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(),usb=(),web-share=(),xr-spatial-tracking=()">
-
+<!-- Initialize security-related JavaScript -->
 <script>
 // Initialize MutationObserver safely
 (function() {

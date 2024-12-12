@@ -208,7 +208,8 @@ function setSecurityHeaders(output) {
     "frame-src 'self' https://accounts.google.com https://apis.google.com;"
   );
   
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  // Set consistent frame options - use IFRAME since we're in Apps Script
+  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME);
   
   return output;
 }
@@ -286,11 +287,12 @@ function getTemplateForUser() {
     // First evaluate the template
     const output = template.evaluate()
       .setTitle('1PWR Purchase Request System')
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      // Let setSecurityHeaders handle all security settings
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
       
-    return output;
+    // Apply security headers consistently
+    return setSecurityHeaders(output);
       
   } catch (error) {
     console.error('Error getting template:', error);
