@@ -248,8 +248,7 @@ function include(filename) {
 function getTemplateForUser() {
   try {
     // Create template with sandbox mode
-    const template = HtmlService.createTemplateFromFile('BaseTemplate')
-      .setTitle('1PWR Purchase Request System');
+    const template = HtmlService.createTemplateFromFile('BaseTemplate');
     
     if (!template) {
       throw new Error('Failed to create template from base file');
@@ -288,7 +287,6 @@ function getTemplateForUser() {
     // Create HTML output with sandbox mode
     const output = HtmlService.createHtmlOutput()
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setTitle('1PWR Purchase Request System')
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
@@ -300,6 +298,7 @@ function getTemplateForUser() {
     }
     
     output.setContent(evaluated.getContent());
+    output.setTitle('1PWR Purchase Request System'); // Set title after evaluating template
     return output;
       
   } catch (error) {
