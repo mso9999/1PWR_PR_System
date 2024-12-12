@@ -31,9 +31,9 @@ function getRequestorList() {
     }
 
     const data = sheet.getDataRange().getValues();
-    // Skip header row and filter active requestors
+    // Skip header row and get all requestors from column A
     const requestors = data.slice(1)
-      .filter(row => row[5] === 'Y')  // Only active requestors
+      .filter(row => row[0])  // Only rows with a name in column A
       .map(row => ({
         name: row[0],
         email: row[1],
@@ -51,7 +51,7 @@ function getRequestorList() {
     console.error('Error loading requestor list:', error);
     return {
       success: false,
-      error: 'Failed to load requestor list: ' + error.toString()
+      error: `Failed to load requestor list: ${error.message}`
     };
   }
 }
