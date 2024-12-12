@@ -236,8 +236,23 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create direct HTML output
-    return HtmlService.createHtmlOutputFromFile('BaseTemplate')
+    // Create template from base
+    const template = HtmlService.createTemplateFromFile('BaseTemplate');
+    
+    // Set all includes
+    template.includeSecurityHeaders = include('SecurityHeaders');
+    template.includeSharedStyles = include('SharedStyles');
+    template.includeScript = include('script');
+    template.includeContent = include('LoginPage');
+    
+    // Set optional includes to empty strings
+    template.includePageSpecificStyles = '';
+    template.includePageSpecificScript = include('LoginScripts');
+    template.includeHeader = '';
+    template.includeFooter = '';
+    
+    // Evaluate template with all includes
+    return template.evaluate()
       .setTitle('1PWR Purchase Request System')
       .setFaviconUrl('https://www.google.com/images/favicon.ico')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
