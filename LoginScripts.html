@@ -31,20 +31,25 @@ function loadUserList() {
   errorMessage.style.display = 'none';
   
   google.script.run
-    .withSuccessHandler(function(users) {
+    .withSuccessHandler(function(response) {
+      if (!response.success) {
+        console.error('Failed to load requestors:', response.error);
+        errorMessage.textContent = response.error || 'Failed to load user list';
+        errorMessage.style.display = 'block';
+        return;
+      }
+
       // Clear existing options except the first one
       while (select.options.length > 1) {
         select.remove(1);
       }
       
-      // Add active users to the dropdown
-      users.forEach(function(user) {
-        if (user.active === 'Y') {
-          const option = document.createElement('option');
-          option.value = user.name;
-          option.textContent = user.name;
-          select.appendChild(option);
-        }
+      // Add active requestors to the dropdown
+      response.requestors.forEach(function(user) {
+        const option = document.createElement('option');
+        option.value = user.name;
+        option.textContent = user.name;
+        select.appendChild(option);
       });
     })
     .withFailureHandler(function(error) {
