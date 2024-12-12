@@ -197,20 +197,8 @@ const COL = {
  * @returns {HtmlOutput} The HTML output with headers set
  */
 function setSecurityHeaders(output) {
-  // Set Content Security Policy
-  output.addMetaTag('Content-Security-Policy', 
-    "default-src 'self' 'unsafe-inline' 'unsafe-eval' " +
-    "https://apis.google.com https://1pwrafrica.com https://www.google.com " +
-    "https://accounts.google.com https://ssl.gstatic.com https://www.gstatic.com " +
-    "https://fonts.googleapis.com https://fonts.gstatic.com; " +
-    "img-src * data: https:; " +
-    "connect-src 'self' https://apis.google.com https://accounts.google.com; " +
-    "frame-src 'self' https://accounts.google.com https://apis.google.com;"
-  );
-  
-  // Set consistent frame options - use IFRAME since we're in Apps Script
+  // Let Google Apps Script handle CSP
   output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME);
-  
   return output;
 }
 
@@ -248,14 +236,11 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create direct HTML output instead of using template evaluation
-    const output = HtmlService.createHtmlOutputFromFile('BaseTemplate')
+    // Create direct HTML output
+    return HtmlService.createHtmlOutputFromFile('BaseTemplate')
       .setTitle('1PWR Purchase Request System')
       .setFaviconUrl('https://www.google.com/images/favicon.ico')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
-      
-    // Apply security headers
-    return setSecurityHeaders(output);
       
   } catch (error) {
     console.error('Error getting template:', error);
