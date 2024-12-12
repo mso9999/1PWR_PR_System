@@ -244,54 +244,17 @@ function include(filename) {
 
 /**
  * Gets the template for the current user
- * @returns {Template} The template for the current user
+ * @returns {HtmlOutput} The template for the current user
  */
 function getTemplateForUser() {
   try {
-    // First set the default sandbox mode globally
-    HtmlService.setDefaultSandboxMode(HtmlService.SandboxMode.IFRAME);
-    
-    // Create template
-    const template = HtmlService.createTemplateFromFile('BaseTemplate');
-    
-    // Common includes with error handling
-    template.includeSecurityHeaders = include('SecurityHeaders') || '';
-    template.includeSharedStyles = include('SharedStyles') || '';
-    template.includeScript = include('script') || '';
-    
-    // Initialize page specific includes
-    template.includePageSpecificStyles = '';
-    template.includePageSpecificScript = '';
-    template.includeHeader = '';
-    template.includeContent = '';
-    template.includeFooter = '';
-    
-    // Page specific content
-    if (isDashboardPage()) {
-      template.includeContent = include('DashboardPage') || '';
-      template.includePageSpecificScript = include('DashboardScripts') || '';
-      template.includePageSpecificStyles = include('DashboardStyles') || '';
-    } else if (isPRFormPage()) {
-      template.includeContent = include('PRFormPage') || '';
-      template.includePageSpecificScript = include('PRFormScripts') || '';
-      template.includeHeader = include('PRFormComponents') || '';
-    } else if (isPRViewPage()) {
-      template.includeContent = include('PRView') || '';
-      template.includePageSpecificScript = include('PRViewScripts') || '';
-    } else {
-      // Default to login page if no other page is selected or session is invalid
-      template.includeContent = include('LoginPage') || '';
-      template.includePageSpecificScript = include('LoginScripts') || '';
-    }
-    
-    // First evaluate the template
-    const output = template.evaluate()
+    // Create direct HTML output instead of using template evaluation
+    const output = HtmlService.createHtmlOutputFromFile('BaseTemplate')
       .setTitle('1PWR Purchase Request System')
-      // Let setSecurityHeaders handle all security settings
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+      .setFaviconUrl('https://www.google.com/images/favicon.ico')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
       
-    // Apply security headers consistently
+    // Apply security headers
     return setSecurityHeaders(output);
       
   } catch (error) {
