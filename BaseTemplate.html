@@ -31,8 +31,6 @@
   <?!= typeof includeSecurityHeaders !== 'undefined' ? includeSecurityHeaders : '' ?>
   <?!= typeof includeSharedStyles !== 'undefined' ? includeSharedStyles : '' ?>
   <?!= typeof includePageSpecificStyles !== 'undefined' ? includePageSpecificStyles : '' ?>
-  <?!= typeof includeScript !== 'undefined' ? includeScript : '' ?>
-  <?!= typeof includePageSpecificScript !== 'undefined' ? includePageSpecificScript : '' ?>
   <title>1PWR Purchase Request System</title>
 </head>
 <body>
@@ -45,5 +43,9 @@
     
     <?!= typeof includeFooter !== 'undefined' ? includeFooter : '' ?>
   </div>
+  
+  <!-- Load scripts at the end of body -->
+  <?!= typeof includeScript !== 'undefined' ? includeScript : '' ?>
+  <?!= typeof includePageSpecificScript !== 'undefined' ? includePageSpecificScript : '' ?>
 </body>
 </html>

@@ -245,17 +245,20 @@ function getTemplateForUser() {
     template.includeScript = include('script');
     template.includeContent = include('LoginPage');
     
-    // Set optional includes to empty strings
+    // Set optional includes
     template.includePageSpecificStyles = '';
     template.includePageSpecificScript = include('LoginScripts');
     template.includeHeader = '';
     template.includeFooter = '';
     
     // Evaluate template with all includes
-    return template.evaluate()
+    const output = template.evaluate()
       .setTitle('1PWR Purchase Request System')
       .setFaviconUrl('https://www.google.com/images/favicon.ico')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+    
+    console.log('Template evaluated successfully');
+    return output;
       
   } catch (error) {
     console.error('Error getting template:', error);
