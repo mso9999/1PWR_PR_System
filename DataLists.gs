@@ -31,14 +31,14 @@ function getRequestorList() {
     }
 
     const data = sheet.getDataRange().getValues();
-    // Skip header row and get all requestors from column A
+    // Skip header row and filter active requestors
     const requestors = data.slice(1)
-      .filter(row => row[0])  // Only rows with a name in column A
+      .filter(row => row[3] === 'Y')  // Filter by Active column (index 3)
       .map(row => ({
-        name: row[0],
-        email: row[1],
-        department: row[2],
-        role: row[3]
+        name: row[0],      // Name
+        email: row[1],     // Email
+        department: row[2], // Department
+        role: row[5]       // Role is in column F (index 5)
       }));
 
     console.log(`Found ${requestors.length} active requestors`);
