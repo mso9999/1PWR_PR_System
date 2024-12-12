@@ -248,7 +248,12 @@ function include(filename) {
 function getTemplateForUser() {
   try {
     // Create template with sandbox mode
-    const template = HtmlService.createTemplateFromFile('BaseTemplate');
+    const template = HtmlService.createTemplateFromFile('BaseTemplate')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+      .setTitle('1PWR Purchase Request System')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico');
     
     if (!template) {
       throw new Error('Failed to create template from base file');
@@ -284,13 +289,8 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Evaluate template and set content
-    const evaluated = template.evaluate()
-      .setTitle('1PWR Purchase Request System')
-      .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
-      .addMetaTag('viewport', 'width=device-width, initial-scale=1')
-      .setFaviconUrl('https://www.google.com/images/favicon.ico');
+    // Evaluate template
+    const evaluated = template.evaluate();
     
     if (!evaluated) {
       throw new Error('Failed to evaluate template');
