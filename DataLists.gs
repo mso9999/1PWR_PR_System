@@ -30,7 +30,10 @@ function getRequestorList() {
       };
     }
 
+    console.log('Getting data from sheet');
     const data = sheet.getDataRange().getValues();
+    console.log(`Found ${data.length} rows (including header)`);
+
     // Skip header row and filter active requestors
     const requestors = data.slice(1)
       .filter(row => row[3] === 'Y')  // Filter by Active column (index 3)
@@ -42,6 +45,8 @@ function getRequestorList() {
       }));
 
     console.log(`Found ${requestors.length} active requestors`);
+    console.log('First requestor:', requestors.length > 0 ? JSON.stringify(requestors[0]) : 'None');
+    
     return {
       success: true,
       requestors: requestors

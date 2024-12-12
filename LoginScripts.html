@@ -22,35 +22,51 @@
 // Initialize login form and load user list
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM loaded, initializing login form');
+  console.log('Calling loadUserList()...');
   loadUserList();
 });
 
 function loadUserList() {
+  console.log('loadUserList() started');
   const select = document.getElementById('userName');
   const errorMessage = document.getElementById('errorMessage');
+  
+  if (!select) {
+    console.error('userName select element not found');
+    return;
+  }
+  
+  console.log('Clearing error message');
   errorMessage.style.display = 'none';
   
+  console.log('Calling getRequestorList()...');
   google.script.run
     .withSuccessHandler(function(response) {
-      if (!response.success) {
-        console.error('Failed to load requestors:', response.error);
-        errorMessage.textContent = response.error || 'Failed to load user list';
+      console.log('getRequestorList response:', response);
+      if (!response || !response.success) {
+        console.error('Failed to load requestors:', response ? response.error : 'No response');
+        errorMessage.textContent = response ? response.error : 'Failed to load user list';
         errorMessage.style.display = 'block';
         return;
       }
 
+      console.log(`Found ${response.requestors.length} requestors`);
+
       // Clear existing options except the first one
+      console.log('Clearing existing options');
       while (select.options.length > 1) {
         select.remove(1);
       }
       
       // Add active requestors to the dropdown
+      console.log('Adding requestors to dropdown');
       response.requestors.forEach(function(user) {
         const option = document.createElement('option');
         option.value = user.name;
         option.textContent = user.name;
         select.appendChild(option);
       });
+      console.log('Finished adding requestors');
     })
     .withFailureHandler(function(error) {
       console.error('Error loading user list:', error);
@@ -58,6 +74,7 @@ function loadUserList() {
       errorMessage.style.display = 'block';
     })
     .getRequestorList();
+  console.log('getRequestorList() called');
 }
 
 function handleLogin(event) {
