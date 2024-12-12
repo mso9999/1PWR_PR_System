@@ -39,14 +39,21 @@ function loadUserList() {
   console.log('Clearing error message');
   errorMessage.style.display = 'none';
   
-  console.log('Calling google.script.run.getActiveRequestors()...');
+  console.log('Calling google.script.run.getRequestorList()...');
   google.script.run
-    .withSuccessHandler(function(users) {
-      console.log('getActiveRequestors success, users:', users);
-      if (!users || !Array.isArray(users)) {
-        console.error('Invalid users data received:', users);
+    .withSuccessHandler(function(response) {
+      console.log('getRequestorList success, response:', response);
+      if (!response || !response.success) {
+        console.error('Failed to load requestors:', response ? response.error : 'No response');
+        if (errorMessage) {
+          errorMessage.textContent = response ? response.error : 'Failed to load user list';
+          errorMessage.style.display = 'block';
+        }
         return;
       }
+      
+      const users = response.requestors;
+      console.log(`Found ${users.length} requestors`);
       
       // Clear existing options
       select.innerHTML = '';
@@ -59,10 +66,10 @@ function loadUserList() {
       
       // Add user options
       users.forEach(function(user) {
-        console.log('Adding user:', user);
+        console.log('Adding user:', user.name);
         const option = document.createElement('option');
-        option.value = user;
-        option.textContent = user;
+        option.value = user.name;
+        option.textContent = user.name;
         select.appendChild(option);
       });
       
@@ -70,11 +77,13 @@ function loadUserList() {
     })
     .withFailureHandler(function(error) {
       console.error('Failed to load users:', error);
-      errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
-      errorMessage.style.display = 'block';
+      if (errorMessage) {
+        errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
+        errorMessage.style.display = 'block';
+      }
     })
-    .getActiveRequestors();
-  console.log('getActiveRequestors() called');
+    .getRequestorList();
+  console.log('getRequestorList() called');
 }
 
 function handleLogin(event) {
