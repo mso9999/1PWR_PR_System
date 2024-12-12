@@ -284,22 +284,19 @@ function getTemplateForUser() {
       template.includePageSpecificScript = include('LoginScripts') || '';
     }
     
-    // Create HTML output with sandbox mode
-    const output = HtmlService.createHtmlOutput()
+    // Evaluate template and set content
+    const evaluated = template.evaluate()
+      .setTitle('1PWR Purchase Request System')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME)
       .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.DENY)
       .addMetaTag('viewport', 'width=device-width, initial-scale=1')
       .setFaviconUrl('https://www.google.com/images/favicon.ico');
     
-    // Evaluate template and set content
-    const evaluated = template.evaluate();
     if (!evaluated) {
       throw new Error('Failed to evaluate template');
     }
     
-    output.setContent(evaluated.getContent());
-    output.setTitle('1PWR Purchase Request System'); // Set title after evaluating template
-    return output;
+    return evaluated;
       
   } catch (error) {
     console.error('Error getting template:', error);
