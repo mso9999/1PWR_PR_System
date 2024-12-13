@@ -63,8 +63,46 @@ const statusListIdMap = {
 //==============================================================================
 function initializeDashboard() {
     console.log('Starting dashboard initialization');
-    setupEventListeners();
-    startAutoRefresh();
+    
+    // Load organizations first
+    google.script.run
+        .withSuccessHandler(function(orgs) {
+            console.log('Organizations loaded:', orgs);
+            populateOrgSelect(orgs);
+            // After populating orgs, set up event listeners and start data loading
+            setupEventListeners();
+            loadDashboardData(); // Initial data load
+            startAutoRefresh();
+        })
+        .withFailureHandler(function(error) {
+            console.error('Failed to load organizations:', error);
+            showError('Failed to initialize dashboard: ' + error);
+        })
+        .getOrganizations();
+}
+
+function populateOrgSelect(orgs) {
+    const orgSelect = document.getElementById('orgSelect');
+    if (!orgSelect) {
+        console.error('Organization select element not found');
+        return;
+    }
+    
+    // Clear existing options except the first one
+    while (orgSelect.options.length > 1) {
+        orgSelect.remove(1);
+    }
+    
+    // Add new options
+    orgs.forEach(org => {
+        const option = document.createElement('option');
+        option.value = org;
+        option.textContent = org;
+        if (org === selectedOrg) {
+            option.selected = true;
+        }
+        orgSelect.appendChild(option);
+    });
 }
 
 function setupEventListeners() {

@@ -144,28 +144,20 @@ try {
           console.log('Login successful, storing session');
           setStoredSessionId(result.sessionId);
           
-          // Create a form to handle the redirection
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = window.location.href;
-          
-          // Add session ID as hidden input
-          const sessionInput = document.createElement('input');
-          sessionInput.type = 'hidden';
-          sessionInput.name = 'sessionId';
-          sessionInput.value = result.sessionId;
-          form.appendChild(sessionInput);
-          
-          // Add page parameter as hidden input
-          const pageInput = document.createElement('input');
-          pageInput.type = 'hidden';
-          pageInput.name = 'page';
-          pageInput.value = 'dashboard';
-          form.appendChild(pageInput);
-          
-          // Add the form to the document and submit it
-          document.body.appendChild(form);
-          form.submit();
+          // Use google.script.run to handle redirection
+          google.script.run
+            .withSuccessHandler(function(url) {
+              console.log('Redirecting to dashboard...');
+              window.location.href = url;
+            })
+            .withFailureHandler(function(error) {
+              console.error('Failed to get dashboard URL:', error);
+              errorMessage.textContent = 'Failed to redirect to dashboard. Please try again.';
+              errorMessage.style.display = 'block';
+              submitButton.disabled = false;
+              submitButton.textContent = originalText;
+            })
+            .getDashboardUrl(result.sessionId);
         } else {
           errorMessage.textContent = result.message || 'Login failed. Please check your password and try again.';
           errorMessage.style.display = 'block';

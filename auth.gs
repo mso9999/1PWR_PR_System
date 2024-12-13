@@ -279,3 +279,32 @@ function getWebAppUrlFromAuth(page = 'dashboard') {
     throw error;
   }
 }
+
+/**
+ * Gets the dashboard URL with session ID
+ * @param {string} sessionId - Session ID to include in URL
+ * @return {string} Dashboard URL with session ID
+ */
+function getDashboardUrl(sessionId) {
+  console.log('Getting dashboard URL for session:', sessionId);
+  
+  try {
+    if (!sessionId) {
+      throw new Error('Session ID is required');
+    }
+
+    // Validate the session first
+    if (!validateSession(sessionId)) {
+      console.error('Invalid or expired session:', sessionId);
+      return getWebAppUrl('login');
+    }
+
+    const baseUrl = getWebAppUrl('dashboard');
+    const dashboardUrl = `${baseUrl}&sessionId=${encodeURIComponent(sessionId)}`;
+    console.log('Generated dashboard URL (session ID hidden)');
+    return dashboardUrl;
+  } catch (error) {
+    console.error('Error getting dashboard URL:', error);
+    return getWebAppUrl('login');
+  }
+}
