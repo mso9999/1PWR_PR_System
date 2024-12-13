@@ -263,25 +263,22 @@ function getDashboardUrl(sessionId) {
     // Validate the session first
     if (!validateSession(sessionId)) {
       console.error('Invalid or expired session:', sessionId);
-      return getWebAppUrl('login');
+      // Use getWebAppUrlFromAuth directly to avoid circular dependency
+      return getWebAppUrlFromAuth('login');
     }
 
-    // Get the base URL without any page parameter
-    const baseUrl = getWebAppUrl();
+    // Get the script URL from ScriptApp
+    const scriptId = ScriptApp.getScriptId();
+    const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
     console.log('Base URL:', baseUrl);
     
-    // Check if we got a valid URL
-    if (!baseUrl || baseUrl.startsWith('?')) {
-      throw new Error('Invalid base URL');
-    }
-    
-    // Add session ID and page parameter
-    const dashboardUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}sessionId=${encodeURIComponent(sessionId)}`;
+    // Add session ID parameter
+    const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}`;
     console.log('Generated dashboard URL (session ID hidden)');
     return dashboardUrl;
   } catch (error) {
     console.error('Error getting dashboard URL:', error);
-    return getWebAppUrl('login');
+    return getWebAppUrlFromAuth('login');
   }
 }
 
