@@ -191,11 +191,17 @@ function getWebAppUrl(page) {
   console.log('Getting web app URL for page:', page);
   
   try {
+    // Get the deployment URL
     const baseUrl = ScriptApp.getService().getUrl();
-    console.log('Base URL:', baseUrl);
+    console.log('Base URL from service:', baseUrl);
     
     if (!baseUrl) {
-      throw new Error('Failed to get base URL');
+      // Fallback to current script URL
+      const scriptId = ScriptApp.getScriptId();
+      console.log('Script ID:', scriptId);
+      const fallbackUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+      console.log('Using fallback URL:', fallbackUrl);
+      return page ? `${fallbackUrl}?page=${encodeURIComponent(page)}` : fallbackUrl;
     }
 
     if (page) {
@@ -210,49 +216,8 @@ function getWebAppUrl(page) {
     return baseUrl;
   } catch (error) {
     console.error('Error getting web app URL:', error);
-    throw error;
-  }
-}
-
-/**
- * Gets current user from session with enhanced validation
- * @param {string} sessionId - Session ID to validate
- * @return {Object|null} User information or null if invalid
- */
-function getCurrentUser(sessionId) {
-  console.log('Getting current user for session:', sessionId);
-  
-  try {
-    if (!sessionId) {
-      console.log('No session ID provided');
-      return null;
-    }
-
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = cache.get(key);
-    
-    if (!value) {
-      console.log('Session not found:', sessionId);
-      return null;
-    }
-
-    const userInfo = JSON.parse(value);
-    
-    // Validate user info structure
-    if (!userInfo.email || !userInfo.role) {
-      console.error('Invalid user info structure:', userInfo);
-      return null;
-    }
-
-    // Refresh session
-    cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
-    console.log('Session refreshed for user:', userInfo.email);
-
-    return userInfo;
-  } catch (error) {
-    console.error('Error getting current user:', error);
-    return null;
+    // Return a default error page URL
+    return '?page=error';
   }
 }
 
@@ -301,7 +266,15 @@ function getDashboardUrl(sessionId) {
       return getWebAppUrl('login');
     }
 
-    const baseUrl = getWebAppUrl(CONFIG.VIEWS.DASHBOARD);  // Use the dashboard view from CONFIG
+    // Get the base URL for the dashboard
+    const baseUrl = getWebAppUrl(CONFIG.VIEWS.DASHBOARD);
+    console.log('Base dashboard URL:', baseUrl);
+    
+    // Check if we got a valid URL
+    if (!baseUrl || baseUrl.startsWith('?')) {
+      throw new Error('Invalid base URL');
+    }
+    
     // Check if the URL already has query parameters
     const separator = baseUrl.includes('?') ? '&' : '?';
     const dashboardUrl = `${baseUrl}${separator}sessionId=${encodeURIComponent(sessionId)}`;
@@ -310,5 +283,47 @@ function getDashboardUrl(sessionId) {
   } catch (error) {
     console.error('Error getting dashboard URL:', error);
     return getWebAppUrl('login');
+  }
+}
+
+/**
+ * Gets current user from session with enhanced validation
+ * @param {string} sessionId - Session ID to validate
+ * @return {Object|null} User information or null if invalid
+ */
+function getCurrentUser(sessionId) {
+  console.log('Getting current user for session:', sessionId);
+  
+  try {
+    if (!sessionId) {
+      console.log('No session ID provided');
+      return null;
+    }
+
+    const cache = CacheService.getUserCache();
+    const key = CACHE_PREFIX + sessionId;
+    const value = cache.get(key);
+    
+    if (!value) {
+      console.log('Session not found:', sessionId);
+      return null;
+    }
+
+    const userInfo = JSON.parse(value);
+    
+    // Validate user info structure
+    if (!userInfo.email || !userInfo.role) {
+      console.error('Invalid user info structure:', userInfo);
+      return null;
+    }
+
+    // Refresh session
+    cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
+    console.log('Session refreshed for user:', userInfo.email);
+
+    return userInfo;
+  } catch (error) {
+    console.error('Error getting current user:', error);
+    return null;
   }
 }

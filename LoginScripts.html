@@ -147,12 +147,21 @@ try {
           // Use google.script.run to handle redirection
           google.script.run
             .withSuccessHandler(function(url) {
+              console.log('Got dashboard URL:', url);
+              if (!url || url.startsWith('?page=error')) {
+                console.error('Invalid dashboard URL');
+                errorMessage.textContent = 'Error accessing dashboard. Please try again.';
+                errorMessage.style.display = 'block';
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+                return;
+              }
               console.log('Redirecting to dashboard...');
               window.location.href = url;
             })
             .withFailureHandler(function(error) {
               console.error('Failed to get dashboard URL:', error);
-              errorMessage.textContent = 'Failed to redirect to dashboard. Please try again.';
+              errorMessage.textContent = 'Error accessing dashboard. Please try again.';
               errorMessage.style.display = 'block';
               submitButton.disabled = false;
               submitButton.textContent = originalText;
