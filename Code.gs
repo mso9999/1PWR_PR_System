@@ -245,6 +245,14 @@ function getTemplateForUser() {
       const user = getCurrentUser(sessionId);
       if (user) {
         console.log('User authenticated:', user.name);
+        // Create event object if it doesn't exist
+        if (!currentEvent) {
+          currentEvent = { parameter: {} };
+        }
+        // Set page parameter if not present
+        if (!currentEvent.parameter.page) {
+          currentEvent.parameter.page = CONFIG.VIEWS.DASHBOARD;
+        }
         return handleAuthenticatedRoute(currentEvent, user);
       } else {
         console.log('Invalid session, redirecting to login');
@@ -424,7 +432,7 @@ function serveDashboard(user) {
     template.includeSecurityHeaders = include('SecurityHeaders');
     template.includeSharedStyles = include('SharedStyles');
     template.includeScript = include('script');
-    template.includeContent = include('DashboardPage');
+    template.includeContent = include('DashboardPage');  // Match the actual file name
     
     // Set optional includes
     template.includePageSpecificStyles = include('DashboardStyles');
@@ -485,7 +493,8 @@ function isPRViewPage() {
 }
 
 function isDashboardPage() {
-  return getUrlParameter('page') === 'dashboard';
+  const page = getUrlParameter('page');
+  return page === CONFIG.VIEWS.DASHBOARD || page === '';  // Default to dashboard if no page specified
 }
 
 function getPageFromUrl() {

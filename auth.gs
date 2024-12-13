@@ -301,7 +301,7 @@ function getDashboardUrl(sessionId) {
       return getWebAppUrl('login');
     }
 
-    const baseUrl = getWebAppUrl('DashboardPage');  // Updated to match the actual file name
+    const baseUrl = getWebAppUrl(CONFIG.VIEWS.DASHBOARD);  // Use the dashboard view from CONFIG
     // Check if the URL already has query parameters
     const separator = baseUrl.includes('?') ? '&' : '?';
     const dashboardUrl = `${baseUrl}${separator}sessionId=${encodeURIComponent(sessionId)}`;
