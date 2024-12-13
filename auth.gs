@@ -199,7 +199,9 @@ function getWebAppUrl(page) {
     }
 
     if (page) {
-      const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
+      // Ensure we have a clean base URL without any query parameters
+      const cleanBaseUrl = baseUrl.split('?')[0];
+      const fullUrl = `${cleanBaseUrl}?page=${encodeURIComponent(page)}`;
       console.log('Generated full URL:', fullUrl);
       return fullUrl;
     }
@@ -299,8 +301,10 @@ function getDashboardUrl(sessionId) {
       return getWebAppUrl('login');
     }
 
-    const baseUrl = getWebAppUrl('dashboard');
-    const dashboardUrl = `${baseUrl}&sessionId=${encodeURIComponent(sessionId)}`;
+    const baseUrl = getWebAppUrl('DashboardPage');  // Updated to match the actual file name
+    // Check if the URL already has query parameters
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    const dashboardUrl = `${baseUrl}${separator}sessionId=${encodeURIComponent(sessionId)}`;
     console.log('Generated dashboard URL (session ID hidden)');
     return dashboardUrl;
   } catch (error) {
