@@ -266,18 +266,17 @@ function getDashboardUrl(sessionId) {
       return getWebAppUrl('login');
     }
 
-    // Get the base URL for the dashboard
-    const baseUrl = getWebAppUrl(CONFIG.VIEWS.DASHBOARD);
-    console.log('Base dashboard URL:', baseUrl);
+    // Get the base URL without any page parameter
+    const baseUrl = getWebAppUrl();
+    console.log('Base URL:', baseUrl);
     
     // Check if we got a valid URL
     if (!baseUrl || baseUrl.startsWith('?')) {
       throw new Error('Invalid base URL');
     }
     
-    // Check if the URL already has query parameters
-    const separator = baseUrl.includes('?') ? '&' : '?';
-    const dashboardUrl = `${baseUrl}${separator}sessionId=${encodeURIComponent(sessionId)}`;
+    // Add session ID and page parameter
+    const dashboardUrl = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}sessionId=${encodeURIComponent(sessionId)}`;
     console.log('Generated dashboard URL (session ID hidden)');
     return dashboardUrl;
   } catch (error) {
