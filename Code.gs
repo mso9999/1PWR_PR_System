@@ -236,7 +236,23 @@ function include(filename) {
  */
 function getTemplateForUser() {
   try {
-    // Create template from base
+    // Get session ID from URL
+    const sessionId = getSessionIdFromUrl();
+    console.log('Session ID from URL:', sessionId);
+    
+    // Check if user is authenticated
+    if (sessionId) {
+      const user = getCurrentUser(sessionId);
+      if (user) {
+        console.log('User authenticated:', user.name);
+        return handleAuthenticatedRoute(currentEvent, user);
+      } else {
+        console.log('Invalid session, redirecting to login');
+        return createErrorPage('Your session has expired. Please log in again.');
+      }
+    }
+    
+    // Create login template if not authenticated
     const template = HtmlService.createTemplateFromFile('BaseTemplate');
     
     // Set all includes
@@ -257,7 +273,7 @@ function getTemplateForUser() {
       .setFaviconUrl('https://www.google.com/images/favicon.ico')
       .setSandboxMode(HtmlService.SandboxMode.IFRAME);
     
-    console.log('Template evaluated successfully');
+    console.log('Login template evaluated successfully');
     return output;
       
   } catch (error) {
@@ -385,8 +401,11 @@ function handleAuthenticatedRoute(e, user) {
  */
 function serveDashboard(user) {
   try {
+    console.log('Serving dashboard for user:', user.name);
+    
     // Get organization from URL parameter or default to empty (all orgs)
     const organization = getUrlParameter('org') || '';
+    console.log('Organization filter:', organization);
     
     // Get dashboard data
     const dashboardData = getDashboardData(organization);
@@ -397,20 +416,37 @@ function serveDashboard(user) {
       data: dashboardData,
       organizations: getActiveOrganizations()
     };
-
-    // Create HTML template
-    const template = HtmlService.createTemplateFromFile('DashboardPage');
+    
+    // Create dashboard template
+    const template = HtmlService.createTemplateFromFile('BaseTemplate');
+    
+    // Set all includes
+    template.includeSecurityHeaders = include('SecurityHeaders');
+    template.includeSharedStyles = include('SharedStyles');
+    template.includeScript = include('script');
+    template.includeContent = include('DashboardPage');
+    
+    // Set optional includes
+    template.includePageSpecificStyles = include('DashboardStyles');
+    template.includePageSpecificScript = include('DashboardScripts');
+    template.includeHeader = include('Header');
+    template.includeFooter = include('Footer');
+    
+    // Set template data
     template.data = templateData;
     
-    // Evaluate template and set security headers
+    // Evaluate template with all includes
     const output = template.evaluate()
-      .setTitle('1PWR PR System - Dashboard')
-      .setFaviconUrl('https://www.google.com/favicon.ico');
+      .setTitle('1PWR Purchase Request System - Dashboard')
+      .setFaviconUrl('https://www.google.com/images/favicon.ico')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
     
-    return setSecurityHeaders(output);
+    console.log('Dashboard template evaluated successfully');
+    return output;
+    
   } catch (error) {
     console.error('Error serving dashboard:', error);
-    return createErrorPage('Failed to load dashboard. Please try again later.');
+    return createErrorPage(error);
   }
 }
 
