@@ -196,28 +196,31 @@ function getWebAppUrl(page) {
     console.log('Base URL from service:', baseUrl);
     
     if (!baseUrl) {
-      // Fallback to current script URL
+      // Fallback to script URL
       const scriptId = ScriptApp.getScriptId();
-      console.log('Script ID:', scriptId);
+      console.log('No service URL, falling back to script ID:', scriptId);
+      if (!scriptId) {
+        throw new Error('Failed to get script ID');
+      }
       const fallbackUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
       console.log('Using fallback URL:', fallbackUrl);
       return page ? `${fallbackUrl}?page=${encodeURIComponent(page)}` : fallbackUrl;
     }
 
+    // Ensure we have a clean base URL without any query parameters
+    const cleanBaseUrl = baseUrl.split('?')[0];
+    console.log('Clean base URL:', cleanBaseUrl);
+
     if (page) {
-      // Ensure we have a clean base URL without any query parameters
-      const cleanBaseUrl = baseUrl.split('?')[0];
       const fullUrl = `${cleanBaseUrl}?page=${encodeURIComponent(page)}`;
       console.log('Generated full URL:', fullUrl);
       return fullUrl;
     }
     
-    console.log('Returning base URL');
-    return baseUrl;
+    return cleanBaseUrl;
   } catch (error) {
     console.error('Error getting web app URL:', error);
-    // Return a default error page URL
-    return '?page=error';
+    throw error; // Let the caller handle the error
   }
 }
 
@@ -230,23 +233,23 @@ function getWebAppUrlFromAuth(page = 'dashboard') {
   console.log('Getting web app URL for page:', page);
   
   try {
-    // Use the main getWebAppUrl function which already has proper fallback logic
-    const baseUrl = getWebAppUrl();
-    if (!baseUrl) {
-      throw new Error('Failed to get base URL');
+    // Get the script URL directly
+    const scriptId = ScriptApp.getScriptId();
+    if (!scriptId) {
+      throw new Error('Failed to get script ID');
     }
     
-    // Ensure we have a clean base URL without any query parameters
-    const cleanBaseUrl = baseUrl.split('?')[0];
+    // Construct base URL with script ID
+    const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+    console.log('Using base URL:', baseUrl);
     
     // Add page parameter
-    const fullUrl = `${cleanBaseUrl}?page=${encodeURIComponent(page)}`;
+    const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
     console.log('Generated full URL:', fullUrl);
     return fullUrl;
   } catch (error) {
-    console.error('Error getting web app URL:', error);
-    // Return a default error page URL
-    return '?page=error';
+    console.error('Error in getWebAppUrlFromAuth:', error);
+    throw error;
   }
 }
 
@@ -269,21 +272,27 @@ function getDashboardUrl(sessionId) {
       return getWebAppUrlFromAuth('login');
     }
 
-    // Get the base URL using the existing getWebAppUrl function
-    const baseUrl = getWebAppUrl();
-    if (!baseUrl) {
-      throw new Error('Failed to get base URL');
+    try {
+      // Get the script URL directly
+      const scriptId = ScriptApp.getScriptId();
+      if (!scriptId) {
+        throw new Error('Failed to get script ID');
+      }
+      
+      // Construct base URL with script ID
+      const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+      console.log('Using base URL:', baseUrl);
+      
+      // Add session ID and page parameters
+      const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=dashboard`;
+      console.log('Generated dashboard URL (session ID hidden)');
+      return dashboardUrl;
+    } catch (urlError) {
+      console.error('Error constructing dashboard URL:', urlError);
+      throw urlError;
     }
-    
-    // Ensure we have a clean base URL without any query parameters
-    const cleanBaseUrl = baseUrl.split('?')[0];
-    
-    // Add session ID and page parameters
-    const dashboardUrl = `${cleanBaseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=dashboard`;
-    console.log('Generated dashboard URL (session ID hidden)');
-    return dashboardUrl;
   } catch (error) {
-    console.error('Error getting dashboard URL:', error);
+    console.error('Error in getDashboardUrl:', error);
     return getWebAppUrlFromAuth('login');
   }
 }
