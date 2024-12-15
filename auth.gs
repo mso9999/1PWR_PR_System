@@ -269,11 +269,26 @@ function getDashboardUrl(sessionId) {
 
     // Get the script URL from ScriptApp
     const scriptId = ScriptApp.getScriptId();
-    const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+    if (!scriptId) {
+      throw new Error('Failed to get script ID');
+    }
+    
+    // Get the deployment ID if available
+    let deploymentId;
+    try {
+      const deployments = ScriptApp.getProjectTriggers().map(t => t.getTriggerSourceId());
+      deploymentId = deployments.length > 0 ? deployments[0] : scriptId;
+    } catch (e) {
+      console.warn('Could not get deployment ID, using script ID:', e);
+      deploymentId = scriptId;
+    }
+    
+    // Construct base URL with deployment/script ID
+    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     console.log('Base URL:', baseUrl);
     
-    // Add session ID parameter
-    const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}`;
+    // Add session ID and page parameters using CONFIG.VIEWS.DASHBOARD
+    const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=${CONFIG.VIEWS.DASHBOARD}`;
     console.log('Generated dashboard URL (session ID hidden)');
     return dashboardUrl;
   } catch (error) {
