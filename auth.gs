@@ -120,16 +120,34 @@ function getUserFromSession(sessionId) {
   console.log('Getting user from session:', sessionId);
   
   try {
+    // Try cache first
     const cache = CacheService.getUserCache();
     const key = CACHE_PREFIX + sessionId;
     const value = cache.get(key);
     
-    if (!value) {
-      console.log('Session not found:', sessionId);
-      return null;
+    if (value) {
+      console.log('Session found in cache');
+      return JSON.parse(value);
     }
 
-    return JSON.parse(value);
+    // If not in cache, check active sessions sheet
+    console.log('Session not in cache, checking sheet');
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === sessionId && data[i][2] === true) { // Check session ID and active status
+        console.log('Session found in sheet');
+        const userInfo = JSON.parse(data[i][1]); // User info is in column B
+        
+        // Store back in cache
+        storeSession(sessionId, userInfo);
+        return userInfo;
+      }
+    }
+
+    console.log('Session not found in sheet or inactive');
+    return null;
   } catch (error) {
     console.error('Session retrieval error:', error);
     return null;
@@ -191,33 +209,30 @@ function getWebAppUrl(page) {
   console.log('Getting web app URL for page:', page);
   
   try {
-    // Get the deployment URL
-    const baseUrl = ScriptApp.getService().getUrl();
-    console.log('Base URL from service:', baseUrl);
-    
-    if (!baseUrl) {
-      // Fallback to script URL
-      const scriptId = ScriptApp.getScriptId();
-      console.log('No service URL, falling back to script ID:', scriptId);
-      if (!scriptId) {
-        throw new Error('Failed to get script ID');
-      }
-      const fallbackUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
-      console.log('Using fallback URL:', fallbackUrl);
-      return page ? `${fallbackUrl}?page=${encodeURIComponent(page)}` : fallbackUrl;
-    }
-
-    // Ensure we have a clean base URL without any query parameters
-    const cleanBaseUrl = baseUrl.split('?')[0];
-    console.log('Clean base URL:', cleanBaseUrl);
-
-    if (page) {
-      const fullUrl = `${cleanBaseUrl}?page=${encodeURIComponent(page)}`;
-      console.log('Generated full URL:', fullUrl);
-      return fullUrl;
+    // Get the deployment ID from the current deployment
+    let deploymentId;
+    try {
+      const service = ScriptApp.getService();
+      const currentUrl = service.getUrl();
+      deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
+    } catch (e) {
+      console.warn('Could not get deployment ID from service:', e);
+      // Fallback to script ID
+      deploymentId = ScriptApp.getScriptId();
     }
     
-    return cleanBaseUrl;
+    if (!deploymentId) {
+      throw new Error('Failed to get deployment/script ID');
+    }
+    
+    // Construct base URL with deployment ID
+    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
+    console.log('Using base URL:', baseUrl);
+    
+    // Add page parameter
+    const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
+    console.log('Generated full URL:', fullUrl);
+    return fullUrl;
   } catch (error) {
     console.error('Error getting web app URL:', error);
     throw error; // Let the caller handle the error
@@ -233,14 +248,24 @@ function getWebAppUrlFromAuth(page = 'dashboard') {
   console.log('Getting web app URL for page:', page);
   
   try {
-    // Get the script URL directly
-    const scriptId = ScriptApp.getScriptId();
-    if (!scriptId) {
-      throw new Error('Failed to get script ID');
+    // Get the deployment ID from the current deployment
+    let deploymentId;
+    try {
+      const service = ScriptApp.getService();
+      const currentUrl = service.getUrl();
+      deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
+    } catch (e) {
+      console.warn('Could not get deployment ID from service:', e);
+      // Fallback to script ID
+      deploymentId = ScriptApp.getScriptId();
     }
     
-    // Construct base URL with script ID
-    const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+    if (!deploymentId) {
+      throw new Error('Failed to get deployment/script ID');
+    }
+    
+    // Construct base URL with deployment ID
+    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     console.log('Using base URL:', baseUrl);
     
     // Add page parameter
@@ -273,14 +298,24 @@ function getDashboardUrl(sessionId) {
     }
 
     try {
-      // Get the script URL directly
-      const scriptId = ScriptApp.getScriptId();
-      if (!scriptId) {
-        throw new Error('Failed to get script ID');
+      // Get the deployment ID from the current deployment
+      let deploymentId;
+      try {
+        const service = ScriptApp.getService();
+        const currentUrl = service.getUrl();
+        deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
+      } catch (e) {
+        console.warn('Could not get deployment ID from service:', e);
+        // Fallback to script ID
+        deploymentId = ScriptApp.getScriptId();
       }
       
-      // Construct base URL with script ID
-      const baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+      if (!deploymentId) {
+        throw new Error('Failed to get deployment/script ID');
+      }
+      
+      // Construct base URL with deployment ID
+      const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
       console.log('Using base URL:', baseUrl);
       
       // Add session ID and page parameters
