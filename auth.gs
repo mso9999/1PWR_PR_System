@@ -230,20 +230,23 @@ function getWebAppUrlFromAuth(page = 'dashboard') {
   console.log('Getting web app URL for page:', page);
   
   try {
-    // Get the deployment ID from the current web app
-    const webAppUrl = ScriptApp.getService().getUrl();
-    const deploymentId = webAppUrl.match(/\/exec([^?#]*)/)?.[1] || '';
+    // Use the main getWebAppUrl function which already has proper fallback logic
+    const baseUrl = getWebAppUrl();
+    if (!baseUrl) {
+      throw new Error('Failed to get base URL');
+    }
     
-    // Construct the proper web app URL
-    const baseUrl = `https://script.google.com/macros/s/${ScriptApp.getScriptId()}/exec${deploymentId}`;
-    console.log('Base URL:', baseUrl);
+    // Ensure we have a clean base URL without any query parameters
+    const cleanBaseUrl = baseUrl.split('?')[0];
     
-    const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
+    // Add page parameter
+    const fullUrl = `${cleanBaseUrl}?page=${encodeURIComponent(page)}`;
     console.log('Generated full URL:', fullUrl);
     return fullUrl;
   } catch (error) {
     console.error('Error getting web app URL:', error);
-    throw error;
+    // Return a default error page URL
+    return '?page=error';
   }
 }
 
@@ -263,32 +266,20 @@ function getDashboardUrl(sessionId) {
     // Validate the session first
     if (!validateSession(sessionId)) {
       console.error('Invalid or expired session:', sessionId);
-      // Use getWebAppUrlFromAuth directly to avoid circular dependency
       return getWebAppUrlFromAuth('login');
     }
 
-    // Get the script URL from ScriptApp
-    const scriptId = ScriptApp.getScriptId();
-    if (!scriptId) {
-      throw new Error('Failed to get script ID');
+    // Get the base URL using the existing getWebAppUrl function
+    const baseUrl = getWebAppUrl();
+    if (!baseUrl) {
+      throw new Error('Failed to get base URL');
     }
     
-    // Get the deployment ID if available
-    let deploymentId;
-    try {
-      const deployments = ScriptApp.getProjectTriggers().map(t => t.getTriggerSourceId());
-      deploymentId = deployments.length > 0 ? deployments[0] : scriptId;
-    } catch (e) {
-      console.warn('Could not get deployment ID, using script ID:', e);
-      deploymentId = scriptId;
-    }
+    // Ensure we have a clean base URL without any query parameters
+    const cleanBaseUrl = baseUrl.split('?')[0];
     
-    // Construct base URL with deployment/script ID
-    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
-    console.log('Base URL:', baseUrl);
-    
-    // Add session ID and page parameters using CONFIG.VIEWS.DASHBOARD
-    const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=${CONFIG.VIEWS.DASHBOARD}`;
+    // Add session ID and page parameters
+    const dashboardUrl = `${cleanBaseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=dashboard`;
     console.log('Generated dashboard URL (session ID hidden)');
     return dashboardUrl;
   } catch (error) {
