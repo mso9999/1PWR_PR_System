@@ -1,11 +1,15 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.6
+ * Version: 1.7
  * Last Updated: 2024-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
- *   Implements secure session storage using Google Apps Script Cache Service.
+ *   Implements secure session storage using Google Apps Script Cache Service and Spreadsheet.
+ *
+ * Changes in 1.7:
+ *   - Updated session storage to persist sessions in both cache and sheet
+ *   - Fixed X-Frame-Options issue to allow iframe embedding
  *
  * Changes in 1.6:
  *   - Added more logging to validateSession
@@ -92,18 +96,53 @@ function authenticateUser(username, password) {
 }
 
 /**
- * Stores a user session in cache.
+ * Stores a user session in cache and sheet.
  * @param {string} sessionId - Unique session identifier
  * @param {Object} userInfo - User information to store
  * @return {boolean} Success status
  */
 function storeSession(sessionId, userInfo) {
+  console.log('Storing session:', sessionId);
   try {
+    // Store in cache
     const cache = CacheService.getUserCache();
     const key = CACHE_PREFIX + sessionId;
     const value = JSON.stringify(userInfo);
-    
     cache.put(key, value, SESSION_DURATION);
+    
+    // Store in sheet
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
+    if (!sheet) {
+      console.log('Creating ActiveSessions sheet');
+      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+      const newSheet = ss.insertSheet('ActiveSessions');
+      newSheet.getRange('A1:D1').setValues([['SessionID', 'UserInfo', 'Active', 'LastAccessed']]);
+    }
+    
+    // Find existing session or get next empty row
+    const data = sheet.getDataRange().getValues();
+    let rowIndex = -1;
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === sessionId) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (rowIndex === -1) {
+      rowIndex = data.length + 1;
+    }
+    
+    // Update or insert session data
+    sheet.getRange(rowIndex, 1, 1, 4).setValues([[
+      sessionId,
+      value,
+      true,
+      new Date().toISOString()
+    ]]);
+    
+    console.log('Session stored successfully');
     return true;
   } catch (error) {
     console.error('Session storage error:', error);
@@ -155,7 +194,7 @@ function getUserFromSession(sessionId) {
 }
 
 /**
- * Removes a session from cache.
+ * Removes a session from cache and sheet.
  * @param {string} sessionId - Session to remove
  */
 function removeSession(sessionId) {
@@ -163,6 +202,17 @@ function removeSession(sessionId) {
     const cache = CacheService.getUserCache();
     const key = CACHE_PREFIX + sessionId;
     cache.remove(key);
+    
+    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === sessionId) {
+        sheet.getRange(i + 1, 1, 1, 4).clearContent();
+        break;
+      }
+    }
+    
     console.log('Session removed:', sessionId);
   } catch (error) {
     console.error('Session removal error:', error);
@@ -314,8 +364,8 @@ function getDashboardUrl(sessionId) {
         throw new Error('Failed to get deployment/script ID');
       }
       
-      // Construct base URL with deployment ID
-      const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
+      // Get the current deployment URL
+      const baseUrl = ScriptApp.getService().getUrl().split('?')[0];
       console.log('Using base URL:', baseUrl);
       
       // Add session ID and page parameters
@@ -372,4 +422,28 @@ function getCurrentUser(sessionId) {
     console.error('Error getting current user:', error);
     return null;
   }
+}
+
+/**
+ * Handles HTTP GET requests
+ * @param {Object} e - Event object
+ * @return {HtmlOutput} HTML output
+ */
+function doGet(e) {
+  const page = e.parameter.page || 'login';
+  console.log('Event parameters:', JSON.stringify(e.parameter));
+  
+  // Get session ID from URL parameters
+  const sessionId = e.parameter.sessionId;
+  console.log('Session ID from URL:', sessionId);
+  
+  // Set headers to allow iframe embedding
+  const output = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage')
+    .evaluate()
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setTitle('1PWR PR System')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  
+  console.log(`${page} template evaluated successfully`);
+  return output;
 }
