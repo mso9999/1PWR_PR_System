@@ -337,43 +337,66 @@ function validateSession(sessionId) {
     
     const data = sheet.getDataRange().getValues();
     console.log('Found', data.length - 1, 'sessions in sheet');
-    console.log('Header row:', data[0]);
+    console.log('Header row:', JSON.stringify(data[0]));
     
     // Log all sessions for debugging
     console.log('All sessions in sheet:');
     for (let i = 1; i < data.length; i++) {
-      console.log(`Row ${i}: ID=${data[i][0]}, Active=${data[i][2]} (${typeof data[i][2]})`);
+      const row = data[i];
+      console.log(`Row ${i}:`, {
+        id: row[0],
+        active: row[2],
+        activeType: typeof row[2],
+        lastAccessed: row[3],
+        matches: row[0] === sessionId
+      });
     }
     
     // Look for our session
     console.log('Looking for session:', sessionId);
+    let found = false;
+    let foundRow = null;
+    let foundIndex = -1;
+    
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       if (row[0] === sessionId) {
-        console.log('Found matching session. Active status:', row[2], 'Type:', typeof row[2]);
+        found = true;
+        foundRow = row;
+        foundIndex = i;
+        break;
+      }
+    }
+    
+    if (found) {
+      console.log('Found session at row', foundIndex + 1, ':', {
+        id: foundRow[0],
+        active: foundRow[2],
+        activeType: typeof foundRow[2],
+        lastAccessed: foundRow[3]
+      });
+      
+      // Check if session is active (handle both boolean true and string 'TRUE')
+      const isActive = foundRow[2] === true || foundRow[2] === 'TRUE';
+      console.log('Is session active?', isActive);
+      
+      if (isActive) {
+        console.log('Session is active');
         
-        // Check if session is active (handle both boolean true and string 'TRUE')
-        const isActive = row[2] === true || row[2] === 'TRUE';
-        console.log('Is session active?', isActive);
+        // Update LastAccessed timestamp
+        const now = new Date().toISOString();
+        console.log('Updating LastAccessed to:', now);
+        sheet.getRange(foundIndex + 1, 4).setValue(now);
         
-        if (isActive) {
-          console.log('Session is active');
-          
-          // Update LastAccessed timestamp
-          const now = new Date().toISOString();
-          console.log('Updating LastAccessed to:', now);
-          sheet.getRange(i + 1, 4).setValue(now);
-          
-          // Refresh cache with user info
-          const userInfo = JSON.parse(row[1]);
-          cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
-          console.log('Session refreshed in cache');
-          
-          return true;
-        } else {
-          console.log('Session found but not active');
-          return false;
-        }
+        // Refresh cache with user info
+        const userInfo = JSON.parse(foundRow[1]);
+        cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
+        console.log('Session refreshed in cache');
+        
+        return true;
+      } else {
+        console.log('Session found but not active');
+        return false;
       }
     }
     
