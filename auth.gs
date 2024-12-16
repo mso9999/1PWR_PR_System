@@ -165,13 +165,15 @@ function storeSession(sessionId, userInfo) {
     range.setWrap(true);
     range.setVerticalAlignment('top');
     
-    // Set specific column formats
-    sheet.getRange(rowIndex, 3).setDataValidation(  // Active column
-      SpreadsheetApp.newDataValidation()
-        .requireBoolean()
-        .build()
-    );
-    sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');  // LastAccessed column
+    // Set checkbox for Active column using a simple TRUE/FALSE validation
+    const activeCell = sheet.getRange(rowIndex, 3);
+    const rule = SpreadsheetApp.newDataValidation()
+      .requireCheckbox()
+      .build();
+    activeCell.setDataValidation(rule);
+    
+    // Format LastAccessed column
+    sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');
     
     console.log('Session stored successfully in both cache and sheet');
     return true;
