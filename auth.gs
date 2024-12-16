@@ -156,7 +156,7 @@ function storeSession(sessionId, userInfo) {
     sheet.getRange(rowIndex, 1, 1, 4).setValues([[
       sessionId,
       value,
-      'TRUE',  // Use string 'TRUE' for consistency with Google Sheets
+      'TRUE',  // Use string 'TRUE' for Google Sheets compatibility
       now.toISOString()
     ]]);
     
@@ -164,13 +164,6 @@ function storeSession(sessionId, userInfo) {
     const range = sheet.getRange(rowIndex, 1, 1, 4);
     range.setWrap(true);
     range.setVerticalAlignment('top');
-    
-    // Set checkbox for Active column
-    const activeCell = sheet.getRange(rowIndex, 3);
-    const rule = SpreadsheetApp.newDataValidation()
-      .requireCheckbox()
-      .build();
-    activeCell.setDataValidation(rule);
     
     // Format LastAccessed column
     sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');
@@ -303,33 +296,60 @@ function validateSession(sessionId) {
   }
 
   try {
-    // Check cache first
-    const userInfo = getUserFromSession(sessionId);
-    console.log('User info from session:', userInfo ? 'found' : 'not found');
+    // Try cache first
+    const cache = CacheService.getUserCache();
+    const key = CACHE_PREFIX + sessionId;
+    const value = cache.get(key);
     
-    if (!userInfo) {
-      return false;
+    if (value) {
+      console.log('Session found in cache');
+      return true;
     }
 
-    // Get the sheet to update LastAccessed
+    console.log('Looking for session in sheet');
+    
+    // Check sheet if not in cache
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const sheet = ss.getSheetByName('ActiveSessions');
     
-    if (sheet) {
-      const data = sheet.getDataRange().getValues();
-      for (let i = 1; i < data.length; i++) {
-        if (data[i][0] === sessionId) {
+    if (!sheet) {
+      console.log('ActiveSessions sheet not found');
+      return false;
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    console.log('Found', data.length - 1, 'sessions in sheet');
+    console.log('Header row:', data[0]);
+    
+    for (let i = 1; i < data.length; i++) {
+      console.log('Checking row', i, ':', JSON.stringify(data[i]));
+      
+      if (data[i][0] === sessionId) {
+        console.log('Found matching session. Active status:', data[i][2]);
+        
+        // Check if session is active (true or TRUE)
+        const isActive = data[i][2] === true || data[i][2] === 'TRUE';
+        
+        if (isActive) {
+          console.log('Session is active');
+          
           // Update LastAccessed timestamp
           sheet.getRange(i + 1, 4).setValue(new Date().toISOString());
-          break;
+          
+          // Refresh cache
+          const userInfo = JSON.parse(data[i][1]);
+          cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
+          
+          return true;
+        } else {
+          console.log('Session found but not active');
+          return false;
         }
       }
     }
-
-    // Refresh session in cache
-    const refreshed = storeSession(sessionId, userInfo);
-    console.log('Session refresh status:', refreshed ? 'success' : 'failed');
-    return refreshed;
+    
+    console.log('Session not found in sheet');
+    return false;
   } catch (error) {
     console.error('Session validation error:', error.toString());
     console.error('Stack trace:', error.stack);
