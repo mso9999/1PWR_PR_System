@@ -161,7 +161,7 @@ function storeSession(sessionId, userInfo) {
     const rowData = [
       sessionId,
       value,
-      'TRUE',
+      'TRUE',  // Use string 'TRUE' which Google Sheets will convert to boolean true
       now.toISOString()
     ];
     console.log('Writing row data:', JSON.stringify(rowData));
@@ -180,7 +180,9 @@ function storeSession(sessionId, userInfo) {
     const verifyData = sheet.getRange(rowIndex, 1, 1, 4).getValues()[0];
     console.log('Verifying written data:', JSON.stringify(verifyData));
     
-    if (verifyData[0] !== sessionId || verifyData[2] !== 'TRUE') {
+    // Check session ID and active status (which will be boolean true)
+    if (verifyData[0] !== sessionId || verifyData[2] !== true) {
+      console.error('Verification failed. Expected:', sessionId, 'true', 'Got:', verifyData[0], verifyData[2]);
       throw new Error('Session data verification failed');
     }
     
@@ -344,8 +346,8 @@ function validateSession(sessionId) {
       if (row[0] === sessionId) {
         console.log('Found matching session. Active status:', row[2], 'Type:', typeof row[2]);
         
-        // Check if session is active
-        if (row[2] === 'TRUE') {
+        // Check if session is active (handle both boolean true and string 'TRUE')
+        if (row[2] === true || row[2] === 'TRUE') {
           console.log('Session is active');
           
           // Update LastAccessed timestamp
