@@ -104,19 +104,36 @@ function authenticateUser(username, password) {
 function storeSession(sessionId, userInfo) {
   console.log('Storing session:', sessionId);
   try {
-    // Store in cache
+    // Store in cache first
     const cache = CacheService.getUserCache();
     const key = CACHE_PREFIX + sessionId;
     const value = JSON.stringify(userInfo);
     cache.put(key, value, SESSION_DURATION);
     
-    // Store in sheet
-    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
+    // Get or create ActiveSessions sheet
+    console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    if (!ss) {
+      throw new Error('Failed to open spreadsheet');
+    }
+    
+    let sheet = ss.getSheetByName('ActiveSessions');
     if (!sheet) {
       console.log('Creating ActiveSessions sheet');
-      const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-      const newSheet = ss.insertSheet('ActiveSessions');
-      newSheet.getRange('A1:D1').setValues([['SessionID', 'UserInfo', 'Active', 'LastAccessed']]);
+      sheet = ss.insertSheet('ActiveSessions');
+      if (!sheet) {
+        throw new Error('Failed to create ActiveSessions sheet');
+      }
+      
+      // Set up header row
+      sheet.getRange('A1:D1').setValues([['SessionID', 'UserInfo', 'Active', 'LastAccessed']]);
+      sheet.setFrozenRows(1);
+      
+      // Set column widths for better readability
+      sheet.setColumnWidth(1, 250); // SessionID
+      sheet.setColumnWidth(2, 300); // UserInfo
+      sheet.setColumnWidth(3, 100); // Active
+      sheet.setColumnWidth(4, 200); // LastAccessed
     }
     
     // Find existing session or get next empty row
@@ -135,17 +152,32 @@ function storeSession(sessionId, userInfo) {
     }
     
     // Update or insert session data
+    const now = new Date();
     sheet.getRange(rowIndex, 1, 1, 4).setValues([[
       sessionId,
       value,
       true,
-      new Date().toISOString()
+      now.toISOString()
     ]]);
     
-    console.log('Session stored successfully');
+    // Format the cells
+    const range = sheet.getRange(rowIndex, 1, 1, 4);
+    range.setWrap(true);
+    range.setVerticalAlignment('top');
+    
+    // Set specific column formats
+    sheet.getRange(rowIndex, 3).setDataValidation(  // Active column
+      SpreadsheetApp.newDataValidation()
+        .requireBoolean()
+        .build()
+    );
+    sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');  // LastAccessed column
+    
+    console.log('Session stored successfully in both cache and sheet');
     return true;
   } catch (error) {
-    console.error('Session storage error:', error);
+    console.error('Session storage error:', error.toString());
+    console.error('Stack trace:', error.stack);
     return false;
   }
 }
@@ -171,8 +203,20 @@ function getUserFromSession(sessionId) {
 
     // If not in cache, check active sessions sheet
     console.log('Session not in cache, checking sheet');
-    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
+    console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    if (!ss) {
+      throw new Error('Failed to open spreadsheet');
+    }
+    
+    const sheet = ss.getSheetByName('ActiveSessions');
+    if (!sheet) {
+      console.log('ActiveSessions sheet not found');
+      return null;
+    }
+    
     const data = sheet.getDataRange().getValues();
+    console.log('Found', data.length - 1, 'sessions in sheet');
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === sessionId && data[i][2] === true) { // Check session ID and active status
@@ -188,7 +232,8 @@ function getUserFromSession(sessionId) {
     console.log('Session not found in sheet or inactive');
     return null;
   } catch (error) {
-    console.error('Session retrieval error:', error);
+    console.error('Session retrieval error:', error.toString());
+    console.error('Stack trace:', error.stack);
     return null;
   }
 }
@@ -199,23 +244,31 @@ function getUserFromSession(sessionId) {
  */
 function removeSession(sessionId) {
   try {
+    // Remove from cache
     const cache = CacheService.getUserCache();
     const key = CACHE_PREFIX + sessionId;
     cache.remove(key);
     
-    const sheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID).getSheetByName('ActiveSessions');
-    const data = sheet.getDataRange().getValues();
+    // Remove from sheet
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('ActiveSessions');
     
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === sessionId) {
-        sheet.getRange(i + 1, 1, 1, 4).clearContent();
-        break;
+    if (sheet) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0] === sessionId) {
+          // Instead of clearing, mark as inactive
+          sheet.getRange(i + 1, 3).setValue(false); // Set Active to false
+          sheet.getRange(i + 1, 4).setValue(new Date().toISOString()); // Update LastAccessed
+          break;
+        }
       }
     }
     
     console.log('Session removed:', sessionId);
   } catch (error) {
-    console.error('Session removal error:', error);
+    console.error('Session removal error:', error.toString());
+    console.error('Stack trace:', error.stack);
   }
 }
 
@@ -233,6 +286,7 @@ function validateSession(sessionId) {
   }
 
   try {
+    // Check cache first
     const userInfo = getUserFromSession(sessionId);
     console.log('User info from session:', userInfo ? 'found' : 'not found');
     
@@ -240,12 +294,28 @@ function validateSession(sessionId) {
       return false;
     }
 
-    // Refresh session
+    // Get the sheet to update LastAccessed
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName('ActiveSessions');
+    
+    if (sheet) {
+      const data = sheet.getDataRange().getValues();
+      for (let i = 1; i < data.length; i++) {
+        if (data[i][0] === sessionId) {
+          // Update LastAccessed timestamp
+          sheet.getRange(i + 1, 4).setValue(new Date().toISOString());
+          break;
+        }
+      }
+    }
+
+    // Refresh session in cache
     const refreshed = storeSession(sessionId, userInfo);
     console.log('Session refresh status:', refreshed ? 'success' : 'failed');
     return refreshed;
   } catch (error) {
-    console.error('Session validation error:', error);
+    console.error('Session validation error:', error.toString());
+    console.error('Stack trace:', error.stack);
     return false;
   }
 }
