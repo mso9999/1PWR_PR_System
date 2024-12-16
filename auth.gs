@@ -339,15 +339,24 @@ function validateSession(sessionId) {
     console.log('Found', data.length - 1, 'sessions in sheet');
     console.log('Header row:', data[0]);
     
+    // Log all sessions for debugging
+    console.log('All sessions in sheet:');
+    for (let i = 1; i < data.length; i++) {
+      console.log(`Row ${i}: ID=${data[i][0]}, Active=${data[i][2]} (${typeof data[i][2]})`);
+    }
+    
+    // Look for our session
+    console.log('Looking for session:', sessionId);
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log('Row', i, 'data:', JSON.stringify(row));
-      
       if (row[0] === sessionId) {
         console.log('Found matching session. Active status:', row[2], 'Type:', typeof row[2]);
         
         // Check if session is active (handle both boolean true and string 'TRUE')
-        if (row[2] === true || row[2] === 'TRUE') {
+        const isActive = row[2] === true || row[2] === 'TRUE';
+        console.log('Is session active?', isActive);
+        
+        if (isActive) {
           console.log('Session is active');
           
           // Update LastAccessed timestamp
@@ -465,11 +474,15 @@ function getDashboardUrl(sessionId) {
   
   try {
     if (!sessionId) {
-      throw new Error('Session ID is required');
+      console.error('No session ID provided');
+      return getWebAppUrlFromAuth('login');
     }
 
-    // Validate the session first
-    if (!validateSession(sessionId)) {
+    console.log('Validating session:', sessionId);
+    const isValid = validateSession(sessionId);
+    console.log('Session validation result:', isValid);
+
+    if (!isValid) {
       console.error('Invalid or expired session:', sessionId);
       return getWebAppUrlFromAuth('login');
     }
@@ -497,7 +510,7 @@ function getDashboardUrl(sessionId) {
       
       // Add session ID and page parameters
       const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=dashboard`;
-      console.log('Generated dashboard URL (session ID hidden)');
+      console.log('Generated dashboard URL with session ID');
       return dashboardUrl;
     } catch (urlError) {
       console.error('Error constructing dashboard URL:', urlError);
