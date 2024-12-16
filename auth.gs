@@ -109,6 +109,7 @@ function storeSession(sessionId, userInfo) {
     const key = CACHE_PREFIX + sessionId;
     const value = JSON.stringify(userInfo);
     cache.put(key, value, SESSION_DURATION);
+    console.log('Session stored in cache');
     
     // Get or create ActiveSessions sheet
     console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
@@ -134,31 +135,38 @@ function storeSession(sessionId, userInfo) {
       sheet.setColumnWidth(2, 300); // UserInfo
       sheet.setColumnWidth(3, 100); // Active
       sheet.setColumnWidth(4, 200); // LastAccessed
+      console.log('Sheet created and formatted');
     }
     
     // Find existing session or get next empty row
     const data = sheet.getDataRange().getValues();
+    console.log('Current sheet data:', JSON.stringify(data));
     let rowIndex = -1;
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === sessionId) {
         rowIndex = i + 1;
+        console.log('Found existing session at row:', rowIndex);
         break;
       }
     }
     
     if (rowIndex === -1) {
       rowIndex = data.length + 1;
+      console.log('Adding new session at row:', rowIndex);
     }
     
     // Update or insert session data
     const now = new Date();
-    sheet.getRange(rowIndex, 1, 1, 4).setValues([[
+    const rowData = [
       sessionId,
       value,
-      'TRUE',  // Use string 'TRUE' for Google Sheets compatibility
+      'TRUE',
       now.toISOString()
-    ]]);
+    ];
+    console.log('Writing row data:', JSON.stringify(rowData));
+    
+    sheet.getRange(rowIndex, 1, 1, 4).setValues([rowData]);
     
     // Format the cells
     const range = sheet.getRange(rowIndex, 1, 1, 4);
@@ -167,6 +175,14 @@ function storeSession(sessionId, userInfo) {
     
     // Format LastAccessed column
     sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');
+    
+    // Verify the data was written correctly
+    const verifyData = sheet.getRange(rowIndex, 1, 1, 4).getValues()[0];
+    console.log('Verifying written data:', JSON.stringify(verifyData));
+    
+    if (verifyData[0] !== sessionId || verifyData[2] !== 'TRUE') {
+      throw new Error('Session data verification failed');
+    }
     
     console.log('Session stored successfully in both cache and sheet');
     return true;
@@ -306,7 +322,7 @@ function validateSession(sessionId) {
       return true;
     }
 
-    console.log('Looking for session in sheet');
+    console.log('Session not in cache, checking sheet');
     
     // Check sheet if not in cache
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
@@ -322,23 +338,25 @@ function validateSession(sessionId) {
     console.log('Header row:', data[0]);
     
     for (let i = 1; i < data.length; i++) {
-      console.log('Checking row', i, ':', JSON.stringify(data[i]));
+      const row = data[i];
+      console.log('Row', i, 'data:', JSON.stringify(row));
       
-      if (data[i][0] === sessionId) {
-        console.log('Found matching session. Active status:', data[i][2]);
+      if (row[0] === sessionId) {
+        console.log('Found matching session. Active status:', row[2], 'Type:', typeof row[2]);
         
-        // Check if session is active (true or TRUE)
-        const isActive = data[i][2] === true || data[i][2] === 'TRUE';
-        
-        if (isActive) {
+        // Check if session is active
+        if (row[2] === 'TRUE') {
           console.log('Session is active');
           
           // Update LastAccessed timestamp
-          sheet.getRange(i + 1, 4).setValue(new Date().toISOString());
+          const now = new Date().toISOString();
+          console.log('Updating LastAccessed to:', now);
+          sheet.getRange(i + 1, 4).setValue(now);
           
-          // Refresh cache
-          const userInfo = JSON.parse(data[i][1]);
+          // Refresh cache with user info
+          const userInfo = JSON.parse(row[1]);
           cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
+          console.log('Session refreshed in cache');
           
           return true;
         } else {
