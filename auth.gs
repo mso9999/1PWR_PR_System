@@ -156,7 +156,7 @@ function storeSession(sessionId, userInfo) {
     sheet.getRange(rowIndex, 1, 1, 4).setValues([[
       sessionId,
       value,
-      true,
+      'TRUE',  // Use string 'TRUE' for consistency with Google Sheets
       now.toISOString()
     ]]);
     
@@ -165,7 +165,7 @@ function storeSession(sessionId, userInfo) {
     range.setWrap(true);
     range.setVerticalAlignment('top');
     
-    // Set checkbox for Active column using a simple TRUE/FALSE validation
+    // Set checkbox for Active column
     const activeCell = sheet.getRange(rowIndex, 3);
     const rule = SpreadsheetApp.newDataValidation()
       .requireCheckbox()
@@ -220,14 +220,29 @@ function getUserFromSession(sessionId) {
     const data = sheet.getDataRange().getValues();
     console.log('Found', data.length - 1, 'sessions in sheet');
     
+    // Log the header row to verify column order
+    console.log('Header row:', data[0]);
+    
     for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === sessionId && data[i][2] === true) { // Check session ID and active status
-        console.log('Session found in sheet');
-        const userInfo = JSON.parse(data[i][1]); // User info is in column B
+      // Log the raw session data for debugging
+      console.log('Row', i, 'data:', JSON.stringify(data[i]));
+      
+      if (data[i][0] === sessionId) {
+        console.log('Found matching session ID. Active status:', data[i][2]);
         
-        // Store back in cache
-        storeSession(sessionId, userInfo);
-        return userInfo;
+        // Check if session is active (true or TRUE)
+        const isActive = data[i][2] === true || data[i][2] === 'TRUE';
+        
+        if (isActive) {
+          console.log('Session is active');
+          const userInfo = JSON.parse(data[i][1]); // User info is in column B
+          
+          // Store back in cache
+          storeSession(sessionId, userInfo);
+          return userInfo;
+        } else {
+          console.log('Session found but not active');
+        }
       }
     }
 
