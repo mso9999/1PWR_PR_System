@@ -600,12 +600,14 @@ function doGet(e) {
   const sessionId = e.parameter.sessionId;
   console.log('Session ID from URL:', sessionId);
   
-  // Set headers to allow iframe embedding
-  const output = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage')
-    .evaluate()
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+  // Create template and set security headers using shared utility
+  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
+  const output = template.evaluate()
     .setTitle('1PWR PR System')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  
+  // Apply security headers consistently with Code.gs
+  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME);
   
   console.log(`${page} template evaluated successfully`);
   return output;
