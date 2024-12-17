@@ -96,7 +96,7 @@ function authenticateUser(username, password) {
 }
 
 /**
- * Stores a user session in cache and sheet.
+ * Stores a user session in sheet.
  * @param {string} sessionId - Unique session identifier
  * @param {Object} userInfo - User information to store
  * @return {boolean} Success status
@@ -104,13 +104,6 @@ function authenticateUser(username, password) {
 function storeSession(sessionId, userInfo) {
   console.log('Storing session:', sessionId);
   try {
-    // Store in cache first
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = JSON.stringify(userInfo);
-    cache.put(key, value, SESSION_DURATION);
-    console.log('Session stored in cache');
-    
     // Get or create ActiveSessions sheet
     console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
@@ -160,16 +153,15 @@ function storeSession(sessionId, userInfo) {
     const now = new Date();
     const rowData = [
       sessionId,
-      value,
-      'TRUE',  // Use string 'TRUE' which Google Sheets will convert to boolean true
+      JSON.stringify(userInfo),
+      true,
       now.toISOString()
     ];
     console.log('Writing row data:', JSON.stringify(rowData));
     
-    sheet.getRange(rowIndex, 1, 1, 4).setValues([rowData]);
-    
-    // Format the cells
+    // Set values and format
     const range = sheet.getRange(rowIndex, 1, 1, 4);
+    range.setValues([rowData]);
     range.setWrap(true);
     range.setVerticalAlignment('top');
     
@@ -180,13 +172,13 @@ function storeSession(sessionId, userInfo) {
     const verifyData = sheet.getRange(rowIndex, 1, 1, 4).getValues()[0];
     console.log('Verifying written data:', JSON.stringify(verifyData));
     
-    // Check session ID and active status (which will be boolean true)
+    // Check session ID and active status
     if (verifyData[0] !== sessionId || verifyData[2] !== true) {
-      console.error('Verification failed. Expected:', sessionId, 'true', 'Got:', verifyData[0], verifyData[2]);
+      console.error('Verification failed. Expected:', sessionId, true, 'Got:', verifyData[0], verifyData[2]);
       throw new Error('Session data verification failed');
     }
     
-    console.log('Session stored successfully in both cache and sheet');
+    console.log('Session stored successfully in sheet');
     return true;
   } catch (error) {
     console.error('Session storage error:', error.toString());
@@ -204,16 +196,6 @@ function getUserFromSession(sessionId) {
   console.log('Getting user from session:', sessionId);
   
   try {
-    // Try cache first
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = cache.get(key);
-    
-    if (value) {
-      console.log('Session found in cache');
-      return JSON.parse(value);
-    }
-
     // If not in cache, check active sessions sheet
     console.log('Session not in cache, checking sheet');
     console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
@@ -248,8 +230,6 @@ function getUserFromSession(sessionId) {
           console.log('Session is active');
           const userInfo = JSON.parse(data[i][1]); // User info is in column B
           
-          // Store back in cache
-          storeSession(sessionId, userInfo);
           return userInfo;
         } else {
           console.log('Session found but not active');
@@ -267,16 +247,11 @@ function getUserFromSession(sessionId) {
 }
 
 /**
- * Removes a session from cache and sheet.
+ * Removes a session from sheet.
  * @param {string} sessionId - Session to remove
  */
 function removeSession(sessionId) {
   try {
-    // Remove from cache
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    cache.remove(key);
-    
     // Remove from sheet
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const sheet = ss.getSheetByName('ActiveSessions');
@@ -314,19 +289,9 @@ function validateSession(sessionId) {
   }
 
   try {
-    // Try cache first
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = cache.get(key);
+    // Check sheet directly without cache
+    console.log('Checking session in sheet');
     
-    if (value) {
-      console.log('Session found in cache');
-      return true;
-    }
-
-    console.log('Session not in cache, checking sheet');
-    
-    // Check sheet if not in cache
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const sheet = ss.getSheetByName('ActiveSessions');
     
@@ -338,19 +303,6 @@ function validateSession(sessionId) {
     const data = sheet.getDataRange().getValues();
     console.log('Found', data.length - 1, 'sessions in sheet');
     console.log('Header row:', JSON.stringify(data[0]));
-    
-    // Log all sessions for debugging
-    console.log('All sessions in sheet:');
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      console.log(`Row ${i}:`, {
-        id: row[0],
-        active: row[2],
-        activeType: typeof row[2],
-        lastAccessed: row[3],
-        matches: row[0] === sessionId
-      });
-    }
     
     // Look for our session
     console.log('Looking for session:', sessionId);
@@ -376,9 +328,9 @@ function validateSession(sessionId) {
         lastAccessed: foundRow[3]
       });
       
-      // Check if session is active (handle both boolean true and string 'TRUE')
-      const isActive = foundRow[2] === true || foundRow[2] === 'TRUE';
-      console.log('Is session active?', isActive);
+      // Check if session is active
+      const isActive = foundRow[2] === true;
+      console.log('Is session active?', isActive, 'Value type:', typeof foundRow[2], 'Value:', foundRow[2]);
       
       if (isActive) {
         console.log('Session is active');
@@ -387,11 +339,6 @@ function validateSession(sessionId) {
         const now = new Date().toISOString();
         console.log('Updating LastAccessed to:', now);
         sheet.getRange(foundIndex + 1, 4).setValue(now);
-        
-        // Refresh cache with user info
-        const userInfo = JSON.parse(foundRow[1]);
-        cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
-        console.log('Session refreshed in cache');
         
         return true;
       } else {
@@ -560,26 +507,13 @@ function getCurrentUser(sessionId) {
       return null;
     }
 
-    const cache = CacheService.getUserCache();
-    const key = CACHE_PREFIX + sessionId;
-    const value = cache.get(key);
-    
-    if (!value) {
-      console.log('Session not found:', sessionId);
-      return null;
-    }
-
-    const userInfo = JSON.parse(value);
+    const userInfo = getUserFromSession(sessionId);
     
     // Validate user info structure
-    if (!userInfo.email || !userInfo.role) {
+    if (!userInfo || !userInfo.email || !userInfo.role) {
       console.error('Invalid user info structure:', userInfo);
       return null;
     }
-
-    // Refresh session
-    cache.put(key, JSON.stringify(userInfo), SESSION_DURATION);
-    console.log('Session refreshed for user:', userInfo.email);
 
     return userInfo;
   } catch (error) {
