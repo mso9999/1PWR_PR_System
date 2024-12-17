@@ -59,9 +59,10 @@ const COL = {
  * @returns {HtmlOutput} The HTML output with headers set
  */
 function setSecurityHeaders(output) {
-  // Let Google Apps Script handle CSP
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME);
-  return output;
+  return output
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 /**
