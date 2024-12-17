@@ -131,6 +131,14 @@ function setupEventListeners() {
 
     // Visibility change handling for refresh management
     document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Listen for session expiry messages
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'sessionExpired') {
+            console.log('Received session expired message');
+            handleSessionExpiry();
+        }
+    });
 }
 
 //==============================================================================
@@ -281,6 +289,44 @@ function updateLastUpdated(timestamp) {
     const element = document.getElementById('lastUpdate');
     if (element) element.textContent = new Date(timestamp).toLocaleString();
     lastUpdateTime = timestamp;
+}
+
+function handleSessionExpiry() {
+    // Clear any ongoing processes
+    if (refreshInterval) {
+        clearInterval(refreshInterval);
+    }
+    
+    // Show a user-friendly message
+    const message = 'Your session has expired. Please log in again.';
+    showMessage(message, 'error');
+    
+    // Redirect to login after a short delay
+    setTimeout(() => {
+        window.location.href = '?page=login&sessionExpired=true';
+    }, 2000);
+}
+
+function showMessage(message, type = 'info') {
+    const messageDiv = document.getElementById('messageDiv') || createMessageDiv();
+    messageDiv.textContent = message;
+    messageDiv.className = `message ${type}`;
+    messageDiv.style.display = 'block';
+}
+
+function createMessageDiv() {
+    const div = document.createElement('div');
+    div.id = 'messageDiv';
+    div.style.position = 'fixed';
+    div.style.top = '20px';
+    div.style.left = '50%';
+    div.style.transform = 'translateX(-50%)';
+    div.style.padding = '10px 20px';
+    div.style.borderRadius = '5px';
+    div.style.zIndex = '1000';
+    div.style.display = 'none';
+    document.body.appendChild(div);
+    return div;
 }
 
 //==============================================================================

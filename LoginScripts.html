@@ -29,6 +29,13 @@ try {
       console.log('DOM loaded, initializing login form');
       console.log('Calling loadUserList()...');
       loadUserList();
+      
+      // Check for session expiry
+      if (typeof SessionManager !== 'undefined') {
+        SessionManager.handleSessionExpiry();
+      } else {
+        console.warn('SessionManager not found');
+      }
     } catch (error) {
       console.error('Error in DOMContentLoaded handler:', error);
     }

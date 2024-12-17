@@ -507,7 +507,8 @@ function getDashboardUrl(sessionId) {
 
     if (!isValid) {
       console.error('Invalid or expired session:', sessionId);
-      return getWebAppUrlFromAuth('login');
+      // Instead of redirecting to login, return a special URL that the client can handle
+      return getWebAppUrlFromAuth('login') + '&sessionExpired=true';
     }
 
     try {
@@ -541,7 +542,7 @@ function getDashboardUrl(sessionId) {
     }
   } catch (error) {
     console.error('Error in getDashboardUrl:', error);
-    return getWebAppUrlFromAuth('login');
+    return getWebAppUrlFromAuth('login') + '&error=' + encodeURIComponent(error.message);
   }
 }
 

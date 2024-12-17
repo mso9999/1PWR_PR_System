@@ -117,30 +117,39 @@ const SessionUtils = {
         return `${url}${separator}sessionId=${encodeURIComponent(sessionId)}`;
     },
 
+    /**
+     * Handles session expiry by checking URL parameters and showing appropriate messages
+     */
     handleSessionExpiry() {
-        console.log('Handling session expiry');
-        this.clearSession();
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionExpired = urlParams.get('sessionExpired');
+        const error = urlParams.get('error');
         
-        // Notify server of session expiry
-        this.notifySessionExpiry();
-        
-        google.script.run
-            .withSuccessHandler((url) => {
-                if (!url) {
-                    console.error('Failed to get login URL');
-                    // Fall back to default login path
-                    window.location.href = '/login.html';
-                    return;
+        if (sessionExpired === 'true') {
+            console.log('Session has expired, showing message');
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = 'Your session has expired. Please log in again.';
+                errorMessage.style.display = 'block';
+            }
+            this.clearSession();
+            
+            // If we're in an iframe, notify the parent window
+            if (window !== window.top) {
+                try {
+                    window.top.postMessage({ type: 'sessionExpired' }, '*');
+                } catch (e) {
+                    console.error('Failed to notify parent window:', e);
                 }
-                
-                // Use utility function for consistent navigation
-                closeOrRedirect(url + '?page=login');
-            })
-            .withFailureHandler((error) => {
-                console.error('Failed to handle session expiry:', error);
-                window.location.href = '/login.html';
-            })
-            .getWebAppUrl();
+            }
+        } else if (error) {
+            console.log('Error from server:', error);
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                errorMessage.textContent = 'An error occurred: ' + decodeURIComponent(error);
+                errorMessage.style.display = 'block';
+            }
+        }
     },
 
     // Session initialization and validation
