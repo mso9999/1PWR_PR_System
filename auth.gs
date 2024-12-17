@@ -539,10 +539,9 @@ function doGet(e) {
   const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
   const output = template.evaluate()
     .setTitle('1PWR PR System')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  
-  // Apply security headers consistently with Code.gs
-  output.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME);
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME);
   
   console.log(`${page} template evaluated successfully`);
   return output;
