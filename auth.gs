@@ -1,11 +1,14 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.8.0
+ * Version: 1.8.1
  * Last Updated: 2024-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
  *   Implements secure session storage using Google Apps Script Cache Service and Spreadsheet.
+ *
+ * Changes in 1.8.1:
+ *   - Added blue dot and version marker to log messages
  *
  * Changes in 1.8.0:
  *   - Added version tracking and improved session comparison logic
@@ -30,7 +33,7 @@
  *   - Enhanced error logging for debugging purposes
  *******************************************************************************************/
 
-const AUTH_VERSION = '1.8.0'; // Version tracking
+const AUTH_VERSION = '1.8.1'; // Version tracking
 const SESSION_DURATION = 21600; // 6 hours in seconds
 const CACHE_PREFIX = '1pwr_session_';
 
@@ -108,7 +111,7 @@ function authenticateUser(username, password) {
  * @return {boolean} Success status
  */
 function storeSession(sessionId, userInfo) {
-  console.log('Storing session:', sessionId);
+  console.log(' Storing session:', sessionId);
   
   try {
     // First store in cache for quick access
@@ -286,7 +289,7 @@ function removeSession(sessionId) {
  * @return {Object|null} User information or null if invalid
  */
 function validateSession(sessionId) {
-  console.log('Validating session:', sessionId);
+  console.log(' Validating session:', sessionId);
   
   if (!sessionId) {
     console.log('No session ID provided');
