@@ -303,25 +303,24 @@ function validateSession(sessionId) {
     
     const data = sheet.getDataRange().getValues();
     console.log('Found', data.length - 1, 'sessions in sheet');
-    console.log('Sheet data:', JSON.stringify(data));
     
     // Look for our session
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log('Checking row', i, ':', JSON.stringify(row));
+      console.log(`Row ${i}: ID=${row[0]}, Active=${row[2]}, Type=${typeof row[2]}`);
       
       if (row[0] === sessionId) {
-        console.log('Found session at row', i);
-        console.log('Session data:', {
-          id: row[0],
-          userInfo: row[1],
-          active: row[2],
-          lastAccessed: row[3]
-        });
+        console.log('Found session at row', i + 1);
         
         // Check if session is active
         const isActive = row[2] === true;
-        console.log('Session active status:', isActive, 'Type:', typeof row[2]);
+        console.log('Session data:', {
+          id: row[0],
+          active: row[2],
+          activeType: typeof row[2],
+          isActive: isActive,
+          lastAccessed: row[3]
+        });
         
         if (isActive) {
           // Update LastAccessed timestamp
@@ -329,11 +328,14 @@ function validateSession(sessionId) {
           sheet.getRange(i + 1, 4).setValue(now);
           console.log('Updated LastAccessed to:', now);
           return true;
+        } else {
+          console.log('Session found but not active');
+          return false;
         }
       }
     }
     
-    console.log('Session not found or not active');
+    console.log('Session not found');
     return false;
   } catch (error) {
     console.error('Session validation error:', error.toString());
@@ -370,10 +372,13 @@ function doGet(e) {
   // Create template and set security headers
   const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
   const output = template.evaluate()
-    .setTitle('1PWR PR System');
+    .setTitle('1PWR PR System')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   
   console.log(`${page} template evaluated successfully`);
-  return setSecurityHeadersAuth(output);
+  return output;
 }
 
 /**
