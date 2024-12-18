@@ -111,10 +111,10 @@ function storeSession(sessionId, userInfo) {
       throw new Error('Failed to open spreadsheet');
     }
     
-    let sheet = ss.getSheetByName('ActiveSessions');
+    let sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     if (!sheet) {
       console.log('Creating ActiveSessions sheet');
-      sheet = ss.insertSheet('ActiveSessions');
+      sheet = ss.insertSheet(CONFIG.SHEETS.ACTIVE_SESSIONS);
       if (!sheet) {
         throw new Error('Failed to create ActiveSessions sheet');
       }
@@ -204,7 +204,7 @@ function getUserFromSession(sessionId) {
       throw new Error('Failed to open spreadsheet');
     }
     
-    const sheet = ss.getSheetByName('ActiveSessions');
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     if (!sheet) {
       console.log('ActiveSessions sheet not found');
       return null;
@@ -254,7 +254,7 @@ function removeSession(sessionId) {
   try {
     // Remove from sheet
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const sheet = ss.getSheetByName('ActiveSessions');
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     
     if (sheet) {
       const data = sheet.getDataRange().getValues();
@@ -291,9 +291,10 @@ function validateSession(sessionId) {
   try {
     // Check sheet directly without cache
     console.log('Looking for session in sheet');
+    console.log('Using spreadsheet ID:', CONFIG.SPREADSHEET_ID);
     
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const sheet = ss.getSheetByName('ActiveSessions');
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     
     if (!sheet) {
       console.log('ActiveSessions sheet not found');
@@ -302,30 +303,33 @@ function validateSession(sessionId) {
     
     const data = sheet.getDataRange().getValues();
     console.log('Found', data.length - 1, 'sessions in sheet');
-    console.log('Header row:', JSON.stringify(data[0]));
+    console.log('Sheet data:', JSON.stringify(data));
     
     // Look for our session
-    let foundRow = data.find((row, index) => index > 0 && row[0] === sessionId);
-    
-    if (foundRow) {
-      console.log('Found session:', {
-        id: foundRow[0],
-        userInfo: foundRow[1],
-        active: foundRow[2],
-        lastAccessed: foundRow[3]
-      });
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      console.log('Checking row', i, ':', JSON.stringify(row));
       
-      // Check if session is active
-      const isActive = foundRow[2] === true;
-      console.log('Session active status:', isActive);
-      
-      if (isActive) {
-        // Update LastAccessed timestamp
-        const now = new Date().toISOString();
-        const rowIndex = data.findIndex(row => row[0] === sessionId);
-        sheet.getRange(rowIndex + 1, 4).setValue(now);
-        console.log('Updated LastAccessed to:', now);
-        return true;
+      if (row[0] === sessionId) {
+        console.log('Found session at row', i);
+        console.log('Session data:', {
+          id: row[0],
+          userInfo: row[1],
+          active: row[2],
+          lastAccessed: row[3]
+        });
+        
+        // Check if session is active
+        const isActive = row[2] === true;
+        console.log('Session active status:', isActive, 'Type:', typeof row[2]);
+        
+        if (isActive) {
+          // Update LastAccessed timestamp
+          const now = new Date().toISOString();
+          sheet.getRange(i + 1, 4).setValue(now);
+          console.log('Updated LastAccessed to:', now);
+          return true;
+        }
       }
     }
     
