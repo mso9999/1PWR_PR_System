@@ -301,18 +301,26 @@ function validateSession(sessionId) {
     // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log(`Checking row ${i}:`, JSON.stringify({
-        storedSessionId: row[0],
+      const rowData = {
+        sessionId: row[0],
+        userInfo: row[1],
         active: row[2],
         lastAccessed: row[3]
-      }));
+      };
+      console.log(`Row ${i}:`, JSON.stringify(rowData));
       
       if (row[0] === sessionId) {
         console.log('Found matching session');
         if (row[2] === true) {
           console.log('Session is active');
-          const userInfo = JSON.parse(row[1]);
-          return userInfo;
+          try {
+            const userInfo = JSON.parse(row[1]);
+            console.log('Parsed user info:', JSON.stringify(userInfo));
+            return userInfo;
+          } catch (parseError) {
+            console.error('Error parsing user info:', parseError);
+            return null;
+          }
         } else {
           console.log('Session is not active');
           return null;
