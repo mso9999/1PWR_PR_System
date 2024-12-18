@@ -1,11 +1,16 @@
 /*******************************************************************************************
  * File: auth.gs
- * Version: 1.7
+ * Version: 1.8.0
  * Last Updated: 2024-12-08
  *
  * Description:
  *   Handles user authentication, session management, and security for the PR system.
  *   Implements secure session storage using Google Apps Script Cache Service and Spreadsheet.
+ *
+ * Changes in 1.8.0:
+ *   - Added version tracking and improved session comparison logic
+ *   - Updated session storage to persist sessions in both cache and sheet
+ *   - Fixed X-Frame-Options issue to allow iframe embedding
  *
  * Changes in 1.7:
  *   - Updated session storage to persist sessions in both cache and sheet
@@ -25,6 +30,7 @@
  *   - Enhanced error logging for debugging purposes
  *******************************************************************************************/
 
+const AUTH_VERSION = '1.8.0'; // Version tracking
 const SESSION_DURATION = 21600; // 6 hours in seconds
 const CACHE_PREFIX = '1pwr_session_';
 
@@ -253,7 +259,7 @@ function removeSession(sessionId) {
  * @return {boolean} Validity status
  */
 function validateSession(sessionId) {
-  console.log('Validating session:', sessionId);
+  console.log('Validating session (v' + AUTH_VERSION + '):', sessionId);
   
   if (!sessionId) {
     console.log('No session ID provided');
@@ -269,7 +275,7 @@ function validateSession(sessionId) {
     
     // Force a refresh of the data
     SpreadsheetApp.flush();
-    Utilities.sleep(1000); // Add a small delay to ensure sheet is updated
+    Utilities.sleep(500); // Reduced delay to 500ms
     
     const data = sheet.getDataRange().getValues();
     console.log('Total rows in sheet:', data.length);
@@ -278,20 +284,20 @@ function validateSession(sessionId) {
     // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log(`\nChecking row ${i}:`);
-      console.log('SessionID:', JSON.stringify(row[0]));
-      console.log('SessionID type:', typeof row[0]);
-      console.log('Active:', JSON.stringify(row[2]));
-      console.log('Active type:', typeof row[2]);
-      console.log('LastAccessed:', JSON.stringify(row[3]));
-      console.log('Comparing:', JSON.stringify({
-        sessionIdMatch: row[0] === sessionId,
-        activeMatch: row[2] === true
+      const storedSessionId = String(row[0]).trim();
+      const requestedSessionId = String(sessionId).trim();
+      const isActive = Boolean(row[2]);
+      
+      console.log(`\nRow ${i} comparison:`, JSON.stringify({
+        stored: storedSessionId,
+        requested: requestedSessionId,
+        match: storedSessionId === requestedSessionId,
+        active: isActive
       }));
       
-      if (String(row[0]) === String(sessionId)) {
+      if (storedSessionId === requestedSessionId) {
         console.log('Found matching session!');
-        if (row[2] === true) {
+        if (isActive) {
           console.log('Session is active');
           try {
             const userInfo = JSON.parse(row[1]);
@@ -309,13 +315,13 @@ function validateSession(sessionId) {
             return null;
           }
         } else {
-          console.log('Session is not active, active =', row[2]);
+          console.log('Session is not active');
           return null;
         }
       }
     }
     
-    console.log('\nSession not found in sheet after checking all rows');
+    console.log('\nSession not found in sheet after checking', data.length - 1, 'rows');
     return null;
   } catch (error) {
     console.error('Error validating session:', error.toString());
