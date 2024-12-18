@@ -285,62 +285,46 @@ function validateSession(sessionId) {
   
   if (!sessionId) {
     console.log('No session ID provided');
-    return false;
+    return null;
   }
 
   try {
-    // Check sheet directly without cache
-    console.log('Looking for session in sheet');
-    console.log('Using spreadsheet ID:', CONFIG.SPREADSHEET_ID);
-    
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
+    console.log('Opened spreadsheet:', CONFIG.SPREADSHEET_ID);
     
-    if (!sheet) {
-      console.log('ActiveSessions sheet not found');
-      return false;
-    }
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
+    console.log('Got sheet:', CONFIG.SHEETS.ACTIVE_SESSIONS);
     
     const data = sheet.getDataRange().getValues();
-    console.log('Found', data.length - 1, 'sessions in sheet');
+    console.log('Total rows in sheet:', data.length);
     
-    // Look for our session
+    // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log(`Row ${i}: ID=${row[0]}, Active=${row[2]}, Type=${typeof row[2]}`);
+      console.log(`Checking row ${i}:`, JSON.stringify({
+        storedSessionId: row[0],
+        active: row[2],
+        lastAccessed: row[3]
+      }));
       
       if (row[0] === sessionId) {
-        console.log('Found session at row', i + 1);
-        
-        // Check if session is active
-        const isActive = row[2] === true;
-        console.log('Session data:', {
-          id: row[0],
-          active: row[2],
-          activeType: typeof row[2],
-          isActive: isActive,
-          lastAccessed: row[3]
-        });
-        
-        if (isActive) {
-          // Update LastAccessed timestamp
-          const now = new Date().toISOString();
-          sheet.getRange(i + 1, 4).setValue(now);
-          console.log('Updated LastAccessed to:', now);
-          return true;
+        console.log('Found matching session');
+        if (row[2] === true) {
+          console.log('Session is active');
+          const userInfo = JSON.parse(row[1]);
+          return userInfo;
         } else {
-          console.log('Session found but not active');
-          return false;
+          console.log('Session is not active');
+          return null;
         }
       }
     }
     
-    console.log('Session not found');
-    return false;
+    console.log('Session not found in sheet');
+    return null;
   } catch (error) {
-    console.error('Session validation error:', error.toString());
-    console.error('Stack trace:', error.stack);
-    return false;
+    console.error('Error validating session:', error);
+    return null;
   }
 }
 
@@ -467,55 +451,15 @@ function getWebAppUrlFromAuth(page = 'dashboard') {
 function getDashboardUrl(sessionId) {
   console.log('Getting dashboard URL for session:', sessionId);
   
-  try {
-    if (!sessionId) {
-      console.error('No session ID provided');
-      return getWebAppUrlFromAuth('login');
-    }
-
-    console.log('Validating session:', sessionId);
-    const isValid = validateSession(sessionId);
-    console.log('Session validation result:', isValid);
-
-    if (!isValid) {
-      console.error('Invalid or expired session:', sessionId);
-      // Instead of redirecting to login, return a special URL that the client can handle
-      return getWebAppUrlFromAuth('login') + '&sessionExpired=true';
-    }
-
-    try {
-      // Get the deployment ID from the current deployment
-      let deploymentId;
-      try {
-        const service = ScriptApp.getService();
-        const currentUrl = service.getUrl();
-        deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
-      } catch (e) {
-        console.warn('Could not get deployment ID from service:', e);
-        // Fallback to script ID
-        deploymentId = ScriptApp.getScriptId();
-      }
-      
-      if (!deploymentId) {
-        throw new Error('Failed to get deployment/script ID');
-      }
-      
-      // Get the current deployment URL
-      const baseUrl = ScriptApp.getService().getUrl().split('?')[0];
-      console.log('Using base URL:', baseUrl);
-      
-      // Add session ID and page parameters
-      const dashboardUrl = `${baseUrl}?sessionId=${encodeURIComponent(sessionId)}&page=dashboard`;
-      console.log('Generated dashboard URL with session ID');
-      return dashboardUrl;
-    } catch (urlError) {
-      console.error('Error constructing dashboard URL:', urlError);
-      throw urlError;
-    }
-  } catch (error) {
-    console.error('Error in getDashboardUrl:', error);
-    return getWebAppUrlFromAuth('login') + '&error=' + encodeURIComponent(error.message);
+  const userInfo = validateSession(sessionId);
+  console.log('Session validation result:', userInfo);
+  
+  if (!userInfo) {
+    console.error('Invalid or expired session:', sessionId);
+    return getWebAppUrl('login', { sessionExpired: true });
   }
+  
+  return getWebAppUrl('dashboard', { sessionId: sessionId });
 }
 
 /**
