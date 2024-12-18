@@ -269,6 +269,7 @@ function validateSession(sessionId) {
     
     // Force a refresh of the data
     SpreadsheetApp.flush();
+    Utilities.sleep(1000); // Add a small delay to ensure sheet is updated
     
     const data = sheet.getDataRange().getValues();
     console.log('Total rows in sheet:', data.length);
@@ -278,11 +279,17 @@ function validateSession(sessionId) {
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       console.log(`\nChecking row ${i}:`);
-      console.log('SessionID:', row[0]);
-      console.log('Active:', row[2]);
-      console.log('LastAccessed:', row[3]);
+      console.log('SessionID:', JSON.stringify(row[0]));
+      console.log('SessionID type:', typeof row[0]);
+      console.log('Active:', JSON.stringify(row[2]));
+      console.log('Active type:', typeof row[2]);
+      console.log('LastAccessed:', JSON.stringify(row[3]));
+      console.log('Comparing:', JSON.stringify({
+        sessionIdMatch: row[0] === sessionId,
+        activeMatch: row[2] === true
+      }));
       
-      if (row[0] === sessionId) {
+      if (String(row[0]) === String(sessionId)) {
         console.log('Found matching session!');
         if (row[2] === true) {
           console.log('Session is active');
