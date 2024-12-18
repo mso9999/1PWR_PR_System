@@ -102,7 +102,7 @@ function authenticateUser(username, password) {
 }
 
 /**
- * Stores a user session in sheet.
+ * Stores a user session in both cache and sheet.
  * @param {string} sessionId - Unique session identifier
  * @param {Object} userInfo - User information to store
  * @return {boolean} Success status
@@ -111,6 +111,13 @@ function storeSession(sessionId, userInfo) {
   console.log('Storing session:', sessionId);
   
   try {
+    // First store in cache for quick access
+    const cache = CacheService.getUserCache();
+    const cacheKey = CACHE_PREFIX + sessionId;
+    cache.put(cacheKey, JSON.stringify(userInfo), SESSION_DURATION);
+    console.log('Session stored in cache');
+    
+    // Then store in spreadsheet for persistence
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
     
@@ -124,40 +131,60 @@ function storeSession(sessionId, userInfo) {
     const data = sheet.getDataRange().getValues();
     console.log('Current sheet data:', JSON.stringify(data));
     
-    // Find next empty row
-    const nextRow = data.length + 1;
-    console.log('Adding new session at row:', nextRow - 1);
+    // Clear any existing sessions for this user
+    let foundExisting = false;
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const existingInfo = JSON.parse(row[1]);
+      if (existingInfo.email === userInfo.email) {
+        console.log('Found existing session for user, updating row:', i + 1);
+        const range = sheet.getRange(i + 1, 1, 1, 4);
+        const timestamp = new Date().toISOString();
+        range.setValues([[sessionId, JSON.stringify(userInfo), true, timestamp]]);
+        foundExisting = true;
+        break;
+      }
+    }
     
-    // Prepare row data
-    const timestamp = new Date().toISOString();
-    const rowData = [
-      sessionId,
-      JSON.stringify(userInfo),
-      true,
-      timestamp
-    ];
-    console.log('Writing row data:', JSON.stringify(rowData));
-    
-    // Write new session
-    sheet.getRange(nextRow, 1, 1, 4).setValues([rowData]);
+    // If no existing session found, add new row
+    if (!foundExisting) {
+      const nextRow = data.length + 1;
+      console.log('Adding new session at row:', nextRow);
+      
+      const timestamp = new Date().toISOString();
+      const rowData = [
+        sessionId,
+        JSON.stringify(userInfo),
+        true,
+        timestamp
+      ];
+      console.log('Writing row data:', JSON.stringify(rowData));
+      
+      sheet.getRange(nextRow, 1, 1, 4).setValues([rowData]);
+    }
     
     // Force the write to complete
     SpreadsheetApp.flush();
     
     // Verify the write
-    const verifyData = sheet.getRange(nextRow, 1, 1, 4).getValues()[0];
-    console.log('Verifying written data:', JSON.stringify(verifyData));
+    const allData = sheet.getDataRange().getValues();
+    let verified = false;
+    for (let i = 1; i < allData.length; i++) {
+      const row = allData[i];
+      if (row[0] === sessionId && row[2] === true) {
+        console.log('Session verified in sheet at row:', i + 1);
+        verified = true;
+        break;
+      }
+    }
     
-    // Double check the write with another flush
-    SpreadsheetApp.flush();
-    
-    if (verifyData[0] === sessionId && verifyData[2] === true) {
-      console.log('Session stored successfully in sheet');
-      return true;
-    } else {
-      console.error('Session verification failed. Written:', JSON.stringify(verifyData));
+    if (!verified) {
+      console.error('Session verification failed');
       return false;
     }
+    
+    console.log('Session stored and verified in both cache and sheet');
+    return true;
     
   } catch (error) {
     console.error('Error storing session:', error);
@@ -256,76 +283,59 @@ function removeSession(sessionId) {
 /**
  * Validates a session and refreshes its expiration.
  * @param {string} sessionId - Session to validate
- * @return {boolean} Validity status
+ * @return {Object|null} User information or null if invalid
  */
 function validateSession(sessionId) {
-  console.log('Validating session (v' + AUTH_VERSION + '):', sessionId);
+  console.log('Validating session:', sessionId);
   
   if (!sessionId) {
     console.log('No session ID provided');
     return null;
   }
-
+  
   try {
+    // First check cache
+    const cache = CacheService.getUserCache();
+    const cacheKey = CACHE_PREFIX + sessionId;
+    const cachedData = cache.get(cacheKey);
+    
+    if (cachedData) {
+      console.log('Session found in cache');
+      return JSON.parse(cachedData);
+    }
+    
+    console.log('Session not in cache, checking sheet');
+    
+    // Check spreadsheet
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    console.log('Opened spreadsheet:', CONFIG.SPREADSHEET_ID);
-    
     const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
-    console.log('Got sheet:', CONFIG.SHEETS.ACTIVE_SESSIONS);
     
-    // Force a refresh of the data
+    // Force a refresh
     SpreadsheetApp.flush();
-    Utilities.sleep(500); // Reduced delay to 500ms
     
     const data = sheet.getDataRange().getValues();
-    console.log('Total rows in sheet:', data.length);
-    console.log('Header row:', JSON.stringify(data[0]));
+    console.log('Checking', data.length - 1, 'rows for session');
     
-    // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const storedSessionId = String(row[0]).trim();
-      const requestedSessionId = String(sessionId).trim();
-      const isActive = Boolean(row[2]);
-      
-      console.log(`\nRow ${i} comparison:`, JSON.stringify({
-        stored: storedSessionId,
-        requested: requestedSessionId,
-        match: storedSessionId === requestedSessionId,
-        active: isActive
-      }));
-      
-      if (storedSessionId === requestedSessionId) {
-        console.log('Found matching session!');
-        if (isActive) {
-          console.log('Session is active');
-          try {
-            const userInfo = JSON.parse(row[1]);
-            console.log('Successfully parsed user info:', JSON.stringify(userInfo));
-            
-            // Update last accessed time
-            const now = new Date().toISOString();
-            sheet.getRange(i + 1, 4).setValue(now);
-            SpreadsheetApp.flush();
-            console.log('Updated LastAccessed to:', now);
-            
-            return userInfo;
-          } catch (parseError) {
-            console.error('Error parsing user info:', parseError);
-            return null;
-          }
-        } else {
-          console.log('Session is not active');
-          return null;
-        }
+      if (row[0] === sessionId && row[2] === true) {
+        console.log('Found active session in sheet at row:', i + 1);
+        const userInfo = JSON.parse(row[1]);
+        
+        // Update cache and last accessed
+        cache.put(cacheKey, row[1], SESSION_DURATION);
+        sheet.getRange(i + 1, 4).setValue(new Date().toISOString());
+        SpreadsheetApp.flush();
+        
+        return userInfo;
       }
     }
     
-    console.log('\nSession not found in sheet after checking', data.length - 1, 'rows');
+    console.log('Session not found in sheet');
     return null;
+    
   } catch (error) {
-    console.error('Error validating session:', error.toString());
-    console.error('Stack trace:', error.stack);
+    console.error('Error validating session:', error);
     return null;
   }
 }
