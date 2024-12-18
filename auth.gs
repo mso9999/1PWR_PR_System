@@ -103,86 +103,58 @@ function authenticateUser(username, password) {
  */
 function storeSession(sessionId, userInfo) {
   console.log('Storing session:', sessionId);
+  
   try {
-    // Get or create ActiveSessions sheet
-    console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    if (!ss) {
-      throw new Error('Failed to open spreadsheet');
-    }
+    console.log('Opening spreadsheet:', CONFIG.SPREADSHEET_ID);
     
-    let sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     if (!sheet) {
-      console.log('Creating ActiveSessions sheet');
-      sheet = ss.insertSheet(CONFIG.SHEETS.ACTIVE_SESSIONS);
-      if (!sheet) {
-        throw new Error('Failed to create ActiveSessions sheet');
-      }
-      
-      // Set up header row
-      sheet.getRange('A1:D1').setValues([['SessionID', 'UserInfo', 'Active', 'LastAccessed']]);
-      sheet.setFrozenRows(1);
-      
-      // Set column widths for better readability
-      sheet.setColumnWidth(1, 250); // SessionID
-      sheet.setColumnWidth(2, 300); // UserInfo
-      sheet.setColumnWidth(3, 100); // Active
-      sheet.setColumnWidth(4, 200); // LastAccessed
-      console.log('Sheet created and formatted');
+      console.error('Active sessions sheet not found');
+      return false;
     }
     
-    // Find existing session or get next empty row
+    // Get current data
     const data = sheet.getDataRange().getValues();
     console.log('Current sheet data:', JSON.stringify(data));
-    let rowIndex = -1;
     
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][0] === sessionId) {
-        rowIndex = i + 1;
-        console.log('Found existing session at row:', rowIndex);
-        break;
-      }
-    }
+    // Find next empty row
+    const nextRow = data.length + 1;
+    console.log('Adding new session at row:', nextRow - 1);
     
-    if (rowIndex === -1) {
-      rowIndex = data.length + 1;
-      console.log('Adding new session at row:', rowIndex);
-    }
-    
-    // Update or insert session data
-    const now = new Date();
+    // Prepare row data
+    const timestamp = new Date().toISOString();
     const rowData = [
       sessionId,
       JSON.stringify(userInfo),
       true,
-      now.toISOString()
+      timestamp
     ];
     console.log('Writing row data:', JSON.stringify(rowData));
     
-    // Set values and format
-    const range = sheet.getRange(rowIndex, 1, 1, 4);
-    range.setValues([rowData]);
-    range.setWrap(true);
-    range.setVerticalAlignment('top');
+    // Write new session
+    sheet.getRange(nextRow, 1, 1, 4).setValues([rowData]);
     
-    // Format LastAccessed column
-    sheet.getRange(rowIndex, 4).setNumberFormat('yyyy-mm-dd hh:mm:ss');
+    // Force the write to complete
+    SpreadsheetApp.flush();
     
-    // Verify the data was written correctly
-    const verifyData = sheet.getRange(rowIndex, 1, 1, 4).getValues()[0];
+    // Verify the write
+    const verifyData = sheet.getRange(nextRow, 1, 1, 4).getValues()[0];
     console.log('Verifying written data:', JSON.stringify(verifyData));
     
-    // Check session ID and active status
-    if (verifyData[0] !== sessionId || verifyData[2] !== true) {
-      console.error('Verification failed. Expected:', sessionId, true, 'Got:', verifyData[0], verifyData[2]);
-      throw new Error('Session data verification failed');
+    // Double check the write with another flush
+    SpreadsheetApp.flush();
+    
+    if (verifyData[0] === sessionId && verifyData[2] === true) {
+      console.log('Session stored successfully in sheet');
+      return true;
+    } else {
+      console.error('Session verification failed. Written:', JSON.stringify(verifyData));
+      return false;
     }
     
-    console.log('Session stored successfully in sheet');
-    return true;
   } catch (error) {
-    console.error('Session storage error:', error.toString());
-    console.error('Stack trace:', error.stack);
+    console.error('Error storing session:', error);
     return false;
   }
 }
