@@ -357,6 +357,40 @@ function validateSession(sessionId) {
 }
 
 /**
+ * Sets security headers for HTML output
+ * @param {HtmlOutput} output - The HTML output to set headers for
+ * @returns {HtmlOutput} The HTML output with headers set
+ */
+function setSecurityHeadersAuth(output) {
+  return output
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME)
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+/**
+ * Handles HTTP GET requests
+ * @param {Object} e - Event object
+ * @return {HtmlOutput} HTML output
+ */
+function doGet(e) {
+  const page = e.parameter.page || 'login';
+  console.log('Event parameters:', JSON.stringify(e.parameter));
+  
+  // Get session ID from URL parameters
+  const sessionId = e.parameter.sessionId;
+  console.log('Session ID from URL:', sessionId);
+  
+  // Create template and set security headers
+  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
+  const output = template.evaluate()
+    .setTitle('1PWR PR System');
+  
+  console.log(`${page} template evaluated successfully`);
+  return setSecurityHeadersAuth(output);
+}
+
+/**
  * Gets the web app URL with enhanced error handling and logging
  * @param {string} page - Optional page parameter
  * @return {string} Web app URL
@@ -520,26 +554,4 @@ function getCurrentUser(sessionId) {
     console.error('Error getting current user:', error);
     return null;
   }
-}
-
-/**
- * Handles HTTP GET requests
- * @param {Object} e - Event object
- * @return {HtmlOutput} HTML output
- */
-function doGet(e) {
-  const page = e.parameter.page || 'login';
-  console.log('Event parameters:', JSON.stringify(e.parameter));
-  
-  // Get session ID from URL parameters
-  const sessionId = e.parameter.sessionId;
-  console.log('Session ID from URL:', sessionId);
-  
-  // Create template and set security headers using shared utility
-  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
-  const output = template.evaluate()
-    .setTitle('1PWR PR System');
-  
-  // Use shared security header function from AppRouter.gs
-  return setSecurityHeaders(output);
 }
