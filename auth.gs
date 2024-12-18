@@ -281,7 +281,7 @@ function removeSession(sessionId) {
  * @return {boolean} Validity status
  */
 function validateSession(sessionId) {
-  console.log('Starting session validation for:', sessionId);
+  console.log('Validating session:', sessionId);
   
   if (!sessionId) {
     console.log('No session ID provided');
@@ -290,7 +290,7 @@ function validateSession(sessionId) {
 
   try {
     // Check sheet directly without cache
-    console.log('Checking session in sheet');
+    console.log('Looking for session in sheet');
     
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const sheet = ss.getSheetByName('ActiveSessions');
@@ -305,49 +305,31 @@ function validateSession(sessionId) {
     console.log('Header row:', JSON.stringify(data[0]));
     
     // Look for our session
-    console.log('Looking for session:', sessionId);
-    let found = false;
-    let foundRow = null;
-    let foundIndex = -1;
+    let foundRow = data.find((row, index) => index > 0 && row[0] === sessionId);
     
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      if (row[0] === sessionId) {
-        found = true;
-        foundRow = row;
-        foundIndex = i;
-        break;
-      }
-    }
-    
-    if (found) {
-      console.log('Found session at row', foundIndex + 1, ':', {
+    if (foundRow) {
+      console.log('Found session:', {
         id: foundRow[0],
+        userInfo: foundRow[1],
         active: foundRow[2],
-        activeType: typeof foundRow[2],
         lastAccessed: foundRow[3]
       });
       
       // Check if session is active
       const isActive = foundRow[2] === true;
-      console.log('Is session active?', isActive, 'Value type:', typeof foundRow[2], 'Value:', foundRow[2]);
+      console.log('Session active status:', isActive);
       
       if (isActive) {
-        console.log('Session is active');
-        
         // Update LastAccessed timestamp
         const now = new Date().toISOString();
-        console.log('Updating LastAccessed to:', now);
-        sheet.getRange(foundIndex + 1, 4).setValue(now);
-        
+        const rowIndex = data.findIndex(row => row[0] === sessionId);
+        sheet.getRange(rowIndex + 1, 4).setValue(now);
+        console.log('Updated LastAccessed to:', now);
         return true;
-      } else {
-        console.log('Session found but not active');
-        return false;
       }
     }
     
-    console.log('Session not found in sheet');
+    console.log('Session not found or not active');
     return false;
   } catch (error) {
     console.error('Session validation error:', error.toString());
