@@ -295,43 +295,52 @@ function validateSession(sessionId) {
     const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
     console.log('Got sheet:', CONFIG.SHEETS.ACTIVE_SESSIONS);
     
+    // Force a refresh of the data
+    SpreadsheetApp.flush();
+    
     const data = sheet.getDataRange().getValues();
     console.log('Total rows in sheet:', data.length);
+    console.log('Header row:', JSON.stringify(data[0]));
     
     // Skip header row
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      const rowData = {
-        sessionId: row[0],
-        userInfo: row[1],
-        active: row[2],
-        lastAccessed: row[3]
-      };
-      console.log(`Row ${i}:`, JSON.stringify(rowData));
+      console.log(`\nChecking row ${i}:`);
+      console.log('SessionID:', row[0]);
+      console.log('Active:', row[2]);
+      console.log('LastAccessed:', row[3]);
       
       if (row[0] === sessionId) {
-        console.log('Found matching session');
+        console.log('Found matching session!');
         if (row[2] === true) {
           console.log('Session is active');
           try {
             const userInfo = JSON.parse(row[1]);
-            console.log('Parsed user info:', JSON.stringify(userInfo));
+            console.log('Successfully parsed user info:', JSON.stringify(userInfo));
+            
+            // Update last accessed time
+            const now = new Date().toISOString();
+            sheet.getRange(i + 1, 4).setValue(now);
+            SpreadsheetApp.flush();
+            console.log('Updated LastAccessed to:', now);
+            
             return userInfo;
           } catch (parseError) {
             console.error('Error parsing user info:', parseError);
             return null;
           }
         } else {
-          console.log('Session is not active');
+          console.log('Session is not active, active =', row[2]);
           return null;
         }
       }
     }
     
-    console.log('Session not found in sheet');
+    console.log('\nSession not found in sheet after checking all rows');
     return null;
   } catch (error) {
-    console.error('Error validating session:', error);
+    console.error('Error validating session:', error.toString());
+    console.error('Stack trace:', error.stack);
     return null;
   }
 }
