@@ -37,13 +37,13 @@
  *******************************************************************************************/
 
 const AUTH_VERSION = '1.8.2'; // Version tracking
-const SESSION_DURATION = CONFIG.SESSION.DURATION || 21600; // 6 hours in seconds
-const CACHE_PREFIX = CONFIG.SESSION.PREFIX || '1pwr_session_';
+const SESSION_DURATION = 21600; // 6 hours in seconds
+const CACHE_PREFIX = '1pwr_session_';
 
 // Use the deployment ID from the current URL
 function getDeploymentId() {
   try {
-    const currentUrl = CONFIG.URL.BASE_PATH;
+    const currentUrl = ScriptApp.getService().getUrl();
     const match = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/);
     return match ? match[1] : ScriptApp.getScriptId();
   } catch (e) {
@@ -432,9 +432,11 @@ function getWebAppUrl(page, params = {}) {
   console.log('[AUTH] Getting web app URL for page:', page, 'params:', JSON.stringify(params));
   
   try {
-    // Get base URL from config or construct it
-    let baseUrl = CONFIG.URL.BASE_PATH;
-    if (!baseUrl) {
+    // Get base URL or construct it
+    let baseUrl;
+    try {
+      baseUrl = ScriptApp.getService().getUrl();
+    } catch (e) {
       const deploymentId = getDeploymentId();
       baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     }
