@@ -137,29 +137,29 @@ function storeSession(sessionId, userInfo) {
     const data = sheet.getDataRange().getValues();
     console.log('[AUTH] Found', data.length - 1, 'existing sessions');
     
-    // Clear any existing sessions for this user
-    let foundExisting = false;
-    let updatedRow = -1;
+    // Find existing sessions for this user
+    const rowsToDeactivate = [];
     for (let i = 1; i < data.length; i++) {
       try {
         const row = data[i];
         const existingInfo = JSON.parse(row[1]);
-        console.log('[AUTH] Checking row', i + 1, 'email:', existingInfo.email);
-        if (existingInfo.email === userInfo.email) {
-          console.log('[AUTH] Found existing session at row:', i + 1);
-          // Deactivate old session
-          sheet.getRange(i + 1, 3).setValue(false);
-          SpreadsheetApp.flush();
-          console.log('[AUTH] Deactivated old session');
-          updatedRow = i;
-          foundExisting = true;
+        if (existingInfo.email === userInfo.email && row[2] === true) {
+          rowsToDeactivate.push(i + 1);
         }
       } catch (e) {
         console.error('[AUTH] Error checking row', i + 1, ':', e);
       }
     }
     
-    // Always add as new row
+    // Batch deactivate old sessions if any found
+    if (rowsToDeactivate.length > 0) {
+      console.log('[AUTH] Deactivating', rowsToDeactivate.length, 'old sessions');
+      const range = sheet.getRangeList(rowsToDeactivate.map(row => `C${row}`));
+      range.setValue(false);
+      SpreadsheetApp.flush();
+    }
+    
+    // Add new session
     const nextRow = data.length + 1;
     console.log('[AUTH] Adding new session at row:', nextRow);
     
@@ -170,7 +170,6 @@ function storeSession(sessionId, userInfo) {
       true,
       timestamp
     ];
-    console.log('[AUTH] Writing new session data');
     
     sheet.getRange(nextRow, 1, 1, 4).setValues([rowData]);
     SpreadsheetApp.flush();
@@ -188,12 +187,55 @@ function storeSession(sessionId, userInfo) {
       return false;
     }
     
+    // Cleanup old sessions if we have too many
+    if (data.length > 100) { // Arbitrary threshold, adjust as needed
+      cleanupOldSessions();
+    }
+    
     console.log('[AUTH] Session stored and verified');
     return true;
     
   } catch (error) {
     console.error('[AUTH] Error storing session:', error);
     return false;
+  }
+}
+
+/**
+ * Cleans up old inactive sessions from the sheet
+ */
+function cleanupOldSessions() {
+  console.log('[AUTH] Starting session cleanup');
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
+    if (!sheet) {
+      console.error('[AUTH] Active sessions sheet not found during cleanup');
+      return;
+    }
+    
+    const data = sheet.getDataRange().getValues();
+    const headerRow = data[0];
+    
+    // Filter out inactive sessions older than 24 hours
+    const now = new Date();
+    const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const rowsToKeep = data.filter((row, index) => {
+      if (index === 0) return true; // Keep header row
+      const timestamp = new Date(row[3]);
+      const isActive = row[2] === true;
+      return isActive || timestamp > cutoff;
+    });
+    
+    // Clear the sheet and rewrite the filtered data
+    sheet.clear();
+    if (rowsToKeep.length > 0) {
+      sheet.getRange(1, 1, rowsToKeep.length, headerRow.length).setValues(rowsToKeep);
+    }
+    
+    console.log('[AUTH] Cleaned up sessions. Remaining:', rowsToKeep.length - 1);
+  } catch (error) {
+    console.error('[AUTH] Error during session cleanup:', error);
   }
 }
 
@@ -299,7 +341,7 @@ function validateSession(sessionId) {
   }
   
   try {
-    // First check cache
+    // Check cache first
     const cache = CacheService.getUserCache();
     const cacheKey = CACHE_PREFIX + sessionId;
     const cachedData = cache.get(cacheKey);
@@ -316,21 +358,16 @@ function validateSession(sessionId) {
     // Check spreadsheet
     const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
     const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
-    
-    // Force a refresh
-    SpreadsheetApp.flush();
+    if (!sheet) {
+      console.error('[AUTH] Active sessions sheet not found');
+      return null;
+    }
     
     const data = sheet.getDataRange().getValues();
     console.log('[AUTH] Checking', data.length - 1, 'rows for session');
     
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
-      console.log('[AUTH] Row', i + 1, 'check:', JSON.stringify({
-        id: row[0],
-        active: row[2],
-        match: row[0] === sessionId
-      }));
-      
       if (row[0] === sessionId && row[2] === true) {
         console.log('[AUTH] Found active session in row:', i + 1);
         try {
@@ -339,7 +376,8 @@ function validateSession(sessionId) {
           
           // Update cache and last accessed
           cache.put(cacheKey, row[1], SESSION_DURATION);
-          sheet.getRange(i + 1, 4).setValue(new Date().toISOString());
+          row[3] = new Date().toISOString();
+          sheet.getRange(i + 1, 4).setValue(row[3]);
           SpreadsheetApp.flush();
           console.log('[AUTH] Updated cache and last accessed time');
           
@@ -351,7 +389,7 @@ function validateSession(sessionId) {
       }
     }
     
-    console.log('[AUTH] Session not found in sheet');
+    console.log('[AUTH] Session not found or inactive');
     return null;
     
   } catch (error) {
