@@ -45,8 +45,10 @@ const CONFIG = {
   SHEETS: {
     ACTIVE_SESSIONS: 'Active Sessions',
   },
-  DEPLOYMENT_ID: 'AKfycbxnIrU-_Zeox0uFqb8tal41c5KBoITIgtV_TFm8W04hdU5dMlRgUSlCrIKGkqB8axDciw', // Known working deployment ID
 };
+
+// Update CONFIG instead of redeclaring
+CONFIG.DEPLOYMENT_ID = 'AKfycbxnIrU-_Zeox0uFqb8tal41c5KBoITIgtV_TFm8W04hdU5dMlRgUSlCrIKGkqB8axDciw';
 
 /**
  * Authenticates a user against the Requestor List.
