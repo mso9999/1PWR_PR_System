@@ -40,6 +40,14 @@ const AUTH_VERSION = '1.8.2'; // Version tracking
 const SESSION_DURATION = 21600; // 6 hours in seconds
 const CACHE_PREFIX = '1pwr_session_';
 
+const CONFIG = {
+  SPREADSHEET_ID: 'your_spreadsheet_id',
+  SHEETS: {
+    ACTIVE_SESSIONS: 'Active Sessions',
+  },
+  DEPLOYMENT_ID: 'AKfycbxnIrU-_Zeox0uFqb8tal41c5KBoITIgtV_TFm8W04hdU5dMlRgUSlCrIKGkqB8axDciw', // Known working deployment ID
+};
+
 /**
  * Authenticates a user against the Requestor List.
  * @param {string} username - The username to authenticate
@@ -417,98 +425,60 @@ function setSecurityHeadersAuth(output) {
  */
 function doGet(e) {
   const page = e.parameter.page || 'login';
-  console.log('[AUTH] Event parameters:', JSON.stringify(e.parameter));
+  console.log('[AUTH] Processing request for page:', page, 'with parameters:', JSON.stringify(e.parameter));
   
   // Get session ID from URL parameters
   const sessionId = e.parameter.sessionId;
   console.log('[AUTH] Session ID from URL:', sessionId);
   
   // Create template and set security headers
-  const template = HtmlService.createTemplateFromFile(page === 'dashboard' ? 'DashboardPage' : 'LoginPage');
+  const templateName = page === 'dashboard' ? 'DashboardPage' : 'LoginPage';
+  console.log('[AUTH] Creating template from file:', templateName);
+  
+  const template = HtmlService.createTemplateFromFile(templateName);
   const output = template.evaluate()
     .setTitle('1PWR PR System')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .setFaviconUrl('https://www.1pwrafrica.com/favicon.ico')
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
   
-  console.log('[AUTH] ' + page + ' template evaluated successfully');
+  console.log('[AUTH] Template', templateName, 'evaluated successfully');
   return output;
 }
 
 /**
  * Gets the web app URL with enhanced error handling and logging
  * @param {string} page - Optional page parameter
+ * @param {Object} params - Additional URL parameters
  * @return {string} Web app URL
  */
-function getWebAppUrl(page) {
-  console.log('[AUTH] Getting web app URL for page:', page);
+function getWebAppUrl(page, params = {}) {
+  console.log('[AUTH] Getting web app URL for page:', page, 'params:', JSON.stringify(params));
   
   try {
-    // Get the deployment ID from the current deployment
-    let deploymentId;
-    try {
-      const service = ScriptApp.getService();
-      const currentUrl = service.getUrl();
-      deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
-    } catch (e) {
-      console.warn('[AUTH] Could not get deployment ID from service:', e);
-      // Fallback to script ID
-      deploymentId = ScriptApp.getScriptId();
-    }
-    
+    // Use the known deployment ID
+    const deploymentId = CONFIG.DEPLOYMENT_ID;
     if (!deploymentId) {
-      throw new Error('Failed to get deployment/script ID');
+      throw new Error('Deployment ID not configured');
     }
     
     // Construct base URL with deployment ID
     const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     console.log('[AUTH] Using base URL:', baseUrl);
     
-    // Add page parameter
-    const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
+    // Combine all parameters
+    const allParams = { page, ...params };
+    const queryString = Object.entries(allParams)
+      .filter(([_, value]) => value !== undefined && value !== null)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    
+    // Add parameters to URL
+    const fullUrl = `${baseUrl}${queryString ? '?' + queryString : ''}`;
     console.log('[AUTH] Generated full URL:', fullUrl);
     return fullUrl;
   } catch (error) {
     console.error('[AUTH] Error getting web app URL:', error);
-    throw error; // Let the caller handle the error
-  }
-}
-
-/**
- * Gets the web app URL with enhanced error handling and logging
- * @param {string} page - Optional page parameter
- * @return {string} Web app URL
- */
-function getWebAppUrlFromAuth(page = 'dashboard') {
-  console.log('[AUTH] Getting web app URL for page:', page);
-  
-  try {
-    // Get the deployment ID from the current deployment
-    let deploymentId;
-    try {
-      const service = ScriptApp.getService();
-      const currentUrl = service.getUrl();
-      deploymentId = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/)?.[1];
-    } catch (e) {
-      console.warn('[AUTH] Could not get deployment ID from service:', e);
-      // Fallback to script ID
-      deploymentId = ScriptApp.getScriptId();
-    }
-    
-    if (!deploymentId) {
-      throw new Error('Failed to get deployment/script ID');
-    }
-    
-    // Construct base URL with deployment ID
-    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
-    console.log('[AUTH] Using base URL:', baseUrl);
-    
-    // Add page parameter
-    const fullUrl = `${baseUrl}?page=${encodeURIComponent(page)}`;
-    console.log('[AUTH] Generated full URL:', fullUrl);
-    return fullUrl;
-  } catch (error) {
-    console.error('[AUTH] Error in getWebAppUrlFromAuth:', error);
     throw error;
   }
 }
@@ -529,7 +499,7 @@ function getDashboardUrl(sessionId) {
     return getWebAppUrl('login', { sessionExpired: true });
   }
   
-  return getWebAppUrl('dashboard', { sessionId: sessionId });
+  return getWebAppUrl('dashboard', { sessionId });
 }
 
 /**
@@ -558,5 +528,57 @@ function getCurrentUser(sessionId) {
   } catch (error) {
     console.error('[AUTH] Error getting current user:', error);
     return null;
+  }
+}
+
+/**
+ * Gets the requestor list from the Requestor List sheet
+ * @return {Array} Requestor list
+ */
+function getRequestorList() {
+  console.log('[AUTH] Getting requestor list');
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    console.log('[AUTH] Opened spreadsheet:', ss.getName());
+    
+    const sheet = ss.getSheetByName('Requestor List');
+    if (!sheet) {
+      console.error('[AUTH] Requestor List sheet not found');
+      return [];
+    }
+    console.log('[AUTH] Found Requestor List sheet');
+    
+    console.log('[AUTH] Getting data from sheet');
+    const data = sheet.getDataRange().getValues();
+    console.log('[AUTH] Found', data.length, 'rows (including header)');
+    
+    const headerRow = data[0];
+    console.log('[AUTH] Header row:', headerRow);
+    
+    const requestors = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      const isActive = row[3] === 'Y';
+      console.log('[AUTH] Row', row[0] + ':', 'Active=' + row[3] + ', isActive=' + isActive);
+      
+      if (isActive) {
+        requestors.push({
+          name: row[0],
+          email: row[1],
+          department: row[2],
+          role: row[5]
+        });
+      }
+    }
+    
+    console.log('[AUTH] Found', requestors.length, 'active requestors');
+    if (requestors.length > 0) {
+      console.log('[AUTH] First requestor:', JSON.stringify(requestors[0]));
+    }
+    
+    return requestors;
+  } catch (error) {
+    console.error('[AUTH] Error getting requestor list:', error);
+    return [];
   }
 }
