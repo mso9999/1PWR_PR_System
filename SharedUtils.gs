@@ -1326,21 +1326,30 @@ function validateSession(sessionId) {
  * Gets redirect URL for secure navigation
  * @returns {Object} Object containing URL and timestamp
  */
-function getRedirectUrl() {
+function getWebAppUrl(page, params = {}) {
+  try {
+    // Get base URL or construct it
+    let baseUrl;
     try {
-        const baseUrl = ScriptApp.getService().getUrl();
-        const webAppUrl = ScriptApp.getService()
-            .getUrl()
-            .replace('/exec', '/dev'); // Use /dev for development, /exec for production
-            
-        return {
-            url: webAppUrl,
-            timestamp: new Date().getTime()
-        };
-    } catch (error) {
-        console.error('Error getting redirect URL:', error);
-        throw new Error('Failed to generate redirect URL');
+      baseUrl = ScriptApp.getService().getUrl();
+    } catch (e) {
+      const scriptId = ScriptApp.getScriptId();
+      baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
     }
+    
+    // Combine all parameters
+    const allParams = { page, ...params };
+    const queryString = Object.entries(allParams)
+      .filter(([_, value]) => value !== undefined && value !== null)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    
+    // Add parameters to URL
+    return `${baseUrl}${queryString ? '?' + queryString : ''}`;
+  } catch (error) {
+    console.error('Error getting web app URL:', error);
+    throw error;
+  }
 }
 
 function handleLogin(event) {
@@ -1439,7 +1448,7 @@ function handleLogin(event) {
                         console.error('Redirect URL request failed:', error);
                         handleLoginError({ message: 'Failed to complete login process' });
                     })
-                    .getRedirectUrl();
+                    .getWebAppUrl();
             } else {
                 handleLoginError({ message: 'Session management not available' });
             }
@@ -1503,6 +1512,6 @@ function getCurrentUser(sessionId) {
 /**
  * @deprecated Use getWebAppUrlFromAuth from auth.gs instead
  */
-function getWebAppUrl(page) {
-  return getWebAppUrlFromAuth(page);
+function getWebAppUrl(page, params) {
+  return getWebAppUrlFromAuth(page, params);
 }
