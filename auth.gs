@@ -37,18 +37,20 @@
  *******************************************************************************************/
 
 const AUTH_VERSION = '1.8.2'; // Version tracking
-const SESSION_DURATION = 21600; // 6 hours in seconds
-const CACHE_PREFIX = '1pwr_session_';
+const SESSION_DURATION = CONFIG.SESSION.DURATION || 21600; // 6 hours in seconds
+const CACHE_PREFIX = CONFIG.SESSION.PREFIX || '1pwr_session_';
 
-const CONFIG = {
-  SPREADSHEET_ID: 'your_spreadsheet_id',
-  SHEETS: {
-    ACTIVE_SESSIONS: 'Active Sessions',
-  },
-};
-
-// Update CONFIG instead of redeclaring
-CONFIG.DEPLOYMENT_ID = 'AKfycbxnIrU-_Zeox0uFqb8tal41c5KBoITIgtV_TFm8W04hdU5dMlRgUSlCrIKGkqB8axDciw';
+// Use the deployment ID from the current URL
+function getDeploymentId() {
+  try {
+    const currentUrl = CONFIG.URL.BASE_PATH;
+    const match = currentUrl.match(/\/macros\/[^/]+\/([^/]+)/);
+    return match ? match[1] : ScriptApp.getScriptId();
+  } catch (e) {
+    console.warn('[AUTH] Could not get deployment ID:', e);
+    return ScriptApp.getScriptId();
+  }
+}
 
 /**
  * Authenticates a user against the Requestor List.
@@ -421,34 +423,6 @@ function setSecurityHeadersAuth(output) {
 }
 
 /**
- * Handles HTTP GET requests
- * @param {Object} e - Event object
- * @return {HtmlOutput} HTML output
- */
-function doGet(e) {
-  const page = e.parameter.page || 'login';
-  console.log('[AUTH] Processing request for page:', page, 'with parameters:', JSON.stringify(e.parameter));
-  
-  // Get session ID from URL parameters
-  const sessionId = e.parameter.sessionId;
-  console.log('[AUTH] Session ID from URL:', sessionId);
-  
-  // Create template and set security headers
-  const templateName = page === 'dashboard' ? 'DashboardPage' : 'LoginPage';
-  console.log('[AUTH] Creating template from file:', templateName);
-  
-  const template = HtmlService.createTemplateFromFile(templateName);
-  const output = template.evaluate()
-    .setTitle('1PWR PR System')
-    .setFaviconUrl('https://www.1pwrafrica.com/favicon.ico')
-    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-  
-  console.log('[AUTH] Template', templateName, 'evaluated successfully');
-  return output;
-}
-
-/**
  * Gets the web app URL with enhanced error handling and logging
  * @param {string} page - Optional page parameter
  * @param {Object} params - Additional URL parameters
@@ -458,14 +432,12 @@ function getWebAppUrl(page, params = {}) {
   console.log('[AUTH] Getting web app URL for page:', page, 'params:', JSON.stringify(params));
   
   try {
-    // Use the known deployment ID
-    const deploymentId = CONFIG.DEPLOYMENT_ID;
-    if (!deploymentId) {
-      throw new Error('Deployment ID not configured');
+    // Get base URL from config or construct it
+    let baseUrl = CONFIG.URL.BASE_PATH;
+    if (!baseUrl) {
+      const deploymentId = getDeploymentId();
+      baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     }
-    
-    // Construct base URL with deployment ID
-    const baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
     console.log('[AUTH] Using base URL:', baseUrl);
     
     // Combine all parameters
@@ -583,4 +555,32 @@ function getRequestorList() {
     console.error('[AUTH] Error getting requestor list:', error);
     return [];
   }
+}
+
+/**
+ * Handles HTTP GET requests
+ * @param {Object} e - Event object
+ * @return {HtmlOutput} HTML output
+ */
+function doGet(e) {
+  const page = e.parameter.page || 'login';
+  console.log('[AUTH] Processing request for page:', page, 'with parameters:', JSON.stringify(e.parameter));
+  
+  // Get session ID from URL parameters
+  const sessionId = e.parameter.sessionId;
+  console.log('[AUTH] Session ID from URL:', sessionId);
+  
+  // Create template and set security headers
+  const templateName = page === 'dashboard' ? 'DashboardPage' : 'LoginPage';
+  console.log('[AUTH] Creating template from file:', templateName);
+  
+  const template = HtmlService.createTemplateFromFile(templateName);
+  const output = template.evaluate()
+    .setTitle('1PWR PR System')
+    .setFaviconUrl('https://www.1pwrafrica.com/favicon.ico')
+    .setSandboxMode(HtmlService.SandboxMode.IFRAME)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  
+  console.log('[AUTH] Template', templateName, 'evaluated successfully');
+  return output;
 }
