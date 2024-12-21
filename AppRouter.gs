@@ -324,10 +324,33 @@ function serveDashboard(user) {
 /**
  * Gets the web app URL
  * @param {string} page - Optional page parameter
+ * @param {Object} params - Additional URL parameters
  * @returns {string} Web app URL
  */
-function getWebAppUrl(page = '') {
-  return getWebAppUrlFromAuth(page);
+function getWebAppUrl(page = '', params = {}) {
+  try {
+    // Get base URL or construct it
+    let baseUrl;
+    try {
+      baseUrl = ScriptApp.getService().getUrl();
+    } catch (e) {
+      const scriptId = ScriptApp.getScriptId();
+      baseUrl = `https://script.google.com/macros/s/${scriptId}/exec`;
+    }
+    
+    // Combine all parameters
+    const allParams = { page, ...params };
+    const queryString = Object.entries(allParams)
+      .filter(([_, value]) => value !== undefined && value !== null)
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+    
+    // Add parameters to URL
+    return `${baseUrl}${queryString ? '?' + queryString : ''}`;
+  } catch (error) {
+    console.error('[AUTH] Error getting web app URL:', error);
+    throw error;
+  }
 }
 
 /**
