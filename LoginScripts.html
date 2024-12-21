@@ -50,70 +50,66 @@ try {
       const error = 'userName select element not found';
       console.error(error);
       if (errorMessage) {
-        errorMessage.textContent = error;
         errorMessage.style.display = 'block';
+        errorMessage.textContent = 'Error loading user list. Please refresh.';
       }
       return;
     }
     
-    if (!google || !google.script || !google.script.run) {
-      const error = 'google.script.run not available';
-      console.error(error);
-      if (errorMessage) {
-        errorMessage.textContent = error;
-        errorMessage.style.display = 'block';
-      }
-      return;
+    // Clear existing options except the first one
+    while (select.options.length > 1) {
+      select.remove(1);
     }
     
-    console.log('Clearing error message');
-    errorMessage.style.display = 'none';
+    // Show loading state
+    select.disabled = true;
+    const loadingOption = document.createElement('option');
+    loadingOption.text = 'Loading users...';
+    loadingOption.disabled = true;
+    select.add(loadingOption);
     
-    console.log('Calling google.script.run.getRequestorList()...');
+    // Load users from server
     google.script.run
-      .withSuccessHandler(function(response) {
-        console.log('getRequestorList success, response:', response);
-        if (!response || !response.success) {
-          console.error('Failed to load requestors:', response ? response.error : 'No response');
-          if (errorMessage) {
-            errorMessage.textContent = response ? response.error : 'Failed to load user list';
-            errorMessage.style.display = 'block';
-          }
-          return;
-        }
+      .withSuccessHandler(function(users) {
+        console.log('Users loaded:', users);
         
-        const users = response.requestors;
-        console.log(`Found ${users.length} requestors`);
-        
-        // Clear existing options
-        select.innerHTML = '';
-        
-        // Add default option
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = '-- Select User --';
-        select.appendChild(defaultOption);
+        // Remove loading option
+        select.remove(select.options.length - 1);
         
         // Add user options
         users.forEach(function(user) {
-          console.log('Adding user:', user.name);
           const option = document.createElement('option');
           option.value = user.name;
-          option.textContent = user.name;
-          select.appendChild(option);
+          option.text = user.name;
+          select.add(option);
         });
         
-        console.log('User list populated successfully');
+        select.disabled = false;
+        if (errorMessage) {
+          errorMessage.style.display = 'none';
+        }
       })
       .withFailureHandler(function(error) {
         console.error('Failed to load users:', error);
+        
+        // Remove loading option
+        select.remove(select.options.length - 1);
+        
+        // Show error
         if (errorMessage) {
-          errorMessage.textContent = 'Failed to load user list. Please refresh the page.';
           errorMessage.style.display = 'block';
+          errorMessage.textContent = 'Failed to load user list. Please refresh.';
         }
+        
+        // Add error option
+        const errorOption = document.createElement('option');
+        errorOption.text = 'Error loading users';
+        errorOption.disabled = true;
+        select.add(errorOption);
+        
+        select.disabled = false;
       })
-      .getRequestorList();
-    console.log('getRequestorList() called');
+      .getActiveRequestors();
   }
 
   function handleLogin(event) {
