@@ -1503,6 +1503,43 @@ function loadUserOptions() {
 }
 
 /**
+ * Gets list of active requestors from Requestor List sheet
+ * @returns {Array<Object>} Array of requestor objects with name and email
+ */
+function getActiveRequestors() {
+  try {
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    const sheet = ss.getSheetByName(CONFIG.SHEETS.REQUESTOR_LIST);
+    if (!sheet) throw new Error('Requestor List sheet not found');
+    
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    
+    // Get column indices
+    const nameCol = headers.indexOf('Name');
+    const emailCol = headers.indexOf('Email');
+    const activeCol = headers.indexOf('Active');
+    
+    if (nameCol === -1 || emailCol === -1 || activeCol === -1) {
+      throw new Error('Required columns not found in Requestor List');
+    }
+    
+    // Filter active requestors and map to objects
+    return data.slice(1)
+      .filter(row => row[activeCol] === true || row[activeCol] === 'Yes')
+      .map(row => ({
+        name: row[nameCol],
+        email: row[emailCol]
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+      
+  } catch (error) {
+    console.error('Error getting active requestors:', error);
+    throw error;
+  }
+}
+
+/**
  * @deprecated Use getCurrentUserFromAuth from auth.gs instead
  */
 function getCurrentUser(sessionId) {
