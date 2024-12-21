@@ -991,7 +991,7 @@ function processOrderedItems(workflow) {
         }
 
         // Calculate days overdue
-        const daysOverdue = calculateDaysOverdue(expectedLandingDate);
+        const daysOverdue = SharedUtils.calculateDaysOverdue(expectedLandingDate);
         
         if (daysOverdue > 0) {
           handleOverdueOrder({
@@ -1103,7 +1103,7 @@ function processAutoCancellation(workflow) {
         const expectedLandingDate = row[COL.EXPECTED_LANDING_DATE];
         if (!expectedLandingDate) continue;
 
-        const daysOverdue = calculateDaysOverdue(expectedLandingDate);
+        const daysOverdue = SharedUtils.calculateDaysOverdue(expectedLandingDate);
         if (daysOverdue >= STATUS_WORKFLOW.AUTO_CANCEL_DAYS) {
           // Auto-cancel the PO
           workflow.updateStatus(
@@ -1180,30 +1180,15 @@ function calculateDaysOverdue(expectedLandingDate) {
   
   if (expected >= today) return 0;
   
-  return calculateBusinessDays(expected, today);
+  return SharedUtils.calculateBusinessDays(expected, today);
 }
 
 /**
- * Calculates business days between dates
- * ----------------------------------
- * 
- * @param {Date} startDate - Start date
- * @param {Date} endDate - End date
- * @returns {number} Number of business days
+ * @deprecated Use calculateBusinessDays from SharedUtils instead
  */
 function calculateBusinessDays(startDate, endDate) {
-  let count = 0;
-  const current = new Date(startDate);
-  
-  while (current <= endDate) {
-    // Skip weekends (0 = Sunday, 6 = Saturday)
-    if (current.getDay() !== 0 && current.getDay() !== 6) {
-      count++;
-    }
-    current.setDate(current.getDate() + 1);
-  }
-  
-  return count;
+  console.warn('calculateBusinessDays in StatusWorkflow.gs is deprecated. Use SharedUtils version instead.');
+  return SharedUtils.calculateBusinessDays(startDate, endDate);
 }
 
 /**

@@ -12,76 +12,11 @@
  ********************************************************************************************/
 
 /**
- * Gets the list of requestors from the Requestor List sheet
- * @return {Object} Object with success flag and either requestor list or error message
+ * @deprecated Use getActiveRequestors from SharedUtils instead
  */
 function getRequestorList() {
-  console.log('Getting requestor list');
-  
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    console.log('Opened spreadsheet:', ss.getName());
-    
-    const sheet = ss.getSheetByName('Requestor List');
-    if (!sheet) {
-      const error = 'Requestor List sheet not found';
-      console.error(error);
-      return {
-        success: false,
-        error: error
-      };
-    }
-    console.log('Found Requestor List sheet');
-
-    console.log('Getting data from sheet');
-    const data = sheet.getDataRange().getValues();
-    console.log(`Found ${data.length} rows (including header)`);
-    
-    if (data.length < 2) {
-      const error = 'No requestors found in sheet';
-      console.error(error);
-      return {
-        success: false,
-        error: error
-      };
-    }
-
-    // Log header row to verify column structure
-    console.log('Header row:', data[0]);
-
-    // Skip header row and filter active requestors
-    const requestors = data.slice(1)
-      .filter(row => {
-        const isActive = row[3] === 'Y';  // Filter by Active column (index 3)
-        console.log(`Row ${row[0]}: Active=${row[3]}, isActive=${isActive}`);
-        return isActive;
-      })
-      .map(row => ({
-        name: row[0],      // Name
-        email: row[1],     // Email
-        department: row[2], // Department
-        role: row[5]       // Role is in column F (index 5)
-      }));
-
-    console.log(`Found ${requestors.length} active requestors`);
-    if (requestors.length > 0) {
-      console.log('First requestor:', JSON.stringify(requestors[0]));
-    } else {
-      console.log('No active requestors found');
-    }
-    
-    return {
-      success: true,
-      requestors: requestors
-    };
-    
-  } catch (error) {
-    console.error('Error getting requestor list:', error);
-    return {
-      success: false,
-      error: 'Failed to load requestor list: ' + error.toString()
-    };
-  }
+  console.warn('getRequestorList in DataLists.gs is deprecated. Use getActiveRequestors instead.');
+  return SharedUtils.getActiveRequestors();
 }
 
 /**

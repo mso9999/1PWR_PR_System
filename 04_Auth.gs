@@ -340,74 +340,35 @@ function removeSession(sessionId) {
 }
 
 /**
- * Validates a session and refreshes its expiration.
- * @param {string} sessionId - Session to validate
- * @return {Object|null} User information or null if invalid
+ * @deprecated Use getActiveRequestors from SharedUtils instead
+ */
+function getRequestorList() {
+  console.warn('getRequestorList is deprecated. Use getActiveRequestors instead.');
+  return SharedUtils.getActiveRequestors();
+}
+
+/**
+ * @deprecated Use getWebAppUrl from SharedUtils instead
+ */
+function getWebAppUrl(page, params = {}) {
+  console.warn('getWebAppUrl in auth.gs is deprecated. Use SharedUtils version instead.');
+  return SharedUtils.getWebAppUrl(page, params);
+}
+
+/**
+ * @deprecated Use getCurrentUser from SharedUtils instead
+ */
+function getCurrentUser(sessionId) {
+  console.warn('getCurrentUser in auth.gs is deprecated. Use SharedUtils version instead.');
+  return SharedUtils.getCurrentUser(sessionId);
+}
+
+/**
+ * @deprecated Use validateSession from SharedUtils instead
  */
 function validateSession(sessionId) {
-  console.log('[AUTH][v1.8.2] Validating session:', sessionId);
-  
-  if (!sessionId) {
-    console.log('[AUTH] No session ID provided');
-    return null;
-  }
-  
-  try {
-    // Check cache first
-    const cache = CacheService.getUserCache();
-    const cacheKey = CACHE_PREFIX + sessionId;
-    const cachedData = cache.get(cacheKey);
-    
-    if (cachedData) {
-      console.log('[AUTH] Session found in cache');
-      const userInfo = JSON.parse(cachedData);
-      console.log('[AUTH] Cache hit for user:', userInfo.email);
-      return userInfo;
-    }
-    
-    console.log('[AUTH] Cache miss, checking sheet');
-    
-    // Check spreadsheet
-    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    const sheet = ss.getSheetByName(CONFIG.SHEETS.ACTIVE_SESSIONS);
-    if (!sheet) {
-      console.error('[AUTH] Active sessions sheet not found');
-      return null;
-    }
-    
-    const data = sheet.getDataRange().getValues();
-    console.log('[AUTH] Checking', data.length - 1, 'rows for session');
-    
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      if (row[0] === sessionId && row[2] === true) {
-        console.log('[AUTH] Found active session in row:', i + 1);
-        try {
-          const userInfo = JSON.parse(row[1]);
-          console.log('[AUTH] Session belongs to:', userInfo.email);
-          
-          // Update cache and last accessed
-          cache.put(cacheKey, row[1], SESSION_DURATION);
-          row[3] = new Date().toISOString();
-          sheet.getRange(i + 1, 4).setValue(row[3]);
-          SpreadsheetApp.flush();
-          console.log('[AUTH] Updated cache and last accessed time');
-          
-          return userInfo;
-        } catch (e) {
-          console.error('[AUTH] Error parsing user info:', e);
-          return null;
-        }
-      }
-    }
-    
-    console.log('[AUTH] Session not found or inactive');
-    return null;
-    
-  } catch (error) {
-    console.error('[AUTH] Error validating session:', error);
-    return null;
-  }
+  console.warn('validateSession in auth.gs is deprecated. Use SharedUtils version instead.');
+  return SharedUtils.validateSession(sessionId);
 }
 
 /**
@@ -420,43 +381,6 @@ function setSecurityHeadersAuth(output) {
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.IFRAME)
     .setSandboxMode(HtmlService.SandboxMode.IFRAME)
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
-}
-
-/**
- * Gets the web app URL with enhanced error handling and logging
- * @param {string} page - Optional page parameter
- * @param {Object} params - Additional URL parameters
- * @return {string} Web app URL
- */
-function getWebAppUrl(page, params = {}) {
-  console.log('[AUTH] Getting web app URL for page:', page, 'params:', JSON.stringify(params));
-  
-  try {
-    // Get base URL or construct it
-    let baseUrl;
-    try {
-      baseUrl = ScriptApp.getService().getUrl();
-    } catch (e) {
-      const deploymentId = getDeploymentId();
-      baseUrl = `https://script.google.com/macros/s/${deploymentId}/exec`;
-    }
-    console.log('[AUTH] Using base URL:', baseUrl);
-    
-    // Combine all parameters
-    const allParams = { page, ...params };
-    const queryString = Object.entries(allParams)
-      .filter(([_, value]) => value !== undefined && value !== null)
-      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-      .join('&');
-    
-    // Add parameters to URL
-    const fullUrl = `${baseUrl}${queryString ? '?' + queryString : ''}`;
-    console.log('[AUTH] Generated full URL:', fullUrl);
-    return fullUrl;
-  } catch (error) {
-    console.error('[AUTH] Error getting web app URL:', error);
-    throw error;
-  }
 }
 
 /**
@@ -476,87 +400,6 @@ function getDashboardUrl(sessionId) {
   }
   
   return getWebAppUrl('dashboard', { sessionId });
-}
-
-/**
- * Gets current user from session with enhanced validation
- * @param {string} sessionId - Session ID to validate
- * @return {Object|null} User information or null if invalid
- */
-function getCurrentUser(sessionId) {
-  console.log('[AUTH] Getting current user for session:', sessionId);
-  
-  try {
-    if (!sessionId) {
-      console.log('[AUTH] No session ID provided');
-      return null;
-    }
-
-    const userInfo = getUserFromSession(sessionId);
-    
-    // Validate user info structure
-    if (!userInfo || !userInfo.email || !userInfo.role) {
-      console.error('[AUTH] Invalid user info structure:', userInfo);
-      return null;
-    }
-
-    return userInfo;
-  } catch (error) {
-    console.error('[AUTH] Error getting current user:', error);
-    return null;
-  }
-}
-
-/**
- * Gets the requestor list from the Requestor List sheet
- * @return {Array} Requestor list
- */
-function getRequestorList() {
-  console.log('[AUTH] Getting requestor list');
-  try {
-    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    console.log('[AUTH] Opened spreadsheet:', ss.getName());
-    
-    const sheet = ss.getSheetByName('Requestor List');
-    if (!sheet) {
-      console.error('[AUTH] Requestor List sheet not found');
-      return [];
-    }
-    console.log('[AUTH] Found Requestor List sheet');
-    
-    console.log('[AUTH] Getting data from sheet');
-    const data = sheet.getDataRange().getValues();
-    console.log('[AUTH] Found', data.length, 'rows (including header)');
-    
-    const headerRow = data[0];
-    console.log('[AUTH] Header row:', headerRow);
-    
-    const requestors = [];
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const isActive = row[3] === 'Y';
-      console.log('[AUTH] Row', row[0] + ':', 'Active=' + row[3] + ', isActive=' + isActive);
-      
-      if (isActive) {
-        requestors.push({
-          name: row[0],
-          email: row[1],
-          department: row[2],
-          role: row[5]
-        });
-      }
-    }
-    
-    console.log('[AUTH] Found', requestors.length, 'active requestors');
-    if (requestors.length > 0) {
-      console.log('[AUTH] First requestor:', JSON.stringify(requestors[0]));
-    }
-    
-    return requestors;
-  } catch (error) {
-    console.error('[AUTH] Error getting requestor list:', error);
-    return [];
-  }
 }
 
 /**
